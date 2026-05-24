@@ -9,13 +9,17 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Formats a Guyanese-dollar amount, e.g. 125000 → "GYD $125,000".
  * `Intl.NumberFormat` with `en-GY` produces the local thousands grouping.
+ *
+ * Uses U+00A0 (non-breaking space) between "GYD" and the amount so the price
+ * never line-wraps mid-figure inside narrow cards. Pair with the `tabular-nums`
+ * utility on the container for column alignment.
  */
 export function formatPrice(price: number, opts: { currency?: boolean } = {}): string {
   const { currency = true } = opts;
   const formatted = new Intl.NumberFormat('en-GY', {
     maximumFractionDigits: 0,
   }).format(price);
-  return currency ? `GYD $${formatted}` : `$${formatted}`;
+  return currency ? `GYD $${formatted}` : `$${formatted}`;
 }
 
 export function generateSlug(text: string): string {

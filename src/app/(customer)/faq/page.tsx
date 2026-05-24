@@ -23,7 +23,7 @@ export default async function FAQPage() {
   const uncategorised = (faqs ?? []).filter((f) => !f.category_id);
 
   return (
-    <main className="container py-10">
+    <div className="container py-10">
       <h1 className="text-3xl font-bold">Frequently asked questions</h1>
       <p className="mt-1 text-gray-600">Can't find what you're looking for? Use the chat in the corner.</p>
 
@@ -63,6 +63,6 @@ export default async function FAQPage() {
           </section>
         )}
       </div>
-    </main>
+    </div>
   );
 }

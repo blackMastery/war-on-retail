@@ -30,7 +30,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-5xl text-gray-300">
+          <div
+            className="flex h-full items-center justify-center text-5xl text-gray-300"
+            aria-hidden="true"
+          >
             📦
           </div>
         )}
@@ -69,7 +72,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {product.short_description && (
           <p className="mt-1 line-clamp-2 text-sm text-gray-500">{product.short_description}</p>
         )}
-        <div className="mt-3 flex items-baseline gap-2">
+        <div className="mt-3 flex items-baseline gap-2 tabular-nums">
           <span className="text-lg font-bold text-gray-900">{formatPrice(product.price)}</span>
           {product.compare_at_price && product.compare_at_price > product.price && (
             <span className="text-sm text-gray-400 line-through">

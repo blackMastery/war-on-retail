@@ -4,7 +4,7 @@ export const metadata = { title: 'Contact us' };
 
 export default function ContactPage() {
   return (
-    <main className="container py-10">
+    <div className="container py-10">
       <h1 className="text-3xl font-bold">Get in touch</h1>
       <p className="mt-2 max-w-2xl text-gray-600">
         We're here to help — choose whichever channel works best for you.
@@ -53,6 +53,6 @@ export default function ContactPage() {
         </ul>
         <p className="mt-2 text-sm text-gray-600">{siteConfig.address}</p>
       </div>
-    </main>
+    </div>
   );
 }

@@ -19,7 +19,7 @@ export default async function SearchPage({
   });
 
   return (
-    <main className="container py-10">
+    <div className="container py-10">
       <h1 className="text-2xl font-bold">Search results</h1>
       <p className="mt-1 text-sm text-gray-600">
         {q ? (
@@ -39,6 +39,6 @@ export default async function SearchPage({
       <div className="mt-6">
         <ProductGrid products={products ?? []} />
       </div>
-    </main>
+    </div>
   );
 }

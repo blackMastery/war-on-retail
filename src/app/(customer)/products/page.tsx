@@ -21,13 +21,13 @@ export default async function ProductsPage({
   const { data: products } = await q.limit(48);
 
   return (
-    <main className="container py-10">
+    <div className="container py-10">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">All products</h1>
         <SortLinks current={sort} />
       </div>
       <ProductGrid products={products ?? []} />
-    </main>
+    </div>
   );
 }
 

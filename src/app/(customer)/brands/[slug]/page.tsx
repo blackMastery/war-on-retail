@@ -39,7 +39,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
     .limit(48);
 
   return (
-    <main className="container py-10">
+    <div className="container py-10">
       <header className="mb-6">
         <h1 className="text-3xl font-bold">{brand.name}</h1>
         {brand.description && (
@@ -47,6 +47,6 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
         )}
       </header>
       <ProductGrid products={products ?? []} />
-    </main>
+    </div>
   );
 }

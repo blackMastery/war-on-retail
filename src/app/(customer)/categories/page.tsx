@@ -14,11 +14,11 @@ export default async function CategoriesIndexPage() {
     .order('display_order');
 
   return (
-    <main className="container py-10">
+    <div className="container py-10">
       <h1 className="mb-6 text-2xl font-bold">Browse categories</h1>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {categories?.map((c) => <CategoryCard key={c.id} category={c} />)}
       </div>
-    </main>
+    </div>
   );
 }

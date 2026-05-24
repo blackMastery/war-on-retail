@@ -22,10 +22,15 @@ export default function SearchBar({ placeholder = 'Search for products, brands, 
       </label>
       <input
         id="site-search"
+        name="q"
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder={placeholder}
+        autoComplete="off"
+        autoCorrect="off"
+        spellCheck={false}
+        enterKeyHint="search"
         className="w-full rounded-full border border-gray-300 bg-white py-2.5 pl-4 pr-12 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
       />
       <button
@@ -33,7 +38,7 @@ export default function SearchBar({ placeholder = 'Search for products, brands, 
         className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full bg-primary-600 p-2 text-white hover:bg-primary-700"
         aria-label="Search"
       >
-        <MagnifyingGlassIcon className="h-4 w-4" />
+        <MagnifyingGlassIcon className="h-4 w-4" aria-hidden="true" />
       </button>
     </form>
   );

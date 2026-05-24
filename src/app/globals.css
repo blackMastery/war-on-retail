@@ -5,14 +5,20 @@
 :root {
   --background: 249 250 251;
   --foreground: 17 24 39;
+  color-scheme: light;
 }
 
 @layer base {
   html {
     @apply antialiased;
+    /* Kills the 300ms tap delay on iOS for every link/button. */
+    touch-action: manipulation;
   }
   body {
     @apply bg-gray-50 text-gray-900;
+    /* Honour iPhone notch/home-indicator on full-bleed sections. */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   /* Honest focus rings for keyboard users. */
   :focus-visible {
@@ -33,4 +39,34 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  /* Tabular figures for prices/counts that line up in columns. */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Respect user motion preferences. Scoped so explicit `motion-safe:` /
+   `motion-reduce:` Tailwind variants still work as overrides. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* The skip-link in app/layout.tsx; visible only when keyboard-focused. */
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  transition: transform 150ms ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
 }

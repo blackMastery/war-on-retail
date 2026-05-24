@@ -12,16 +12,22 @@ export default function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-white shadow-sm">
+    <header
+      className="sticky top-0 z-40 bg-white shadow-sm"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       {/* Utility bar */}
       <div className="bg-gray-900 text-white">
         <div className="container flex items-center justify-between py-2 text-xs sm:text-sm">
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-4">
             <a href={`tel:${siteConfig.phone}`} className="hover:text-primary-300">
-              📞 {siteConfig.phone}
+              <span aria-hidden="true">📞 </span>
+              {siteConfig.phone}
             </a>
-            <span className="hidden md:inline opacity-50">|</span>
-            <span className="hidden md:inline opacity-80">{siteConfig.hours.weekdays}</span>
+            <span aria-hidden="true" className="hidden opacity-50 md:inline">
+              |
+            </span>
+            <span className="hidden opacity-80 md:inline">{siteConfig.hours.weekdays}</span>
           </div>
           <a
             href={`https://wa.me/${siteConfig.whatsapp}`}
@@ -36,12 +42,17 @@ export default function Header() {
 
       {/* Main bar */}
       <div className="container flex items-center gap-4 py-4">
-        <Link href="/" className="flex items-center text-xl font-extrabold tracking-tight">
+        <Link
+          href="/"
+          aria-label={`${siteConfig.name} home`}
+          translate="no"
+          className="flex shrink-0 items-center text-xl font-extrabold tracking-tight"
+        >
           <span className="text-primary-600">War on</span>
           <span className="ml-1">Retail</span>
         </Link>
 
-        <div className="ml-4 hidden flex-1 md:flex">
+        <div className="ml-4 hidden min-w-0 flex-1 md:flex">
           <SearchBar />
         </div>
 
@@ -50,9 +61,10 @@ export default function Header() {
             type="button"
             onClick={() => setMobileSearchOpen((v) => !v)}
             aria-label="Toggle search"
+            aria-expanded={mobileSearchOpen}
             className="rounded-full p-2 hover:bg-gray-100 md:hidden"
           >
-            <MagnifyingGlassIcon className="h-6 w-6" />
+            <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -61,7 +73,11 @@ export default function Header() {
             aria-expanded={mobileMenuOpen}
             className="rounded-full p-2 hover:bg-gray-100 md:hidden"
           >
-            {mobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
+            {mobileMenuOpen ? (
+              <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+            ) : (
+              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+            )}
           </button>
         </div>
       </div>
@@ -73,7 +89,7 @@ export default function Header() {
       )}
 
       {/* Primary nav */}
-      <nav className="bg-primary-600 text-white">
+      <nav aria-label="Primary" className="bg-primary-600 text-white">
         <div className="container hidden items-center gap-6 py-3 text-sm font-medium md:flex">
           {primaryNav.map((item) => (
             <Link
@@ -81,7 +97,7 @@ export default function Header() {
               href={item.href}
               className={`hover:text-primary-100 ${item.highlight ? 'font-bold' : ''}`}
             >
-              {item.highlight ? '🔥 ' : ''}
+              {item.highlight && <span aria-hidden="true">🔥 </span>}
               {item.label}
             </Link>
           ))}
@@ -90,7 +106,10 @@ export default function Header() {
 
       {mobileMenuOpen && (
         <div className="border-t bg-white md:hidden">
-          <div className="container flex flex-col gap-1 py-3 text-sm">
+          <nav
+            aria-label="Mobile primary"
+            className="container flex flex-col gap-1 py-3 text-sm"
+          >
             {primaryNav.map((item) => (
               <Link
                 key={item.href}
@@ -98,11 +117,11 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-md px-2 py-2 hover:bg-gray-100"
               >
-                {item.highlight ? '🔥 ' : ''}
+                {item.highlight && <span aria-hidden="true">🔥 </span>}
                 {item.label}
               </Link>
             ))}
-          </div>
+          </nav>
         </div>
       )}
     </header>

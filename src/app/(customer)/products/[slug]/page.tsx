@@ -69,7 +69,7 @@ export default async function ProductDetailPage({
   );
 
   return (
-    <main className="container py-8">
+    <div className="container py-8">
       <nav className="mb-4 text-sm text-gray-500">
         <Link href="/" className="hover:text-primary-600">
           Home
@@ -225,6 +225,6 @@ export default async function ProductDetailPage({
           </div>
         </section>
       )}
-    </main>
+    </div>
   );
 }

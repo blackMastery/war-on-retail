@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { siteConfig } from '@/config/site';
 import './globals.css';
@@ -21,10 +21,27 @@ export const metadata: Metadata = {
   },
 };
 
+// `theme-color` matches the page background so iOS Safari's chrome blends in.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f9fafb' },
+    { media: '(prefers-color-scheme: dark)', color: '#111827' },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        {/* Keyboard skip-link — invisible until focused, then jumps past the header. */}
+        <a
+          href="#main"
+          className="skip-link rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-md"
+        >
+          Skip to main content
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

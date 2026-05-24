@@ -21,12 +21,12 @@ export default async function DealsPage() {
   );
 
   return (
-    <main className="container py-10">
+    <div className="container py-10">
       <header className="mb-6">
         <h1 className="text-3xl font-bold">🔥 Today's deals</h1>
         <p className="mt-1 text-gray-600">Live discounts across our catalogue.</p>
       </header>
       <ProductGrid products={onSale} />
-    </main>
+    </div>
   );
 }

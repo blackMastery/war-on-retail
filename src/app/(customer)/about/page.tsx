@@ -4,7 +4,7 @@ export const metadata = { title: 'About' };
 
 export default function AboutPage() {
   return (
-    <main className="container py-10">
+    <div className="container py-10">
       <div className="prose prose-gray max-w-3xl">
         <h1>About {siteConfig.name}</h1>
         <p>
@@ -25,6 +25,6 @@ export default function AboutPage() {
           email <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
         </p>
       </div>
-    </main>
+    </div>
   );
 }
