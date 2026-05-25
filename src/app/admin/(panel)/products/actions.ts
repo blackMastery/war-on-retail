@@ -24,6 +24,8 @@ const ProductInput = z.object({
   category_id: z.string().uuid().optional().nullable(),
   brand_id: z.string().uuid().optional().nullable(),
   featured_image_url: z.string().url().optional().nullable().or(z.literal('')),
+  // JSON-encoded string[] of gallery image URLs (everything except the featured).
+  image_urls_json: z.string().optional().nullable(),
   is_active: z.coerce.boolean().default(true),
   is_featured: z.coerce.boolean().default(false),
   specifications_json: z.string().optional().nullable(),
@@ -69,6 +71,19 @@ export async function upsertProduct(_prev: ProductFormState, fd: FormData): Prom
     }
   }
 
+  // Parse the gallery URL list. Empty/missing → empty array.
+  let imageUrls: string[] = [];
+  if (input.image_urls_json) {
+    try {
+      const parsed = JSON.parse(input.image_urls_json);
+      if (Array.isArray(parsed)) {
+        imageUrls = parsed.filter((u): u is string => typeof u === 'string' && u.length > 0);
+      }
+    } catch {
+      return { error: 'Image gallery payload was malformed. Refresh and try again.' };
+    }
+  }
+
   const payload = {
     name: input.name,
     slug,
@@ -84,6 +99,7 @@ export async function upsertProduct(_prev: ProductFormState, fd: FormData): Prom
     category_id: input.category_id || null,
     brand_id: input.brand_id || null,
     featured_image_url: input.featured_image_url || null,
+    image_urls: imageUrls,
     is_active: input.is_active,
     is_featured: input.is_featured,
     specifications: specifications as Json,
@@ -94,7 +110,7 @@ export async function upsertProduct(_prev: ProductFormState, fd: FormData): Prom
     const { error } = await supabase.from('products').update(payload).eq('id', input.id);
     if (error) return { error: error.message };
   } else {
-    const { error } = await supabase.from('products').insert({ ...payload, image_urls: [] });
+    const { error } = await supabase.from('products').insert(payload);
     if (error) return { error: error.message };
   }
 

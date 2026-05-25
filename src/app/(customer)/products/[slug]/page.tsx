@@ -1,10 +1,11 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { calculateDiscount, formatPrice } from '@/lib/utils';
 import { siteConfig } from '@/config/site';
 import ProductCard from '@/components/customer/ProductCard';
+import ProductGallery from '@/components/customer/ProductGallery';
+import { fetchMoreFromBrand, fetchRelatedProducts } from '@/lib/products/recommendations';
 
 export const revalidate = 60;
 
@@ -56,13 +57,16 @@ export default async function ProductDetailPage({
   const isOutOfStock = product.track_inventory && product.stock_quantity === 0;
   const specs = (product.specifications ?? {}) as Record<string, unknown>;
 
-  const { data: related } = await supabase
-    .from('products')
-    .select('*')
-    .eq('is_active', true)
-    .eq('category_id', product.category_id ?? '')
-    .neq('id', product.id)
-    .limit(4);
+  // Recommendations: a mixed-signal "You may also like" row plus an optional
+  // "More from {brand}" strip when the brand has at least 3 other items.
+  // Both queries run in parallel; we de-duplicate after the fact so the user
+  // never sees the same product in both rows.
+  const [related, brandMore] = await Promise.all([
+    fetchRelatedProducts(supabase, product, { limit: 8 }),
+    fetchMoreFromBrand(supabase, product, { limit: 6 }),
+  ]);
+  const relatedIds = new Set(related.map((p) => p.id));
+  const brandMoreDeduped = brandMore.filter((p) => !relatedIds.has(p.id)).slice(0, 4);
 
   const inquiryMessage = encodeURIComponent(
     `Hi War on Retail, I'm interested in "${product.name}" (SKU ${product.sku ?? 'n/a'}).`,
@@ -91,41 +95,11 @@ export default async function ProductDetailPage({
 
       <div className="grid gap-8 md:grid-cols-2">
         {/* Gallery */}
-        <div>
-          <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 ring-1 ring-gray-200">
-            {allImages[0] ? (
-              <Image
-                src={allImages[0]}
-                alt={product.name}
-                fill
-                sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-7xl text-gray-300">
-                📦
-              </div>
-            )}
-            {discount > 0 && (
-              <span className="absolute left-3 top-3 rounded bg-primary-600 px-2 py-0.5 text-sm font-bold text-white">
-                -{discount}%
-              </span>
-            )}
-          </div>
-          {allImages.length > 1 && (
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {allImages.slice(1).map((src, i) => (
-                <div
-                  key={i}
-                  className="relative aspect-square overflow-hidden rounded ring-1 ring-gray-200"
-                >
-                  <Image src={src} alt="" fill className="object-cover" />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <ProductGallery
+          images={allImages}
+          productName={product.name}
+          discount={discount}
+        />
 
         {/* Detail */}
         <div>
@@ -215,11 +189,45 @@ export default async function ProductDetailPage({
         </div>
       </div>
 
-      {related && related.length > 0 && (
-        <section className="mt-16">
-          <h2 className="mb-4 text-xl font-bold">You may also like</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {related.map((p) => (
+      {related.length > 0 && (
+        <section aria-labelledby="related-heading" className="mt-16">
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <h2 id="related-heading" className="text-xl font-bold">
+              You may also like
+            </h2>
+            {product.category_id && category && (
+              <Link
+                href={`/categories/${category.slug}`}
+                className="text-sm font-medium text-primary-600 hover:underline"
+              >
+                More in {category.name} <span aria-hidden="true">→</span>
+              </Link>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {related.slice(0, 4).map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {brand && brandMoreDeduped.length >= 3 && (
+        <section aria-labelledby="brand-related-heading" className="mt-12">
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <h2 id="brand-related-heading" className="text-xl font-bold">
+              More from <span translate="no">{brand.name}</span>
+            </h2>
+            <Link
+              href={`/brands/${brand.slug}`}
+              className="text-sm font-medium text-primary-600 hover:underline"
+            >
+              All <span translate="no">{brand.name}</span> products{' '}
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {brandMoreDeduped.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

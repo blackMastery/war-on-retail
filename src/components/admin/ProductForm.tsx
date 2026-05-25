@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import { upsertProduct, type ProductFormState } from '@/app/admin/(panel)/products/actions';
+import ProductImagesField from '@/components/admin/ProductImagesField';
 import type { Brand, Category, Product } from '@/types/database';
 
 type Props = {
@@ -159,16 +160,16 @@ export default function ProductForm({ product, categories, brands }: Props) {
         </div>
       </Section>
 
-      <Section title="Media">
-        <Field label="Featured image URL" hint="Use a Supabase Storage public URL or any HTTPS URL.">
-          <input
-            name="featured_image_url"
-            type="url"
-            defaultValue={product?.featured_image_url ?? ''}
-            placeholder="https://…"
-            className={INPUT}
-          />
-        </Field>
+      <Section title="Images">
+        <p className="text-xs text-gray-600">
+          Upload as many images as you want. Pick one as the featured image — it’s the one that
+          shows on product cards and as the hero on the product page. Files upload directly to the{' '}
+          <code>product-images</code> Supabase Storage bucket.
+        </p>
+        <ProductImagesField
+          initialFeaturedUrl={product?.featured_image_url ?? null}
+          initialUrls={product?.image_urls ?? []}
+        />
       </Section>
 
       <Section title="Specifications">
