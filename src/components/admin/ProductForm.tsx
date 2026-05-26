@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { upsertProduct, type ProductFormState } from '@/app/admin/(panel)/products/actions';
 import ProductImagesField from '@/components/admin/ProductImagesField';
+import SpecificationsField from '@/components/admin/SpecificationsField';
 import type { Brand, Category, Product } from '@/types/database';
 
 type Props = {
@@ -173,19 +174,14 @@ export default function ProductForm({ product, categories, brands }: Props) {
       </Section>
 
       <Section title="Specifications">
-        <Field
-          label="Specifications JSON"
-          hint='Free-form. Example: {"screen_size":"55","resolution":"4K"}'
-        >
-          <textarea
-            name="specifications_json"
-            rows={4}
-            defaultValue={
-              product?.specifications ? JSON.stringify(product.specifications, null, 2) : '{}'
-            }
-            className={`${INPUT} font-mono text-xs`}
-          />
-        </Field>
+        <p className="mb-3 text-xs text-gray-600">
+          Technical details shown in the product page’s spec table. One row per attribute — the
+          name on the left is the label customers see, the value on the right is what shows next
+          to it.
+        </p>
+        <SpecificationsField
+          initial={(product?.specifications ?? {}) as Record<string, unknown>}
+        />
       </Section>
 
       <Section title="Status">
