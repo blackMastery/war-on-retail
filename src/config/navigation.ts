@@ -5,6 +5,7 @@
 export type NavItem = { label: string; href: string; highlight?: boolean };
 
 export const primaryNav: readonly NavItem[] = [
+  { label: 'All Products', href: '/products' },
   { label: 'All Categories', href: '/categories' },
   { label: 'Brands', href: '/brands' },
   { label: 'Electronics', href: '/categories/electronics' },
@@ -15,6 +16,7 @@ export const primaryNav: readonly NavItem[] = [
 
 export const footerLinks = {
   shop: [
+    { label: 'All Products', href: '/products' },
     { label: 'Electronics', href: '/categories/electronics' },
     { label: 'Home Appliances', href: '/categories/home-appliances' },
     { label: 'Kitchen', href: '/categories/kitchen-appliances' },
