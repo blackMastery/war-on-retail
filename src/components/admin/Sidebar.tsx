@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -9,6 +10,7 @@ const NAV = [
   { href: '/admin', label: 'Dashboard', icon: '📊' },
   { href: '/admin/products', label: 'Products', icon: '📦' },
   { href: '/admin/products/import', label: 'CSV Import', icon: '⬆️' },
+  { href: '/admin/promotions', label: 'Promotions', icon: '🎯' },
   { href: '/admin/categories', label: 'Categories', icon: '🗂' },
   { href: '/admin/brands', label: 'Brands', icon: '🏷' },
   { href: '/admin/chatbot', label: 'Chatbot FAQs', icon: '🤖' },
@@ -28,10 +30,17 @@ export default function Sidebar({ email, bootstrap }: { email: string; bootstrap
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-gray-200 bg-white md:flex">
       <div className="border-b border-gray-200 p-4">
-        <Link href="/admin" className="text-lg font-extrabold">
-          <span className="text-primary-600">War on</span> Retail
+        <Link href="/admin" aria-label="War on Retail admin home" className="block">
+          <Image
+            src="/logo.png"
+            alt="War on Retail"
+            width={180}
+            height={85}
+            priority
+            className="h-10 w-auto"
+          />
         </Link>
-        <p className="mt-0.5 text-xs uppercase tracking-wide text-gray-400">Admin</p>
+        <p className="mt-1 text-xs uppercase tracking-wide text-gray-400">Admin</p>
       </div>
 
       <nav className="flex-1 space-y-1 p-3">

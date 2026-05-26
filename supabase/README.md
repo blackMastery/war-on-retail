@@ -17,9 +17,12 @@ supabase db push
 | 5 | `20260101000400_seed_sample_products.sql` | Demo products so the store renders |
 | 6 | `20260101000500_search_function.sql` | `search_products` RPC |
 | 7 | `20260101000600_admin_users_auth_link.sql` | FK to `auth.users` + `make_admin` / `revoke_admin` RPCs |
+| 8 | `20260101000700_promotions.sql` | Homepage specials/promotions table + storage policy |
+| 9 | `20260101000800_promotions_link.sql` | Adds `link_url` to promotions (click target) |
 
-After migrations, create the three storage buckets from the Supabase dashboard:
+After migrations, create the four storage buckets from the Supabase dashboard:
 
 - `product-images` — public
 - `brand-logos` — public
 - `category-images` — public
+- `promotions` — public

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { siteConfig } from '@/config/site';
 import { footerLinks } from '@/config/navigation';
@@ -11,9 +12,13 @@ export default function Footer() {
       <div className="container py-12">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div translate="no" className="text-lg font-bold text-white">
-              <span className="text-primary-500">War on</span> Retail
-            </div>
+            <Image
+              src="/logo.png"
+              alt={siteConfig.name}
+              width={180}
+              height={85}
+              className="h-12 w-auto"
+            />
             <p className="mt-3 text-pretty text-sm">{siteConfig.description}</p>
             <p className="mt-4 text-sm">
               <a href={`tel:${siteConfig.phone}`} className="hover:text-white">

@@ -2,6 +2,9 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import ProductGrid from '@/components/customer/ProductGrid';
+import Pagination from '@/components/customer/Pagination';
+import ResultCount from '@/components/customer/ResultCount';
+import { PAGE_SIZE, paginate, parsePage } from '@/lib/pagination';
 
 export const revalidate = 60;
 
@@ -19,10 +22,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { slug } = await params;
+  const { page } = await searchParams;
+  const requestedPage = parsePage(page);
   const supabase = await createClient();
 
   const { data: category } = await supabase
@@ -44,14 +51,17 @@ export default async function CategoryPage({
   // Collect ids: the category itself + all descendant subcategories.
   const ids = [category.id, ...(subcats ?? []).map((c) => c.id)];
 
-  const { data: products } = await supabase
+  const offset = (requestedPage - 1) * PAGE_SIZE;
+  const { data: products, count } = await supabase
     .from('products')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('is_active', true)
     .in('category_id', ids)
     .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false })
-    .limit(48);
+    .range(offset, offset + PAGE_SIZE - 1);
+
+  const pag = paginate({ requestedPage, count, rows: products ?? [] });
 
   return (
     <div className="container py-10">
@@ -60,6 +70,7 @@ export default async function CategoryPage({
         {category.description && (
           <p className="mt-2 max-w-2xl text-gray-600">{category.description}</p>
         )}
+        <ResultCount state={pag} emptyMessage="No products in this category yet." />
       </header>
 
       {subcats && subcats.length > 0 && (
@@ -77,6 +88,13 @@ export default async function CategoryPage({
       )}
 
       <ProductGrid products={products ?? []} />
+
+      <Pagination
+        currentPage={pag.currentPage}
+        totalPages={pag.totalPages}
+        baseQuery=""
+        basePath={`/categories/${category.slug}`}
+      />
     </div>
   );
 }

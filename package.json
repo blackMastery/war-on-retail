@@ -9,7 +9,9 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "seed": "tsx scripts/seed-data.ts"
+    "seed": "tsx scripts/seed-data.ts",
+    "logo:transparent": "tsx scripts/transparent-logo.ts",
+    "favicon": "tsx scripts/build-favicon.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",

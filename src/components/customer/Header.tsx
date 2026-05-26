@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Bars3Icon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -46,10 +47,16 @@ export default function Header() {
           href="/"
           aria-label={`${siteConfig.name} home`}
           translate="no"
-          className="flex shrink-0 items-center text-xl font-extrabold tracking-tight"
+          className="flex shrink-0 items-center"
         >
-          <span className="text-primary-600">War on</span>
-          <span className="ml-1">Retail</span>
+          <Image
+            src="/logo.png"
+            alt={siteConfig.name}
+            width={180}
+            height={85}
+            priority
+            className="h-12 w-auto"
+          />
         </Link>
 
         <div className="ml-4 hidden min-w-0 flex-1 md:flex">

@@ -205,6 +205,36 @@ type AdminUserInsert = {
 };
 type AdminUserUpdate = Partial<AdminUserInsert>;
 
+// ---------- Promotions ----------
+export type PromotionRow = {
+  id: string;
+  title: string;
+  image_url: string;
+  /** Optional click target. Internal path (`/...`) or full https URL. NULL = display-only. */
+  link_url: string | null;
+  is_featured: boolean;
+  display_order: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+type PromotionInsert = {
+  id?: string;
+  title: string;
+  image_url: string;
+  link_url?: string | null;
+  is_featured?: boolean;
+  display_order?: number;
+  starts_at?: string | null;
+  ends_at?: string | null;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+type PromotionUpdate = Partial<PromotionInsert>;
+
 // ---------- Database root ----------
 // Each Table needs `Relationships: []` — @supabase/postgrest-js >=2.x requires
 // it to satisfy the `GenericTable` constraint, otherwise typed selects collapse
@@ -256,6 +286,12 @@ export type Database = {
         Update: AdminUserUpdate;
         Relationships: Empty;
       };
+      promotions: {
+        Row: PromotionRow;
+        Insert: PromotionInsert;
+        Update: PromotionUpdate;
+        Relationships: Empty;
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -277,3 +313,4 @@ export type FAQ = FAQRow;
 export type FAQCategory = FAQCategoryRow;
 export type ChatbotConversation = ChatbotConversationRow;
 export type AdminUser = AdminUserRow;
+export type Promotion = PromotionRow;

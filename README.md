@@ -47,7 +47,9 @@ npm install
    - `20260101000400_seed_sample_products.sql`
    - `20260101000500_search_function.sql`
    - `20260101000600_admin_users_auth_link.sql`
-4. In **Storage**, create three public buckets: `product-images`, `brand-logos`, `category-images`.
+   - `20260101000700_promotions.sql`
+   - `20260101000800_promotions_link.sql`
+4. In **Storage**, create four public buckets: `product-images`, `brand-logos`, `category-images`, `promotions`.
 
 (Or use the Supabase CLI: `supabase link --project-ref … && supabase db push`.)
 
@@ -144,6 +146,21 @@ hatch for the very first admin.
 ```sql
 select revoke_admin('former@example.com');
 ```
+
+### Run a homepage sale
+
+> 📖 Before designing the image, read [**docs/promotion-images.md**](docs/promotion-images.md)
+> for recommended dimensions (2000×1250 for featured, 1200×675 for side tiles), safe-zone
+> rules, and file-size budgets.
+
+1. Go to `/admin/promotions` → **New promotion**.
+2. Upload an image (16:10 recommended). The first promotion you mark **Featured** takes the
+   large slot; the rest tile next to it.
+3. Optionally set **Starts at** / **Ends at** so the sale auto-shows during the window and
+   hides afterwards. Leave both blank to run indefinitely.
+4. Save. The next homepage render (within ~60 s) replaces the red hero with your mosaic.
+5. To end the sale early, edit the promo and uncheck **Active** (audit trail preserved) — or
+   delete it.
 
 ### Add products in bulk
 1. Go to `/admin/products/import`.

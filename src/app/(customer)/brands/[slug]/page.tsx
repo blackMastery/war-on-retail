@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import ProductGrid from '@/components/customer/ProductGrid';
+import Pagination from '@/components/customer/Pagination';
+import ResultCount from '@/components/customer/ResultCount';
+import { PAGE_SIZE, paginate, parsePage } from '@/lib/pagination';
 
 export const revalidate = 60;
 
@@ -16,8 +19,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: data.name, description: data.description ?? undefined };
 }
 
-export default async function BrandPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function BrandPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { slug } = await params;
+  const { page } = await searchParams;
+  const requestedPage = parsePage(page);
   const supabase = await createClient();
 
   const { data: brand } = await supabase
@@ -29,24 +40,38 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
 
   if (!brand) notFound();
 
-  const { data: products } = await supabase
+  const offset = (requestedPage - 1) * PAGE_SIZE;
+  const { data: products, count } = await supabase
     .from('products')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('is_active', true)
     .eq('brand_id', brand.id)
     .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false })
-    .limit(48);
+    .range(offset, offset + PAGE_SIZE - 1);
+
+  const pag = paginate({ requestedPage, count, rows: products ?? [] });
 
   return (
     <div className="container py-10">
       <header className="mb-6">
-        <h1 className="text-3xl font-bold">{brand.name}</h1>
+        <h1 className="text-3xl font-bold" translate="no">
+          {brand.name}
+        </h1>
         {brand.description && (
           <p className="mt-2 max-w-2xl text-gray-600">{brand.description}</p>
         )}
+        <ResultCount state={pag} emptyMessage={`No ${brand.name} products yet.`} />
       </header>
+
       <ProductGrid products={products ?? []} />
+
+      <Pagination
+        currentPage={pag.currentPage}
+        totalPages={pag.totalPages}
+        baseQuery=""
+        basePath={`/brands/${brand.slug}`}
+      />
     </div>
   );
 }

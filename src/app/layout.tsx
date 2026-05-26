@@ -12,12 +12,23 @@ export const metadata: Metadata = {
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  // Favicon (`src/app/icon.png`) and Apple touch icon (`src/app/apple-icon.png`)
+  // are picked up automatically via the App Router file convention — regenerate
+  // them with `npm run favicon`. The OG / Twitter images below point at the wide
+  // logo.png on purpose: social previews look right with the rectangular tag.
   openGraph: {
     title: siteConfig.name,
     description: siteConfig.description,
     url: siteConfig.url,
     siteName: siteConfig.name,
     type: 'website',
+    images: [{ url: '/logo.png', alt: siteConfig.name }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: ['/logo.png'],
   },
 };
 
