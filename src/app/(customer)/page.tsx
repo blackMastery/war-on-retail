@@ -6,6 +6,7 @@ import HorizontalScroller from '@/components/customer/HorizontalScroller';
 import ProductCard from '@/components/customer/ProductCard';
 import ProductGrid from '@/components/customer/ProductGrid';
 import PromotionMosaic from '@/components/customer/PromotionMosaic';
+import RecentlyViewedStrip from '@/components/customer/RecentlyViewedStrip';
 import { NEW_ARRIVAL_WINDOW_DAYS, newArrivalCutoffIso } from '@/config/catalog';
 
 // Short revalidate so newly-scheduled promotions appear within a minute.
@@ -142,6 +143,11 @@ export default async function Homepage() {
           </HorizontalScroller>
         </section>
       )}
+
+      {/* Recently viewed — pulls from localStorage; renders nothing for
+          first-time visitors. Two-product minimum keeps it from being a
+          lonely strip with one tile after the first product view. */}
+      <RecentlyViewedStrip title="Recently Viewed" minItems={2} />
 
       {/* Featured products */}
       <section className="bg-gray-100">

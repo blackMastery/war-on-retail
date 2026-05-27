@@ -6,8 +6,11 @@ import { useMemo, useState } from 'react';
 import { Bars3Icon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { siteConfig } from '@/config/site';
+import CartIcon from './CartIcon';
+import CompareIcon from './CompareIcon';
 import SearchBar from './SearchBar';
 import NavDropdown, { type NavGroup, type NavItem } from './NavDropdown';
+import WishlistIcon from './WishlistIcon';
 
 type Category = {
   id: string;
@@ -130,6 +133,9 @@ export default function Header({ categories, brands }: Props) {
           >
             <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
           </button>
+          <CompareIcon />
+          <WishlistIcon />
+          <CartIcon />
           <button
             type="button"
             onClick={() => setMobileMenuOpen((v) => !v)}

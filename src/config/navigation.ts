@@ -24,6 +24,9 @@ export const footerLinks = {
     { label: 'Personal Care', href: '/categories/personal-care' },
   ],
   help: [
+    { label: 'Cart', href: '/cart' },
+    { label: 'Wishlist', href: '/wishlist' },
+    { label: 'Compare', href: '/compare' },
     { label: 'Contact Us', href: '/contact' },
     { label: 'Shipping & Returns', href: '/policies/shipping' },
     { label: 'Warranty', href: '/policies/warranty' },

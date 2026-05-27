@@ -3,9 +3,15 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { calculateDiscount, formatPrice } from '@/lib/utils';
 import { siteConfig } from '@/config/site';
+import AddToCartButton from '@/components/customer/AddToCartButton';
+import CompareToggle from '@/components/customer/CompareToggle';
 import ProductCard from '@/components/customer/ProductCard';
 import ProductGallery from '@/components/customer/ProductGallery';
+import RecentlyViewedStrip from '@/components/customer/RecentlyViewedStrip';
+import RecentlyViewedTracker from '@/components/customer/RecentlyViewedTracker';
+import WishlistButton from '@/components/customer/WishlistButton';
 import { fetchMoreFromBrand, fetchRelatedProducts } from '@/lib/products/recommendations';
+import { buildProductJsonLd } from '@/lib/products/structured-data';
 
 export const revalidate = 60;
 
@@ -72,8 +78,20 @@ export default async function ProductDetailPage({
     `Hi War on Retail, I'm interested in "${product.name}" (SKU ${product.sku ?? 'n/a'}).`,
   );
 
+  // Schema.org Product structured data — fed to Google's rich-result parser.
+  const jsonLd = buildProductJsonLd({ product, brand, images: allImages });
+
   return (
     <div className="container py-8">
+      <script
+        type="application/ld+json"
+        // JSON.stringify here is XSS-safe — all inputs go through JSON-encoding;
+        // there's no HTML interpolated into the script body.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {/* Headless: record this view in the customer's recently-viewed list. */}
+      <RecentlyViewedTracker slug={product.slug} />
+
       <nav className="mb-4 text-sm text-gray-500">
         <Link href="/" className="hover:text-primary-600">
           Home
@@ -145,19 +163,32 @@ export default async function ProductDetailPage({
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
+            <AddToCartButton
+              product={{
+                productId: product.id,
+                slug: product.slug,
+                name: product.name,
+                price: product.price,
+                imageUrl: product.featured_image_url,
+                sku: product.sku,
+              }}
+              disabled={isOutOfStock}
+            />
+            <WishlistButton slug={product.slug} productName={product.name} />
+            <CompareToggle slug={product.slug} productName={product.name} />
             <a
               href={`https://wa.me/${siteConfig.whatsapp}?text=${inquiryMessage}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-md bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
             >
-              💬 Buy via WhatsApp
+              <span aria-hidden="true">💬 </span>Buy via WhatsApp
             </a>
             <a
               href={`tel:${siteConfig.phone}`}
               className="inline-flex items-center gap-2 rounded-md border-2 border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50"
             >
-              📞 Call {siteConfig.phone}
+              <span aria-hidden="true">📞 </span>Call {siteConfig.phone}
             </a>
           </div>
 
@@ -233,6 +264,10 @@ export default async function ProductDetailPage({
           </div>
         </section>
       )}
+
+      {/* Recently viewed — excludes the current product so the visitor isn't
+          looking at themselves. Returns null until the visitor has 2+ items. */}
+      <RecentlyViewedStrip excludeSlug={product.slug} minItems={2} />
     </div>
   );
 }

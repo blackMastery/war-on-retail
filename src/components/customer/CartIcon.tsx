@@ -1,0 +1,44 @@
+'use client';
+
+import Link from 'next/link';
+import { ShoppingBagIcon } from '@heroicons/react/24/outline';
+import { selectItemCount, useCartHydrated, useCartStore } from '@/lib/cart/store';
+
+/**
+ * Header cart icon with item-count badge.
+ *
+ * Hydration: the count is rendered as `null` until the store finishes
+ * reading from localStorage. That avoids the SSR-says-0 → client-says-3
+ * flicker, which would also throw a React hydration warning. The icon
+ * itself (and the link to /cart) renders in both phases so the visual
+ * position doesn't shift on hydration.
+ */
+export default function CartIcon() {
+  const count = useCartStore(selectItemCount);
+  const hydrated = useCartHydrated();
+  const showBadge = hydrated && count > 0;
+
+  return (
+    <Link
+      href="/cart"
+      aria-label={
+        hydrated
+          ? count === 0
+            ? 'Cart is empty'
+            : `Cart, ${count} ${count === 1 ? 'item' : 'items'}`
+          : 'Cart'
+      }
+      className="relative inline-flex items-center justify-center rounded-full p-2 hover:bg-gray-100"
+    >
+      <ShoppingBagIcon className="h-6 w-6" aria-hidden="true" />
+      {showBadge && (
+        <span
+          aria-hidden="true"
+          className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white tabular-nums"
+        >
+          {count > 99 ? '99+' : count}
+        </span>
+      )}
+    </Link>
+  );
+}

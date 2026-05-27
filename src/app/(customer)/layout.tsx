@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import Header from '@/components/customer/Header';
 import Footer from '@/components/customer/Footer';
 import Chatbot from '@/components/customer/Chatbot';
+import CookieNotice from '@/components/customer/CookieNotice';
 
 export const revalidate = 120;
 
@@ -33,6 +34,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
       </main>
       <Footer />
       <Chatbot />
+      <CookieNotice />
     </div>
   );
 }
