@@ -15,7 +15,11 @@ export default function CategoryCard({ category }: { category: Category }) {
   return (
     <Link
       href={`/categories/${category.slug}`}
-      className="group flex flex-col items-center rounded-lg bg-white p-6 text-center shadow-sm ring-1 ring-gray-200 transition hover:-translate-y-0.5 hover:shadow-md"
+      // `h-full` so the card fills its wrapper in flex/grid layouts — without
+      // it, cards with single-word names ("Electronics") are shorter than
+      // ones whose name wraps to two lines ("Home Appliances"). `justify-center`
+      // keeps the icon + name visually centred when the card stretches.
+      className="group flex h-full flex-col items-center justify-center rounded-lg bg-white p-6 text-center shadow-sm ring-1 ring-gray-200 transition hover:-translate-y-0.5 hover:shadow-md"
     >
       {category.image_url ? (
         <div className="relative h-16 w-16">

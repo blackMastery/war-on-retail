@@ -68,7 +68,7 @@ export default function WishlistButton({ slug, productName, variant = 'button' }
       onClick={() => toggle(slug)}
       aria-label={label}
       aria-pressed={displaySaved}
-      className={`inline-flex items-center gap-2 rounded-md border-2 px-6 py-3 font-semibold transition ${
+      className={`inline-flex items-center justify-center gap-2 rounded-md border-2 px-6 py-3 font-semibold transition ${
         displaySaved
           ? 'border-primary-600 bg-primary-50 text-primary-700 hover:bg-primary-100'
           : 'border-gray-300 text-gray-700 hover:bg-gray-50'

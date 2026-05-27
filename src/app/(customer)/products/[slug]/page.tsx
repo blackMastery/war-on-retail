@@ -161,7 +161,12 @@ export default async function ProductDetailPage({
             )}
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          {/* Action grid: a 2-column grid on tablet+ stacks neatly to one column
+              on phones. `[&>*]:w-full` stretches each button (which is
+              `inline-flex` by default) to fill its grid cell, so widths line up.
+              Order is hierarchy-led: primary CTAs (Add to cart + WhatsApp) on
+              the top row, secondaries (Save + Call) on the bottom. */}
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 [&>*]:w-full">
             <AddToCartButton
               product={{
                 productId: product.id,
@@ -173,18 +178,18 @@ export default async function ProductDetailPage({
               }}
               disabled={isOutOfStock}
             />
-            <WishlistButton slug={product.slug} productName={product.name} />
             <a
               href={`https://wa.me/${siteConfig.whatsapp}?text=${inquiryMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-md bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
             >
               <span aria-hidden="true">💬 </span>Buy via WhatsApp
             </a>
+            <WishlistButton slug={product.slug} productName={product.name} />
             <a
               href={`tel:${siteConfig.phone}`}
-              className="inline-flex items-center gap-2 rounded-md border-2 border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50"
+              className="inline-flex items-center justify-center gap-2 rounded-md border-2 border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50"
             >
               <span aria-hidden="true">📞 </span>Call {siteConfig.phone}
             </a>
