@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { calculateDiscount, formatPrice } from '@/lib/utils';
+import { isNewArrival } from '@/config/catalog';
 import type { Product } from '@/types/database';
 
 interface ProductCardProps {
@@ -14,6 +15,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     product.track_inventory &&
     product.stock_quantity > 0 &&
     product.stock_quantity <= product.low_stock_threshold;
+  // Date-driven badge — no DB flag to maintain, expires on its own.
+  const isNew = isNewArrival(product.created_at);
 
   return (
     <Link
@@ -55,6 +58,14 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
           )}
         </div>
+
+        {/* Right-side stack — keeps positive signals visually separate from
+            discount/low-stock chips on the left. */}
+        {isNew && (
+          <span className="absolute right-2 top-2 rounded bg-emerald-500 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white shadow-sm">
+            New
+          </span>
+        )}
 
         {isOutOfStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">

@@ -3,8 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 import CategoryCard from '@/components/customer/CategoryCard';
 import BrandCard from '@/components/customer/BrandCard';
 import HorizontalScroller from '@/components/customer/HorizontalScroller';
+import ProductCard from '@/components/customer/ProductCard';
 import ProductGrid from '@/components/customer/ProductGrid';
 import PromotionMosaic from '@/components/customer/PromotionMosaic';
+import { NEW_ARRIVAL_WINDOW_DAYS, newArrivalCutoffIso } from '@/config/catalog';
 
 // Short revalidate so newly-scheduled promotions appear within a minute.
 export const revalidate = 60;
@@ -25,25 +27,39 @@ export default async function Homepage() {
     .order('display_order')
     .limit(5);
 
-  const [{ data: featured }, { data: categories }, { data: brands }, { data: promotions }] =
-    await Promise.all([
-      supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true)
-        .eq('is_featured', true)
-        .order('created_at', { ascending: false })
-        .limit(8),
-      supabase
-        .from('categories')
-        .select('*')
-        .eq('is_active', true)
-        .is('parent_id', null)
-        .order('display_order'),
-      // Bumped from 12 — horizontal scroll handles more items gracefully.
-      supabase.from('brands').select('*').eq('is_active', true).order('display_order').limit(24),
-      promotionsQuery,
-    ]);
+  const [
+    { data: featured },
+    { data: categories },
+    { data: brands },
+    { data: promotions },
+    { data: newArrivals },
+  ] = await Promise.all([
+    supabase
+      .from('products')
+      .select('*')
+      .eq('is_active', true)
+      .eq('is_featured', true)
+      .order('created_at', { ascending: false })
+      .limit(8),
+    supabase
+      .from('categories')
+      .select('*')
+      .eq('is_active', true)
+      .is('parent_id', null)
+      .order('display_order'),
+    // Bumped from 12 — horizontal scroll handles more items gracefully.
+    supabase.from('brands').select('*').eq('is_active', true).order('display_order').limit(24),
+    promotionsQuery,
+    // New arrivals: products whose created_at is within NEW_ARRIVAL_WINDOW_DAYS.
+    // No DB flag — purely date-driven, auto-expires when the row ages out.
+    supabase
+      .from('products')
+      .select('*')
+      .eq('is_active', true)
+      .gte('created_at', newArrivalCutoffIso())
+      .order('created_at', { ascending: false })
+      .limit(12),
+  ]);
 
   const hasPromotions = !!promotions && promotions.length > 0;
 
@@ -97,6 +113,35 @@ export default async function Homepage() {
           ))}
         </HorizontalScroller>
       </section>
+
+      {/* New Arrivals — only shown when something exists in the window. */}
+      {newArrivals && newArrivals.length > 0 && (
+        <section className="container py-12">
+          <div className="mb-6 flex items-end justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-bold">
+                <span aria-hidden="true">✨ </span>Just Arrived
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Fresh stock added in the last {NEW_ARRIVAL_WINDOW_DAYS} days
+              </p>
+            </div>
+            <Link
+              href="/products?sort=newest"
+              className="shrink-0 text-sm font-medium text-primary-600 hover:underline"
+            >
+              View all <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+          <HorizontalScroller ariaLabel="New arrivals" gap={4}>
+            {newArrivals.map((p) => (
+              <div key={p.id} className="w-60 shrink-0 snap-start sm:w-64">
+                <ProductCard product={p} />
+              </div>
+            ))}
+          </HorizontalScroller>
+        </section>
+      )}
 
       {/* Featured products */}
       <section className="bg-gray-100">
