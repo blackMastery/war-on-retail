@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ProductCard from '@/components/customer/ProductCard';
 import { useWishlistHydrated, useWishlistStore } from '@/lib/wishlist/store';
@@ -25,37 +25,43 @@ export default function WishlistView() {
   const clear = useWishlistStore((s) => s.clear);
 
   const [products, setProducts] = useState<Product[] | null>(null);
-  const lastQueryRef = useRef<string>('');
+
+  // Dep is the joined-string form of `slugs`, not the array reference, so
+  // identical contents never trigger a redundant refetch. Identical-by-string
+  // also means Strict Mode's mount-time double-invoke produces the same dep
+  // value both times — but unlike the old `lastQueryRef` dedupe, we now use
+  // `AbortController` to cancel the first in-flight fetch and let the second
+  // setup actually start a fresh one. Previously the second setup would see a
+  // matching ref, bail out, and we'd be left with a permanently-cancelled
+  // fetch and a null state.
+  const slugsKey = slugs.join(',');
 
   useEffect(() => {
     if (!hydrated) {
       setProducts(null);
       return;
     }
-    if (slugs.length === 0) {
+    if (!slugsKey) {
       setProducts([]);
-      lastQueryRef.current = '';
       return;
     }
-    const key = slugs.join(',');
-    if (key === lastQueryRef.current) return;
-    lastQueryRef.current = key;
 
-    let cancelled = false;
-    fetch(`/api/products/by-slugs?slugs=${encodeURIComponent(key)}`)
+    const controller = new AbortController();
+    fetch(`/api/products/by-slugs?slugs=${encodeURIComponent(slugsKey)}`, {
+      signal: controller.signal,
+    })
       .then((r) => r.json())
       .then((data: { products?: Product[] }) => {
-        if (cancelled) return;
         setProducts(data.products ?? []);
       })
-      .catch(() => {
-        if (cancelled) return;
+      .catch((err) => {
+        // AbortError is expected when the effect re-runs / unmounts; ignore.
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         setProducts([]);
       });
-    return () => {
-      cancelled = true;
-    };
-  }, [hydrated, slugs]);
+
+    return () => controller.abort();
+  }, [hydrated, slugsKey]);
 
   if (!hydrated || products == null) {
     return (

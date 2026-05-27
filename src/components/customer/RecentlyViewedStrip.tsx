@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import HorizontalScroller from './HorizontalScroller';
 import ProductCard from './ProductCard';
 import {
@@ -42,34 +42,40 @@ export default function RecentlyViewedStrip({
     [allSlugs, excludeSlug],
   );
 
-  // Cache fetched products by slug so navigating between pages doesn't refetch.
   const [products, setProducts] = useState<Product[] | null>(null);
-  const lastQueryRef = useRef<string>('');
+
+  // Joined-string dep, plus `AbortController` for cancellation. The previous
+  // `lastQueryRef` dedupe was broken under React Strict Mode: the first
+  // mount-time effect would set the ref + start a fetch, cleanup would cancel
+  // it, then the second mount-time effect would see the ref match and bail
+  // out — leaving us with a permanently-cancelled fetch and a stuck skeleton.
+  const slugsKey = slugsToShow.join(',');
 
   useEffect(() => {
     if (!hydrated || slugsToShow.length < minItems) {
       setProducts(null);
       return;
     }
-    const key = slugsToShow.join(',');
-    if (key === lastQueryRef.current) return;
-    lastQueryRef.current = key;
 
-    let cancelled = false;
-    fetch(`/api/products/by-slugs?slugs=${encodeURIComponent(key)}`)
+    const controller = new AbortController();
+    fetch(`/api/products/by-slugs?slugs=${encodeURIComponent(slugsKey)}`, {
+      signal: controller.signal,
+    })
       .then((r) => r.json())
       .then((data: { products?: Product[] }) => {
-        if (cancelled) return;
         setProducts(data.products ?? []);
       })
-      .catch(() => {
-        if (cancelled) return;
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         setProducts([]);
       });
-    return () => {
-      cancelled = true;
-    };
-  }, [hydrated, slugsToShow, minItems]);
+
+    return () => controller.abort();
+    // `slugsToShow.length` is captured in `slugsKey`; including it would be
+    // redundant. `minItems` is a constant the parent passes — including it
+    // covers the (unlikely) case of the parent re-rendering with a different
+    // threshold.
+  }, [hydrated, slugsKey, slugsToShow.length, minItems]);
 
   if (!hydrated) return null;
   if (slugsToShow.length < minItems) return null;

@@ -10,8 +10,11 @@ type Props = {
   product: Omit<CartItem, 'quantity'>;
   /** True when the product is out of stock — button is disabled and labelled accordingly. */
   disabled?: boolean;
-  /** Visual variant. `primary` is the headline button on the product page;
-   *  `compact` is for tight spaces (cards, scrollers — not yet used here). */
+  /**
+   * - `primary` — large headline button (product detail page). Inline width.
+   * - `compact` — full-width small button (product card). `stopPropagation`
+   *    on the click so it doesn't trigger the surrounding card-overlay link.
+   */
   variant?: 'primary' | 'compact';
   /** How many to add per click. Defaults to 1; the cart page uses its own steppers. */
   quantity?: number;
@@ -44,7 +47,11 @@ export default function AddToCartButton({
     return () => clearTimeout(t);
   }, [justAdded]);
 
-  function onClick() {
+  function onClick(e: React.MouseEvent<HTMLButtonElement>) {
+    // When mounted inside a product card with an overlay link, the click would
+    // otherwise bubble up and trigger navigation. Stop it.
+    e.preventDefault();
+    e.stopPropagation();
     if (disabled) return;
     addItem(product, quantity);
     setJustAdded(true);
@@ -55,7 +62,8 @@ export default function AddToCartButton({
   const sizing =
     variant === 'primary'
       ? 'px-6 py-3'
-      : 'px-3 py-1.5 text-sm';
+      // Compact: full-width small. Designed to sit at the bottom of a ProductCard.
+      : 'w-full px-3 py-2 text-sm';
   const colours = justAdded
     ? 'bg-green-600 text-white hover:bg-green-700'
     : 'bg-primary-600 text-white hover:bg-primary-700';
@@ -71,7 +79,7 @@ export default function AddToCartButton({
       {justAdded ? (
         <>
           <CheckIcon className="h-5 w-5" aria-hidden="true" />
-          Added to cart
+          Added{variant === 'primary' ? ' to cart' : ''}
         </>
       ) : disabled ? (
         <>

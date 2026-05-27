@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 import { calculateDiscount, formatPrice } from '@/lib/utils';
 import { siteConfig } from '@/config/site';
 import AddToCartButton from '@/components/customer/AddToCartButton';
-import CompareToggle from '@/components/customer/CompareToggle';
 import ProductCard from '@/components/customer/ProductCard';
 import ProductGallery from '@/components/customer/ProductGallery';
 import RecentlyViewedStrip from '@/components/customer/RecentlyViewedStrip';
@@ -175,7 +174,6 @@ export default async function ProductDetailPage({
               disabled={isOutOfStock}
             />
             <WishlistButton slug={product.slug} productName={product.name} />
-            <CompareToggle slug={product.slug} productName={product.name} />
             <a
               href={`https://wa.me/${siteConfig.whatsapp}?text=${inquiryMessage}`}
               target="_blank"
