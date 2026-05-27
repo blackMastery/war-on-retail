@@ -43,6 +43,15 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+  /* Hide the native scrollbar on horizontal scroll regions — used by
+     <HorizontalScroller>. Mouse wheel and touch swipe still work. */
+  .no-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge legacy */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
 }
 
 /* Respect user motion preferences. Scoped so explicit `motion-safe:` /

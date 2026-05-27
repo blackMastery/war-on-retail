@@ -5,11 +5,7 @@ export default function ProductGrid({ products }: { products: Product[] }) {
   if (!products.length) {
     return (
       <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center text-gray-500">
-        No products to show yet. Add some via the{' '}
-        <a href="/admin/products" className="font-medium text-primary-600 hover:underline">
-          admin panel
-        </a>
-        .
+        No products to show yet.
       </div>
     );
   }

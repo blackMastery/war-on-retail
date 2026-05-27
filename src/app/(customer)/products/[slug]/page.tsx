@@ -170,7 +170,7 @@ export default async function ProductDetailPage({
                     key={k}
                     className={`grid grid-cols-3 text-sm ${i % 2 ? 'bg-white' : 'bg-gray-50'}`}
                   >
-                    <dt className="col-span-1 px-4 py-2 font-medium text-gray-600">
+                    <dt className="col-span-1 px-4 py-2 font-medium text-gray-600 capitalize">
                       {k.replace(/_/g, ' ')}
                     </dt>
                     <dd className="col-span-2 px-4 py-2 text-gray-900">{String(v)}</dd>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import CategoryCard from '@/components/customer/CategoryCard';
 import BrandCard from '@/components/customer/BrandCard';
+import HorizontalScroller from '@/components/customer/HorizontalScroller';
 import ProductGrid from '@/components/customer/ProductGrid';
 import PromotionMosaic from '@/components/customer/PromotionMosaic';
 
@@ -39,7 +40,8 @@ export default async function Homepage() {
         .eq('is_active', true)
         .is('parent_id', null)
         .order('display_order'),
-      supabase.from('brands').select('*').eq('is_active', true).order('display_order').limit(12),
+      // Bumped from 12 — horizontal scroll handles more items gracefully.
+      supabase.from('brands').select('*').eq('is_active', true).order('display_order').limit(24),
       promotionsQuery,
     ]);
 
@@ -79,7 +81,7 @@ export default async function Homepage() {
         </section>
       )}
 
-      {/* Categories */}
+      {/* Categories — horizontal scroller */}
       <section className="container py-12">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="text-2xl font-bold">Shop by Category</h2>
@@ -87,9 +89,13 @@ export default async function Homepage() {
             View all <span aria-hidden="true">→</span>
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-          {categories?.map((c) => <CategoryCard key={c.id} category={c} />)}
-        </div>
+        <HorizontalScroller ariaLabel="Categories" gap={3}>
+          {categories?.map((c) => (
+            <div key={c.id} className="w-36 shrink-0 snap-start sm:w-44">
+              <CategoryCard category={c} />
+            </div>
+          ))}
+        </HorizontalScroller>
       </section>
 
       {/* Featured products */}
@@ -108,7 +114,7 @@ export default async function Homepage() {
         </div>
       </section>
 
-      {/* Brands */}
+      {/* Brands — horizontal scroller */}
       <section className="container py-12">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="text-2xl font-bold">Popular Brands</h2>
@@ -116,9 +122,13 @@ export default async function Homepage() {
             View all <span aria-hidden="true">→</span>
           </Link>
         </div>
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
-          {brands?.map((b) => <BrandCard key={b.id} brand={b} />)}
-        </div>
+        <HorizontalScroller ariaLabel="Brands" gap={3}>
+          {brands?.map((b) => (
+            <div key={b.id} className="w-32 shrink-0 snap-start sm:w-36">
+              <BrandCard brand={b} />
+            </div>
+          ))}
+        </HorizontalScroller>
       </section>
 
       {/* Value props */}
