@@ -3,19 +3,10 @@ import ProductGrid from '@/components/customer/ProductGrid';
 import Pagination from '@/components/customer/Pagination';
 import ResultCount from '@/components/customer/ResultCount';
 import { PAGE_SIZE, paginate, parsePage } from '@/lib/pagination';
+import { buildIlikeOrClause } from '@/lib/products/search';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Search' };
-
-/**
- * Escapes the PostgREST `ilike` wildcards (`%`, `_`) and the separator that
- * the `.or(...)` filter uses (`,`). Anything else flows through verbatim so
- * the user can type spaces, hyphens, etc. without confusing the matcher.
- */
-function buildPattern(raw: string): string {
-  const safe = raw.replace(/[%_,]/g, '\\$&');
-  return `%${safe}%`;
-}
 
 export default async function SearchPage({
   searchParams,
@@ -35,18 +26,13 @@ export default async function SearchPage({
     .eq('is_active', true);
 
   if (q.trim()) {
-    const pattern = buildPattern(q.trim());
     // `or(...)` matches any of name / short_description / description / SKU.
     // Note: we used to call the search_products RPC here for tsvector ranking,
     // but RPCs can't return a count for pagination. Trading rank for totals.
-    query = query.or(
-      [
-        `name.ilike.${pattern}`,
-        `short_description.ilike.${pattern}`,
-        `description.ilike.${pattern}`,
-        `sku.ilike.${pattern}`,
-      ].join(','),
-    );
+    // The OR clause is built from the shared helper so the autocomplete
+    // route (`/api/search/suggest`) and this full-results page agree on
+    // exactly which rows match.
+    query = query.or(buildIlikeOrClause(q.trim()));
   }
 
   const { data: products, count, error } = await query
