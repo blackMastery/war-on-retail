@@ -68,16 +68,16 @@ export default function WishlistButton({ slug, productName, variant = 'button' }
       onClick={() => toggle(slug)}
       aria-label={label}
       aria-pressed={displaySaved}
-      className={`inline-flex items-center justify-center gap-2 rounded-md border-2 px-6 py-3 font-semibold transition ${
+      className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border-2 px-6 py-3 font-semibold transition-colors ${
         displaySaved
-          ? 'border-primary-600 bg-primary-50 text-primary-700 hover:bg-primary-100'
-          : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+          ? 'border-primary-600 bg-primary-600 text-white hover:bg-primary-700'
+          : 'border-accent-700 bg-accent-200 text-gray-900 hover:bg-accent-300'
       }`}
     >
       {displaySaved ? (
         <HeartSolid className="h-5 w-5" aria-hidden="true" />
       ) : (
-        <HeartOutline className="h-5 w-5" aria-hidden="true" />
+        <HeartOutline className="h-5 w-5 text-primary-700" aria-hidden="true" />
       )}
       {displaySaved ? 'Saved' : 'Save'}
     </button>

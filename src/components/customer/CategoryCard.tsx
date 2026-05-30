@@ -1,17 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { categoryIconFor } from '@/lib/category-icons';
 import type { Category } from '@/types/database';
 
-const ICONS: Record<string, string> = {
-  electronics: '📺',
-  'home-appliances': '🧊',
-  'kitchen-appliances': '🍳',
-  'personal-care': '💈',
-  computing: '💻',
-};
-
 export default function CategoryCard({ category }: { category: Category }) {
-  const icon = ICONS[category.slug] ?? '📦';
+  const icon = categoryIconFor(category.slug);
   return (
     <Link
       href={`/categories/${category.slug}`}

@@ -14,13 +14,13 @@ export default async function CustomerLayout({ children }: { children: React.Rea
   const [{ data: categories }, { data: brands }] = await Promise.all([
     supabase
       .from('categories')
-      .select('id, name, slug, parent_id, display_order')
+      .select('id, name, slug, parent_id, display_order, image_url')
       .eq('is_active', true)
       .order('display_order')
       .order('name'),
     supabase
       .from('brands')
-      .select('id, name, slug, display_order')
+      .select('id, name, slug, display_order, logo_url')
       .eq('is_active', true)
       .order('display_order')
       .order('name'),

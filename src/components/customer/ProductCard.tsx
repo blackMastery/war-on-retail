@@ -6,8 +6,14 @@ import AddToCartButton from './AddToCartButton';
 import WishlistButton from './WishlistButton';
 import type { Product } from '@/types/database';
 
+/** Default `sizes` for 2-up mobile grids and responsive product listings. */
+const DEFAULT_IMAGE_SIZES =
+  '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 45vw';
+
 interface ProductCardProps {
   product: Product;
+  /** Pass a fixed width (e.g. `240px`) when the card lives in a horizontal scroller. */
+  imageSizes?: string;
 }
 
 /**
@@ -18,18 +24,13 @@ interface ProductCardProps {
  *      visible content in the DOM so its stacking order puts it above plain
  *      text/image but below the action buttons.
  *
- *   2. **Action buttons** — `<WishlistButton>` (heart, top-right corner of
+ *   2. **Action buttons** — `<WishlistButton>` (heart, bottom-right of the
  *      image) and `<AddToCartButton>` (full-width compact, bottom of card
  *      body). Both have `z-10` and call `stopPropagation` on their click so
  *      they intercept their own taps without firing the overlay link's
  *      navigation.
- *
- *  This is the standard "card link" pattern. The alternative (separate links
- *  for image and title with siblings buttons) is more semantic HTML but loses
- *  the "click anywhere on the card to navigate" UX that everyone expects from
- *  e-commerce cards.
  */
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, imageSizes = DEFAULT_IMAGE_SIZES }: ProductCardProps) {
   const discount = calculateDiscount(product.price, product.compare_at_price);
   const isOutOfStock = product.track_inventory && product.stock_quantity === 0;
   const isLowStock =
@@ -47,7 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             src={product.featured_image_url}
             alt={product.name}
             fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            sizes={imageSizes}
             className="object-cover transition-transform duration-300 motion-reduce:transform-none group-hover:scale-105"
           />
         ) : (
@@ -59,70 +60,70 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Badge stack — all positive/urgency signals piled top-left, leaves
-            the top-right corner free for the wishlist heart. */}
-        <div className="absolute left-2 top-2 flex flex-col gap-1">
+        {/* Badge stack — top-left; wishlist sits bottom-right of the image. */}
+        <div className="absolute left-1.5 top-1.5 flex flex-col gap-0.5 sm:left-2 sm:top-2 sm:gap-1">
           {discount > 0 && (
-            <span className="rounded bg-primary-600 px-2 py-0.5 text-xs font-bold text-white">
+            <span className="rounded bg-primary-600 px-1.5 py-0.5 text-[10px] font-bold text-white sm:px-2 sm:text-xs">
               -{discount}%
             </span>
           )}
           {product.is_featured && (
-            <span className="rounded bg-accent-500 px-2 py-0.5 text-xs font-bold text-gray-900">
+            <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold text-gray-900 sm:px-2 sm:text-xs">
               Featured
             </span>
           )}
           {isLowStock && (
-            <span className="rounded bg-orange-500 px-2 py-0.5 text-xs font-bold text-white">
+            <span className="rounded bg-orange-500 px-1.5 py-0.5 text-[10px] font-bold text-white sm:px-2 sm:text-xs">
               Low stock
             </span>
           )}
           {isNew && (
-            <span className="rounded bg-emerald-500 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white">
+            <span className="rounded bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white sm:px-2 sm:text-xs">
               New
             </span>
           )}
         </div>
 
-        {/* Wishlist heart — top-right corner, z-10 to beat the overlay link.
-            stopPropagation lives inside the button component itself. */}
-        <div className="absolute right-2 top-2 z-10">
+        <div className="absolute bottom-1.5 right-1.5 z-10 sm:bottom-2 sm:right-2">
           <WishlistButton slug={product.slug} productName={product.name} variant="icon" />
         </div>
 
         {isOutOfStock && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
-            <span className="rounded bg-gray-900 px-3 py-1.5 text-sm font-bold text-white">
+            <span className="rounded bg-gray-900 px-2 py-1 text-xs font-bold text-white sm:px-3 sm:py-1.5 sm:text-sm">
               Out of stock
             </span>
           </div>
         )}
       </div>
 
-      {/* Card body */}
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="line-clamp-2 min-h-[2.75rem] font-semibold text-gray-900 group-hover:text-primary-600">
+      {/* Card body — tighter padding/typography on 2-col mobile grids. */}
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
+        <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold text-gray-900 sm:min-h-[2.75rem] sm:text-base sm:group-hover:text-primary-600">
           {product.name}
         </h3>
         {product.short_description && (
-          <p className="mt-1 line-clamp-2 text-sm text-gray-500">{product.short_description}</p>
+          <p className="mt-1 hidden line-clamp-2 text-sm text-gray-500 sm:block">
+            {product.short_description}
+          </p>
         )}
-        <div className="mt-3 flex items-baseline gap-2 tabular-nums">
-          <span className="text-lg font-bold text-gray-900">{formatPrice(product.price)}</span>
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 tabular-nums sm:mt-3">
+          <span className="text-base font-bold text-gray-900 sm:text-lg">
+            {formatPrice(product.price)}
+          </span>
           {product.compare_at_price && product.compare_at_price > product.price && (
-            <span className="text-sm text-gray-400 line-through">
+            <span className="text-xs text-gray-400 line-through sm:text-sm">
               {formatPrice(product.compare_at_price)}
             </span>
           )}
         </div>
         {product.track_inventory && !isOutOfStock && (
-          <p className="mt-1 text-xs text-gray-500">{product.stock_quantity} in stock</p>
+          <p className="mt-1 hidden text-xs text-gray-500 sm:block">
+            {product.stock_quantity} in stock
+          </p>
         )}
 
-        {/* Add to cart — sits in its own row, mt-auto pushes it to the bottom
-            even when card heights vary in a grid. z-10 + stopPropagation
-            (inside the component) prevents the overlay link from firing. */}
-        <div className="relative z-10 mt-auto pt-3">
+        <div className="relative z-10 mt-auto pt-2 sm:pt-3">
           <AddToCartButton
             variant="compact"
             disabled={isOutOfStock}
@@ -138,12 +139,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Overlay link — last in the DOM so it sits on top of plain content
-          (image + text) but below the z-10 action buttons. */}
       <Link
         href={`/products/${product.slug}`}
         aria-label={product.name}
-        className="absolute inset-0 z-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+        className="absolute inset-0 z-0 rounded-lg transition-colors active:bg-gray-900/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
       />
     </article>
   );

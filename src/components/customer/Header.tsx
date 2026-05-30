@@ -4,9 +4,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { Bars3Icon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import {
+  Bars3Icon,
+  FireIcon,
+  MagnifyingGlassIcon,
+  ShoppingBagIcon,
+  Squares2X2Icon,
+  TagIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { siteConfig } from '@/config/site';
+import { categoryIconFor } from '@/lib/category-icons';
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
 import CartIcon from './CartIcon';
 import SearchBar from './SearchBar';
@@ -19,12 +28,14 @@ type Category = {
   slug: string;
   parent_id: string | null;
   display_order: number;
+  image_url: string | null;
 };
 type Brand = {
   id: string;
   name: string;
   slug: string;
   display_order: number;
+  logo_url: string | null;
 };
 
 type Props = {
@@ -38,6 +49,25 @@ export default function Header({ categories, brands }: Props) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  // Two-phase mount/show state so the open/close transitions can play:
+  //   - `mobileMenuMounted` controls DOM presence (kept true during the
+  //      closing animation so the fade-out is visible)
+  //   - `mobileMenuShown` controls the visibility classes (opacity, translate)
+  // Pattern: mount → next animation frame → flip shown. On close: flip shown
+  // → wait the transition duration → unmount.
+  const [mobileMenuMounted, setMobileMenuMounted] = useState(false);
+  const [mobileMenuShown, setMobileMenuShown] = useState(false);
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      setMobileMenuMounted(true);
+      const raf = requestAnimationFrame(() => setMobileMenuShown(true));
+      return () => cancelAnimationFrame(raf);
+    }
+    setMobileMenuShown(false);
+    const t = setTimeout(() => setMobileMenuMounted(false), 200);
+    return () => clearTimeout(t);
+  }, [mobileMenuOpen]);
 
   useBodyScrollLock(mobileMenuOpen);
 
@@ -87,6 +117,7 @@ export default function Header({ categories, brands }: Props) {
   }
 
   return (
+    <>
     <header
       className="sticky top-0 z-40 bg-white shadow-sm"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
@@ -216,18 +247,71 @@ export default function Header({ categories, brands }: Props) {
         </div>
       </nav>
 
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="border-t bg-white md:hidden">
+    </header>
+
+      {/* Mobile menu — full-screen overlay with its own self-contained top bar
+          (logo + close button). Built this way deliberately, NOT as a drawer
+          anchored below the sticky header, because:
+          1. iOS Safari's body→html overflow propagation breaks `position:
+             sticky` whenever the scroll lock kicks in — the sticky header would
+             drop to the top of the document and the user, scrolled to the
+             bottom, would see no header at all (the bug this iteration fixes).
+          2. A full-screen overlay is the dominant mobile e-commerce pattern
+             (Amazon, Best Buy, Target). No backdrop, no half-state — the menu
+             owns the viewport while open and gets out of the way completely
+             when closed. */}
+      {mobileMenuMounted && (
+        <div
+          className={`fixed inset-0 z-50 flex flex-col bg-white transition duration-200 ease-out md:hidden motion-reduce:transition-none ${
+            mobileMenuShown ? 'opacity-100 translate-y-0' : 'pointer-events-none -translate-y-2 opacity-0'
+          }`}
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          {/* Self-contained top bar: matches the visible header bar so the
+              user never feels the chrome "disappeared", and carries the X
+              close button so dismissal is always one tap. */}
+          <div className="flex shrink-0 items-center justify-between border-b border-gray-200 px-3 py-3 sm:px-4 sm:py-4">
+            <Link
+              href="/"
+              aria-label={`${siteConfig.name} home`}
+              translate="no"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex shrink-0 items-center"
+            >
+              <Image
+                src="/logo.png"
+                alt={siteConfig.name}
+                width={180}
+                height={85}
+                className="h-10 w-auto sm:h-12"
+              />
+            </Link>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Close navigation"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+            >
+              <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+            </button>
+          </div>
           <nav
             aria-label="Mobile primary"
-            className="container flex max-h-[min(70dvh,calc(100dvh-8rem))] flex-col gap-1 overflow-y-auto overscroll-contain py-3 text-sm"
+            className="container flex flex-1 flex-col gap-1 overflow-y-auto overscroll-contain py-3 text-sm"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}
           >
-            <MobileLink href="/products" onSelect={() => setMobileMenuOpen(false)}>
+            <MobileLink
+              href="/products"
+              onSelect={() => setMobileMenuOpen(false)}
+              thumbnail={<UtilityThumb icon={ShoppingBagIcon} tone="primary" />}
+            >
               All Products
             </MobileLink>
 
-            <MobileSection label="All Categories">
+            <MobileSection
+              label="All Categories"
+              thumbnail={<UtilityThumb icon={Squares2X2Icon} />}
+            >
               <MobileLink
                 href="/categories"
                 onSelect={() => setMobileMenuOpen(false)}
@@ -240,13 +324,14 @@ export default function Header({ categories, brands }: Props) {
                   key={p.id}
                   href={`/categories/${p.slug}`}
                   onSelect={() => setMobileMenuOpen(false)}
+                  thumbnail={<CategoryThumb imageUrl={p.image_url} slug={p.slug} />}
                 >
                   {p.name}
                 </MobileLink>
               ))}
             </MobileSection>
 
-            <MobileSection label="Brands">
+            <MobileSection label="Brands" thumbnail={<UtilityThumb icon={TagIcon} />}>
               <MobileLink
                 href="/brands"
                 onSelect={() => setMobileMenuOpen(false)}
@@ -259,6 +344,7 @@ export default function Header({ categories, brands }: Props) {
                   key={b.id}
                   href={`/brands/${b.slug}`}
                   onSelect={() => setMobileMenuOpen(false)}
+                  thumbnail={<BrandThumb logoUrl={b.logo_url} name={b.name} />}
                 >
                   {b.name}
                 </MobileLink>
@@ -267,19 +353,21 @@ export default function Header({ categories, brands }: Props) {
 
             {featured.map((c) => {
               const subs = childrenOf(c.id);
+              const thumb = <CategoryThumb imageUrl={c.image_url} slug={c.slug} />;
               if (subs.length === 0) {
                 return (
                   <MobileLink
                     key={c.id}
                     href={`/categories/${c.slug}`}
                     onSelect={() => setMobileMenuOpen(false)}
+                    thumbnail={thumb}
                   >
                     {c.name}
                   </MobileLink>
                 );
               }
               return (
-                <MobileSection key={c.id} label={c.name}>
+                <MobileSection key={c.id} label={c.name} thumbnail={thumb}>
                   <MobileLink
                     href={`/categories/${c.slug}`}
                     onSelect={() => setMobileMenuOpen(false)}
@@ -304,13 +392,14 @@ export default function Header({ categories, brands }: Props) {
               href="/deals"
               onSelect={() => setMobileMenuOpen(false)}
               className="font-bold"
+              thumbnail={<UtilityThumb icon={FireIcon} tone="deal" />}
             >
-              <span aria-hidden="true">🔥 </span>Deals
+              Deals
             </MobileLink>
           </nav>
         </div>
       )}
-    </header>
+    </>
   );
 }
 
@@ -319,19 +408,23 @@ function MobileLink({
   children,
   onSelect,
   className = '',
+  thumbnail,
 }: {
   href: string;
   children: React.ReactNode;
   onSelect: () => void;
   className?: string;
+  /** Optional 32 × 32 visual leading the label. See `<CategoryThumb>` / `<BrandThumb>`. */
+  thumbnail?: React.ReactNode;
 }) {
   return (
     <Link
       href={href}
       onClick={onSelect}
-      className={`flex min-h-11 items-center rounded-md px-3 py-2 hover:bg-gray-100 active:bg-gray-100 ${className}`}
+      className={`flex min-h-11 items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100 active:bg-gray-100 ${className}`}
     >
-      {children}
+      {thumbnail}
+      <span className="min-w-0 flex-1 truncate">{children}</span>
     </Link>
   );
 }
@@ -339,22 +432,147 @@ function MobileLink({
 function MobileSection({
   label,
   children,
+  thumbnail,
 }: {
   label: string;
   children: React.ReactNode;
+  /** Optional 32 × 32 visual leading the section label in the summary row. */
+  thumbnail?: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(false);
   return (
-    <details className="group rounded-md">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-md px-3 py-2 hover:bg-gray-100 active:bg-gray-100 [&::-webkit-details-marker]:hidden">
-        <span>{label}</span>
+    // Custom button-based accordion (rather than <details>) so we can animate
+    // the open/close. <details> hides its content via display:none which can't
+    // be transitioned. The grid-template-rows 0fr→1fr trick is the modern
+    // smooth way to animate auto-height collapse without measuring children.
+    <div className="rounded-md">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2 text-left hover:bg-gray-100 active:bg-gray-100"
+      >
+        {thumbnail}
+        <span className="min-w-0 flex-1 truncate">{label}</span>
         <ChevronDownIcon
-          className="h-4 w-4 shrink-0 text-gray-500 transition-transform motion-reduce:transition-none group-open:rotate-180"
+          className={`h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200 motion-reduce:transition-none ${
+            open ? 'rotate-180' : ''
+          }`}
           aria-hidden="true"
         />
-      </summary>
-      <div className="ml-3 mt-1 flex flex-col gap-0.5 border-l border-gray-200 pl-3">
-        {children}
+      </button>
+      <div
+        className={`grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none ${
+          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="ml-3 mt-1 flex flex-col gap-0.5 border-l border-gray-200 pl-3">
+            {children}
+          </div>
+        </div>
       </div>
-    </details>
+    </div>
+  );
+}
+
+/**
+ * 32 × 32 thumbnail for a category in the mobile menu.
+ *
+ * When `image_url` is set, renders it on a soft gray plate so transparent PNGs
+ * still look intentional. Otherwise renders the slug's emoji fallback from
+ * `categoryIconFor()` so the icon matches what the homepage CategoryCard shows.
+ *
+ * Decorative — the visible label names the category, so `alt=""` /
+ * `aria-hidden` keep AT from announcing it twice.
+ */
+function CategoryThumb({
+  imageUrl,
+  slug,
+}: {
+  imageUrl: string | null;
+  slug: string;
+}) {
+  if (imageUrl) {
+    return (
+      <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded bg-gray-50 ring-1 ring-gray-200">
+        <Image src={imageUrl} alt="" fill sizes="32px" className="object-contain p-0.5" />
+      </span>
+    );
+  }
+  return (
+    <span
+      aria-hidden="true"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-gray-50 text-lg leading-none ring-1 ring-gray-200"
+    >
+      {categoryIconFor(slug)}
+    </span>
+  );
+}
+
+/**
+ * 32 × 32 thumbnail for the "utility" rows in the mobile menu — the items
+ * that aren't a single category or brand and so don't have a logo/photo:
+ * "All Products", "All Categories", "Brands", "Deals".
+ *
+ * Uses Heroicons (already in the project) instead of emojis here because the
+ * neighbouring category rows show real product photography; outline icons on a
+ * tinted plate read as deliberate UI affordances rather than mismatched
+ * decoration.
+ *
+ * `tone` lets each row carry a distinct hue (gray for neutral, red/orange for
+ * deals) so the menu has a hint of colour vocabulary instead of all-gray.
+ */
+function UtilityThumb({
+  icon: Icon,
+  tone = 'gray',
+}: {
+  icon: typeof ShoppingBagIcon;
+  tone?: 'gray' | 'primary' | 'deal';
+}) {
+  const tones = {
+    gray: 'bg-gray-50 text-gray-600 ring-gray-200',
+    primary: 'bg-primary-50 text-primary-700 ring-primary-100',
+    deal: 'bg-orange-50 text-orange-600 ring-orange-100',
+  } as const;
+  return (
+    <span
+      aria-hidden="true"
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded ring-1 ${tones[tone]}`}
+    >
+      <Icon className="h-4 w-4" />
+    </span>
+  );
+}
+
+/**
+ * 32 × 32 thumbnail for a brand in the mobile menu.
+ *
+ * Falls back to a primary-tinted circle with the brand's first initial — keeps
+ * the column visually rhythmic even for brands that haven't uploaded a logo
+ * yet, which matters more in a menu than on a card (a wall of empty boxes
+ * would be worse than a wall of letters).
+ */
+function BrandThumb({
+  logoUrl,
+  name,
+}: {
+  logoUrl: string | null;
+  name: string;
+}) {
+  if (logoUrl) {
+    return (
+      <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded bg-gray-50 ring-1 ring-gray-200">
+        <Image src={logoUrl} alt="" fill sizes="32px" className="object-contain p-0.5" />
+      </span>
+    );
+  }
+  return (
+    <span
+      aria-hidden="true"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-semibold text-primary-700 ring-1 ring-primary-100"
+    >
+      {name.charAt(0).toUpperCase()}
+    </span>
   );
 }

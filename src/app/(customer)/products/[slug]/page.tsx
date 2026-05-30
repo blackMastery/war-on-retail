@@ -308,7 +308,7 @@ export default async function ProductDetailPage({
             <WishlistButton slug={product.slug} productName={product.name} />
             <a
               href={`tel:${siteConfig.phone}`}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-surface-dark bg-surface-dark px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-900"
             >
               <span aria-hidden="true">📞 </span>
               <span className="sm:hidden">Call us</span>

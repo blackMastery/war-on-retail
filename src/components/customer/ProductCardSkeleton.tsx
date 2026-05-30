@@ -22,12 +22,12 @@ export default function ProductCardSkeleton() {
       className="flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200"
     >
       <div className="aspect-square bg-gray-200" />
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
         <div className="h-4 w-3/4 rounded bg-gray-200" />
-        <div className="mt-2 h-4 w-1/2 rounded bg-gray-200" />
-        <div className="mt-3 h-5 w-1/3 rounded bg-gray-200" />
-        <div className="mt-auto pt-3">
-          <div className="h-8 w-full rounded bg-gray-200" />
+        <div className="mt-2 hidden h-4 w-1/2 rounded bg-gray-200 sm:block" />
+        <div className="mt-2 h-4 w-1/3 rounded bg-gray-200 sm:mt-3" />
+        <div className="mt-auto pt-2 sm:pt-3">
+          <div className="h-11 w-full rounded bg-gray-200 sm:h-8" />
         </div>
       </div>
     </div>

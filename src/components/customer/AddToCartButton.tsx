@@ -66,9 +66,8 @@ export default function AddToCartButton({
     'inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50';
   const sizing =
     variant === 'primary'
-      ? 'px-6 py-3'
-      // Compact: full-width small. Designed to sit at the bottom of a ProductCard.
-      : 'w-full px-3 py-2 text-sm';
+      ? 'min-h-11 px-6 py-3'
+      : 'min-h-11 w-full px-3 py-2.5 text-sm sm:py-2';
   const colours = justAdded
     ? 'bg-green-600 text-white hover:bg-green-700'
     : 'bg-primary-600 text-white hover:bg-primary-700';
@@ -82,22 +81,43 @@ export default function AddToCartButton({
         type="button"
         onClick={onClick}
         disabled={disabled}
+        aria-label={
+          disabled
+            ? 'Out of stock'
+            : justAdded
+              ? 'Added to cart'
+              : 'Add to cart'
+        }
         className={`${base} ${sizing} ${colours}`}
       >
         {justAdded ? (
           <>
-            <CheckIcon className="h-5 w-5" aria-hidden="true" />
+            <CheckIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
             Added{variant === 'primary' ? ' to cart' : ''}
           </>
         ) : disabled ? (
           <>
-            <ShoppingBagIcon className="h-5 w-5" aria-hidden="true" />
-            Out of stock
+            <ShoppingBagIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+            {variant === 'compact' ? (
+              <>
+                <span className="sm:hidden">Unavailable</span>
+                <span className="hidden sm:inline">Out of stock</span>
+              </>
+            ) : (
+              'Out of stock'
+            )}
           </>
         ) : (
           <>
-            <ShoppingBagIcon className="h-5 w-5" aria-hidden="true" />
-            Add to cart
+            <ShoppingBagIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+            {variant === 'compact' ? (
+              <>
+                <span className="sm:hidden">Add</span>
+                <span className="hidden sm:inline">Add to cart</span>
+              </>
+            ) : (
+              'Add to cart'
+            )}
           </>
         )}
       </button>
