@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -14,18 +15,134 @@ import { buildProductJsonLd } from '@/lib/products/structured-data';
 
 export const revalidate = 60;
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+/**
+ * Truncate at a word boundary so meta-description previews don't end mid-word.
+ * Google typically renders 155–160 chars; 200 leaves headroom for social
+ * previews (OG/Twitter) which truncate higher, while still being safe.
+ */
+function truncateAtWord(input: string, max = 200): string {
+  const trimmed = input.trim().replace(/\s+/g, ' ');
+  if (trimmed.length <= max) return trimmed;
+  const slice = trimmed.slice(0, max);
+  const lastSpace = slice.lastIndexOf(' ');
+  return (lastSpace > 0 ? slice.slice(0, lastSpace) : slice).trimEnd() + '…';
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
-  const { data } = await supabase
+
+  const { data: product } = await supabase
     .from('products')
-    .select('name, short_description, meta_title, meta_description')
+    .select(
+      'name, slug, short_description, description, meta_title, meta_description, featured_image_url, image_urls, price, compare_at_price, stock_quantity, track_inventory, is_active, brand_id, sku',
+    )
     .eq('slug', slug)
     .maybeSingle();
-  if (!data) return { title: 'Product not found' };
+
+  // Unknown product → tell crawlers explicitly not to index the 404. Without
+  // this, a deleted-then-re-crawled URL can linger as a soft-404 in Search
+  // Console reports.
+  if (!product || !product.is_active) {
+    return {
+      title: 'Product not found',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  // Brand name (one extra round-trip but it keeps the metadata description
+  // and OG title brand-prefixed, which matters for SERP CTR on brand-driven
+  // searches like "Samsung 55 inch TV Guyana").
+  const { data: brand } = product.brand_id
+    ? await supabase
+        .from('brands')
+        .select('name')
+        .eq('id', product.brand_id)
+        .maybeSingle()
+    : { data: null };
+
+  const canonicalPath = `/products/${product.slug}`;
+  const canonical = `${siteConfig.url.replace(/\/+$/, '')}${canonicalPath}`;
+
+  // Title — prefer admin-set meta_title, fall back to "{Brand} {Name}".
+  // The root layout's title template appends " · War on Retail" automatically.
+  const title =
+    product.meta_title ??
+    (brand?.name ? `${brand.name} ${product.name}` : product.name);
+
+  // Description fallback ladder. Each step is intentional:
+  //  1. meta_description — explicit marketing copy
+  //  2. short_description — the promo blurb on the card
+  //  3. truncated long description — better than nothing
+  //  4. generated fallback — formula combining brand + price + trust signals,
+  //     because an empty meta description is worse than a templated one for
+  //     SERPs and social previews.
+  const generatedDescription = (() => {
+    if (product.meta_description) return product.meta_description;
+    if (product.short_description) return product.short_description;
+    if (product.description) return product.description;
+    const lead = brand?.name
+      ? `Buy the ${brand.name} ${product.name}`
+      : `Buy ${product.name}`;
+    return `${lead} for ${formatPrice(product.price)} at ${siteConfig.name}. Authentic products, manufacturer warranty, delivery across Guyana.`;
+  })();
+  const description = truncateAtWord(generatedDescription, 200);
+
+  // OG/Twitter image. Prefer the featured image; fall back to the first
+  // gallery image; finally fall back to the site logo (set in app/layout.tsx).
+  const ogImageUrl =
+    product.featured_image_url ?? product.image_urls?.[0] ?? '/logo.png';
+  const ogImageAlt = brand?.name
+    ? `${brand.name} ${product.name}`
+    : product.name;
+
+  const isOutOfStock = product.track_inventory && product.stock_quantity === 0;
+  const price = typeof product.price === 'string' ? Number(product.price) : product.price;
+
   return {
-    title: data.meta_title ?? data.name,
-    description: data.meta_description ?? data.short_description ?? undefined,
+    title,
+    description,
+    alternates: { canonical: canonicalPath },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: 'website',
+      siteName: siteConfig.name,
+      locale: 'en_GY',
+      images: [{ url: ogImageUrl, alt: ogImageAlt }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImageUrl],
+    },
+    // Facebook/Pinterest product-pin meta tags. Next.js exposes arbitrary
+    // <meta> via the `other` field. These are namespaced strings, not
+    // OpenGraph proper, so they live here.
+    other: {
+      'product:price:amount': price.toFixed(2),
+      'product:price:currency': 'GYD',
+      'product:availability': isOutOfStock ? 'out of stock' : 'in stock',
+      'product:condition': 'new',
+      ...(product.sku ? { 'product:retailer_item_id': product.sku } : {}),
+      ...(brand?.name ? { 'product:brand': brand.name } : {}),
+    },
   };
 }
 
