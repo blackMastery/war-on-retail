@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: 'War on Retail',
   description: 'Your trusted electronics and home-appliance store in Guyana.',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.waronretailguyana.com',
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5926943827',
   email: 'info@waronretail.com',
   phone: '592-694-3827',
