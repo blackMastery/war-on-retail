@@ -77,7 +77,7 @@ export default function HorizontalScroller({ children, ariaLabel, gap = 3 }: Pro
     <div className="relative" role="region" aria-label={ariaLabel}>
       <div
         ref={ref}
-        className={`no-scrollbar flex ${gapClass} snap-x snap-mandatory scroll-pl-1 overflow-x-auto scroll-smooth`}
+        className={`no-scrollbar flex items-stretch ${gapClass} snap-x snap-mandatory scroll-pl-1 overflow-x-auto scroll-smooth`}
       >
         {children}
       </div>

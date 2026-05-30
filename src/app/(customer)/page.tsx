@@ -256,8 +256,8 @@ export default async function Homepage() {
           </div>
           <HorizontalScroller ariaLabel="New arrivals" gap={4}>
             {newArrivals.map((p) => (
-              <div key={p.id} className="w-60 shrink-0 snap-start sm:w-64">
-                <ProductCard product={p} imageSizes="240px" />
+              <div key={p.id} className="flex w-60 shrink-0 snap-start sm:w-64">
+                <ProductCard product={p} layout="strip" imageSizes="240px" className="w-full" />
               </div>
             ))}
           </HorizontalScroller>

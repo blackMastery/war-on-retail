@@ -52,8 +52,8 @@ export default function Header({ categories, brands }: Props) {
 
   // Two-phase mount/show state so the open/close transitions can play:
   //   - `mobileMenuMounted` controls DOM presence (kept true during the
-  //      closing animation so the fade-out is visible)
-  //   - `mobileMenuShown` controls the visibility classes (opacity, translate)
+  //      closing animation so the slide-out is visible)
+  //   - `mobileMenuShown` controls the visibility classes (translate, opacity)
   // Pattern: mount → next animation frame → flip shown. On close: flip shown
   // → wait the transition duration → unmount.
   const [mobileMenuMounted, setMobileMenuMounted] = useState(false);
@@ -61,11 +61,24 @@ export default function Header({ categories, brands }: Props) {
   useEffect(() => {
     if (mobileMenuOpen) {
       setMobileMenuMounted(true);
-      const raf = requestAnimationFrame(() => setMobileMenuShown(true));
-      return () => cancelAnimationFrame(raf);
+      // Two nested RAFs: the first lets the browser commit the just-mounted
+      // (closed) state to the DOM and paint it; the second flips to open so
+      // the transition has two distinct frames to interpolate between. Without
+      // the double-RAF, React can batch the mount + state flip into a single
+      // frame and the browser skips the animation entirely.
+      let raf2 = 0;
+      const raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => setMobileMenuShown(true));
+      });
+      return () => {
+        cancelAnimationFrame(raf1);
+        if (raf2) cancelAnimationFrame(raf2);
+      };
     }
     setMobileMenuShown(false);
-    const t = setTimeout(() => setMobileMenuMounted(false), 200);
+    // Matches the overlay's `duration-300` transition — unmount after the
+    // slide-out completes so the user sees the panel leave the screen.
+    const t = setTimeout(() => setMobileMenuMounted(false), 300);
     return () => clearTimeout(t);
   }, [mobileMenuOpen]);
 
@@ -261,9 +274,27 @@ export default function Header({ categories, brands }: Props) {
              owns the viewport while open and gets out of the way completely
              when closed. */}
       {mobileMenuMounted && (
+        <>
+          {/* Backdrop — fades in alongside the drawer's slide. Tap to close.
+              This is what gives the menu its "app drawer" feel: the user can
+              still see (dimmed) where they were on the page, and the menu
+              feels layered over context rather than replacing it. */}
+          <div
+            role="presentation"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ease-out md:hidden motion-reduce:transition-none ${
+              mobileMenuShown ? 'opacity-100' : 'pointer-events-none opacity-0'
+            }`}
+          />
         <div
-          className={`fixed inset-0 z-50 flex flex-col bg-white transition duration-200 ease-out md:hidden motion-reduce:transition-none ${
-            mobileMenuShown ? 'opacity-100 translate-y-0' : 'pointer-events-none -translate-y-2 opacity-0'
+          // Side drawer: ~85% of viewport width capped at ~360 px, slides in
+          // from the left edge. Parked off-screen at -translate-x-full when
+          // closed, slides to translate-x-0 on open. ease-out keeps the
+          // motion feeling responsive (most velocity at the start) rather
+          // than the sluggish ease-in-out default. The right-edge shadow
+          // gives the drawer depth against the backdrop.
+          className={`fixed bottom-0 left-0 top-0 z-50 flex w-[85%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-300 ease-out will-change-transform md:hidden motion-reduce:transition-none ${
+            mobileMenuShown ? 'translate-x-0' : 'pointer-events-none -translate-x-full'
           }`}
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
@@ -398,6 +429,7 @@ export default function Header({ categories, brands }: Props) {
             </MobileLink>
           </nav>
         </div>
+        </>
       )}
     </>
   );

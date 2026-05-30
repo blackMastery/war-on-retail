@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { calculateDiscount, formatPrice } from '@/lib/utils';
+import { calculateDiscount, formatPrice, cn } from '@/lib/utils';
 import { isNewArrival } from '@/config/catalog';
 import AddToCartButton from './AddToCartButton';
 import WishlistButton from './WishlistButton';
@@ -14,6 +14,9 @@ interface ProductCardProps {
   product: Product;
   /** Pass a fixed width (e.g. `240px`) when the card lives in a horizontal scroller. */
   imageSizes?: string;
+  /** `strip` — fixed-height cards for horizontal product carousels. */
+  layout?: 'default' | 'strip';
+  className?: string;
 }
 
 /**
@@ -30,7 +33,13 @@ interface ProductCardProps {
  *      they intercept their own taps without firing the overlay link's
  *      navigation.
  */
-export default function ProductCard({ product, imageSizes = DEFAULT_IMAGE_SIZES }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  imageSizes = DEFAULT_IMAGE_SIZES,
+  layout = 'default',
+  className,
+}: ProductCardProps) {
+  const isStrip = layout === 'strip';
   const discount = calculateDiscount(product.price, product.compare_at_price);
   const isOutOfStock = product.track_inventory && product.stock_quantity === 0;
   const isLowStock =
@@ -40,7 +49,13 @@ export default function ProductCard({ product, imageSizes = DEFAULT_IMAGE_SIZES 
   const isNew = isNewArrival(product.created_at);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 transition-shadow hover:shadow-md">
+    <article
+      className={cn(
+        'group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 transition-shadow hover:shadow-md',
+        isStrip && 'h-full',
+        className,
+      )}
+    >
       {/* Image area */}
       <div className="relative aspect-square bg-gray-100">
         {product.featured_image_url ? (
@@ -98,17 +113,34 @@ export default function ProductCard({ product, imageSizes = DEFAULT_IMAGE_SIZES 
       </div>
 
       {/* Card body — tighter padding/typography on 2-col mobile grids. */}
-      <div className="flex flex-1 flex-col p-3 sm:p-4">
-        <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold text-gray-900 sm:min-h-[2.75rem] sm:text-base sm:group-hover:text-primary-600">
+      <div className={cn('flex flex-1 flex-col', isStrip ? 'p-4' : 'p-3 sm:p-4')}>
+        <h3
+          className={cn(
+            'line-clamp-2 font-semibold text-gray-900',
+            isStrip
+              ? 'min-h-[2.75rem] text-base sm:group-hover:text-primary-600'
+              : 'min-h-[2.5rem] text-sm sm:min-h-[2.75rem] sm:text-base sm:group-hover:text-primary-600',
+          )}
+        >
           {product.name}
         </h3>
-        {product.short_description && (
+        {!isStrip && product.short_description && (
           <p className="mt-1 hidden line-clamp-2 text-sm text-gray-500 sm:block">
             {product.short_description}
           </p>
         )}
-        <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 tabular-nums sm:mt-3">
-          <span className="text-base font-bold text-gray-900 sm:text-lg">
+        <div
+          className={cn(
+            'flex flex-wrap items-baseline gap-x-2 gap-y-0.5 tabular-nums',
+            isStrip ? 'mt-3 min-h-[1.75rem]' : 'mt-2 sm:mt-3',
+          )}
+        >
+          <span
+            className={cn(
+              'font-bold text-gray-900',
+              isStrip ? 'text-lg' : 'text-base sm:text-lg',
+            )}
+          >
             {formatPrice(product.price)}
           </span>
           {product.compare_at_price && product.compare_at_price > product.price && (
@@ -117,13 +149,13 @@ export default function ProductCard({ product, imageSizes = DEFAULT_IMAGE_SIZES 
             </span>
           )}
         </div>
-        {product.track_inventory && !isOutOfStock && (
+        {!isStrip && product.track_inventory && !isOutOfStock && (
           <p className="mt-1 hidden text-xs text-gray-500 sm:block">
             {product.stock_quantity} in stock
           </p>
         )}
 
-        <div className="relative z-10 mt-auto pt-2 sm:pt-3">
+        <div className={cn('relative z-10 mt-auto', isStrip ? 'pt-3' : 'pt-2 sm:pt-3')}>
           <AddToCartButton
             variant="compact"
             disabled={isOutOfStock}
