@@ -270,7 +270,7 @@ export default async function Homepage() {
       <RecentlyViewedStrip title="Recently Viewed" minItems={2} />
 
       {/* Featured products */}
-      <section className="bg-accent-200">
+      <section className="bg-accent-600">
         <div className="container py-12">
           <div className="mb-6 flex items-end justify-between">
             <h2 className="text-2xl font-bold">Featured Products</h2>

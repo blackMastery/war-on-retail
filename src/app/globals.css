@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: 255 248 225;
+  --background: 255 215 0;
   --foreground: 17 24 39;
   color-scheme: light;
 }
@@ -16,7 +16,7 @@
     touch-action: manipulation;
   }
   body {
-    @apply bg-accent-100 text-gray-900;
+    @apply bg-accent-500 text-gray-900;
     overflow-x: clip;
     /* Bottom inset for home indicator; top handled by sticky Header. */
     padding-bottom: env(safe-area-inset-bottom);

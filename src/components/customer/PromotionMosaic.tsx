@@ -26,7 +26,7 @@ export default function PromotionMosaic({ promotions }: { promotions: Promotion[
   const rest = promotions.filter((_, i) => i !== featuredIdx);
 
   return (
-    <section aria-label="Current specials" className="bg-accent-200">
+    <section aria-label="Current specials" className="bg-accent-600">
       <div className="container py-8 md:py-12">
         <div
           className={`grid gap-4 ${

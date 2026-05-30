@@ -178,7 +178,7 @@ export default function Chatbot() {
             role="log"
             aria-live="polite"
             aria-atomic="false"
-            className="flex-1 space-y-3 overflow-y-auto overscroll-contain bg-accent-100 px-3 py-3"
+            className="flex-1 space-y-3 overflow-y-auto overscroll-contain bg-white px-3 py-3"
           >
             {messages.map((m, i) => (
               <div

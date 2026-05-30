@@ -71,7 +71,7 @@ export default function WishlistButton({ slug, productName, variant = 'button' }
       className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border-2 px-6 py-3 font-semibold transition-colors ${
         displaySaved
           ? 'border-primary-600 bg-primary-600 text-white hover:bg-primary-700'
-          : 'border-accent-700 bg-accent-200 text-gray-900 hover:bg-accent-300'
+          : 'border-accent-800 bg-accent-400 text-gray-900 hover:bg-accent-300'
       }`}
     >
       {displaySaved ? (

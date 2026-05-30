@@ -86,13 +86,13 @@ export default function HorizontalScroller({ children, ariaLabel, gap = 3 }: Pro
       {canScrollLeft && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-accent-100 to-transparent"
+          className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-accent-500 to-transparent"
         />
       )}
       {canScrollRight && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-accent-100 to-transparent"
+          className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-accent-500 to-transparent"
         />
       )}
 
