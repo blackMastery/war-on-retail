@@ -1,5 +1,7 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { siteConfig } from '@/config/site';
 import CategoryCard from '@/components/customer/CategoryCard';
 import BrandCard from '@/components/customer/BrandCard';
 import HorizontalScroller from '@/components/customer/HorizontalScroller';
@@ -11,6 +13,117 @@ import { NEW_ARRIVAL_WINDOW_DAYS, newArrivalCutoffIso } from '@/config/catalog';
 
 // Short revalidate so newly-scheduled promotions appear within a minute.
 export const revalidate = 60;
+
+// Homepage SEO. Distinct from the root layout's defaults: the title is
+// `absolute` so the "· War on Retail" template doesn't append (the brand
+// already appears in the lead phrase), and the description is tuned for
+// the keywords a Guyanese shopper actually types.
+const homeTitle = `${siteConfig.name} — Electronics & Home Appliances in Guyana`;
+const homeDescription =
+  'Shop TVs, fridges, washing machines, computers, and personal-care electronics in Guyana. Authentic products, manufacturer warranties, fast delivery in Georgetown and nationwide. Buy via WhatsApp or browse online.';
+
+export const metadata: Metadata = {
+  title: { absolute: homeTitle },
+  description: homeDescription,
+  alternates: { canonical: '/' },
+  keywords: [
+    'electronics Guyana',
+    'home appliances Guyana',
+    'TVs Georgetown',
+    'fridges Guyana',
+    'washing machines Guyana',
+    'computers Guyana',
+    'kitchen appliances Guyana',
+    'personal care electronics',
+    'War on Retail',
+  ],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    title: homeTitle,
+    description: homeDescription,
+    url: siteConfig.url,
+    type: 'website',
+    siteName: siteConfig.name,
+    locale: 'en_GY',
+    images: [{ url: '/logo.png', alt: siteConfig.name }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: homeTitle,
+    description: homeDescription,
+    images: ['/logo.png'],
+  },
+};
+
+/**
+ * Organization + WebSite JSON-LD.
+ *
+ * - `Organization` declares the business identity for the Knowledge Panel —
+ *   name, logo, social profiles, contact channel, address. Google reads
+ *   `sameAs` to consolidate identity across Facebook/Instagram/Twitter.
+ * - `WebSite` with a `SearchAction` tells Google the URL pattern for the
+ *   in-site search. This is the trigger for the sitelinks search box that
+ *   appears on branded SERPs (e.g. searching "war on retail" shows a search
+ *   field below the result).
+ */
+function buildHomeJsonLd() {
+  const base = siteConfig.url.replace(/\/+$/, '');
+  const organization = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${base}/#organization`,
+    name: siteConfig.name,
+    url: base,
+    logo: `${base}/logo.png`,
+    description: siteConfig.description,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Georgetown',
+      addressCountry: 'GY',
+    },
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        telephone: `+${siteConfig.whatsapp}`,
+        contactType: 'customer service',
+        areaServed: 'GY',
+        availableLanguage: ['English'],
+      },
+    ],
+    sameAs: [
+      siteConfig.social.facebook,
+      siteConfig.social.instagram,
+      siteConfig.social.twitter,
+    ],
+  };
+  const website = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${base}/#website`,
+    url: base,
+    name: siteConfig.name,
+    description: siteConfig.description,
+    publisher: { '@id': `${base}/#organization` },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${base}/search?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+  return { '@context': 'https://schema.org', '@graph': [organization, website] };
+}
 
 export default async function Homepage() {
   const supabase = await createClient();
@@ -63,9 +176,16 @@ export default async function Homepage() {
   ]);
 
   const hasPromotions = !!promotions && promotions.length > 0;
+  const jsonLd = buildHomeJsonLd();
 
   return (
     <div>
+      {/* Organization + WebSite structured data. JSON.stringify is XSS-safe
+          here — every input is JSON-encoded, no HTML is interpolated. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Promotion mosaic replaces the hero when any are live. */}
       {hasPromotions ? (
         <PromotionMosaic promotions={promotions} />
