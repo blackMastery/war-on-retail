@@ -12,13 +12,13 @@ import {
   type ProductFilters,
   type SortKey,
 } from '@/lib/products/filters';
+import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
 import type { Brand, Category } from '@/types/database';
 import PriceRangeSlider from './PriceRangeSlider';
 
 type Props = {
   categories: Pick<Category, 'id' | 'slug' | 'name' | 'parent_id'>[];
   brands: Pick<Brand, 'id' | 'slug' | 'name'>[];
-  /** Catalogue-wide price extremes — the slider's hard bounds. */
   priceBounds: { min: number; max: number };
 };
 
@@ -27,9 +27,6 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
   const searchParams = useSearchParams();
   const [pending, startTransition] = useTransition();
 
-  // Hydrate from URL on first paint AND whenever the URL changes externally
-  // (e.g. a chip removal). Keeping the form state mirrored to the URL avoids
-  // a confused "you cleared but I still show old" race.
   const urlFilters = useMemo(() => {
     const sp: Record<string, string | string[]> = {};
     for (const key of searchParams.keys()) {
@@ -43,7 +40,8 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
   const [mobileOpen, setMobileOpen] = useState(false);
   useEffect(() => setDraft(urlFilters), [urlFilters]);
 
-  // Top-level categories with their direct children grouped underneath.
+  useBodyScrollLock(mobileOpen);
+
   const tree = useMemo(() => {
     const tops = categories.filter((c) => !c.parent_id);
     return tops.map((t) => ({
@@ -60,7 +58,6 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
     });
   }
 
-  // ---- per-control handlers ----
   const toggleArr = (key: 'categorySlugs' | 'brandSlugs', slug: string) =>
     commit({
       ...draft,
@@ -83,16 +80,114 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
       sort: 'featured',
     });
 
+  const filterFields = (
+    <>
+      <div className="hidden lg:block">
+        <SortSelect value={draft.sort} onChange={(v) => commit({ ...draft, sort: v })} />
+      </div>
+
+      <Group title="Category">
+        <ul className="space-y-2">
+          {tree.map((parent) => {
+            const expanded =
+              draft.categorySlugs.includes(parent.slug) ||
+              parent.children.some((c) => draft.categorySlugs.includes(c.slug));
+            return (
+              <li key={parent.id}>
+                <CheckboxRow
+                  label={parent.name}
+                  checked={draft.categorySlugs.includes(parent.slug)}
+                  onChange={() => toggleArr('categorySlugs', parent.slug)}
+                />
+                {expanded && parent.children.length > 0 && (
+                  <ul className="ml-5 mt-1 space-y-1">
+                    {parent.children.map((c) => (
+                      <li key={c.id}>
+                        <CheckboxRow
+                          label={c.name}
+                          size="sm"
+                          checked={draft.categorySlugs.includes(c.slug)}
+                          onChange={() => toggleArr('categorySlugs', c.slug)}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </Group>
+
+      <Group title="Brand">
+        <ul className="max-h-56 space-y-2 overflow-y-auto overscroll-contain pr-1">
+          {brands.map((b) => (
+            <li key={b.id}>
+              <CheckboxRow
+                label={b.name}
+                checked={draft.brandSlugs.includes(b.slug)}
+                onChange={() => toggleArr('brandSlugs', b.slug)}
+              />
+            </li>
+          ))}
+        </ul>
+      </Group>
+
+      <Group title="Price (GYD)">
+        <PriceRangeSlider
+          bounds={priceBounds}
+          value={{ min: draft.minPrice, max: draft.maxPrice }}
+          onCommit={setPriceRange}
+        />
+      </Group>
+
+      <Group title="Availability">
+        <ul className="space-y-2">
+          <li>
+            <CheckboxRow
+              label="In stock only"
+              checked={draft.inStock}
+              onChange={() => commit({ ...draft, inStock: !draft.inStock })}
+            />
+          </li>
+          <li>
+            <CheckboxRow
+              label="On sale"
+              checked={draft.onSale}
+              onChange={() => commit({ ...draft, onSale: !draft.onSale })}
+            />
+          </li>
+        </ul>
+      </Group>
+
+      {pending && (
+        <p className="text-xs text-gray-500" aria-live="polite">
+          Updating results…
+        </p>
+      )}
+    </>
+  );
+
+  const filterHeader = hasActiveFilters(draft) ? (
+    <button
+      type="button"
+      onClick={clearAll}
+      className="min-h-11 px-2 text-xs font-medium text-primary-600 hover:underline"
+    >
+      Clear all
+    </button>
+  ) : null;
+
   return (
     <>
-      {/* Mobile toggle */}
-      <div className="mb-4 flex items-center justify-between lg:hidden">
+      {/* Mobile toolbar */}
+      <div className="mb-4 flex flex-wrap items-center gap-2 lg:hidden">
         <button
           type="button"
-          onClick={() => setMobileOpen((v) => !v)}
+          onClick={() => setMobileOpen(true)}
           aria-expanded={mobileOpen}
           aria-controls="product-filters"
-          className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-gray-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-gray-50"
         >
           <AdjustmentsHorizontalIcon className="h-4 w-4" aria-hidden="true" />
           Filters
@@ -109,132 +204,71 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
             </span>
           )}
         </button>
-        <SortSelect value={draft.sort} onChange={(v) => commit({ ...draft, sort: v })} />
+        <div className="min-w-0 flex-1">
+          <SortSelect value={draft.sort} onChange={(v) => commit({ ...draft, sort: v })} />
+        </div>
       </div>
 
+      {/* Desktop sidebar */}
       <aside
         id="product-filters"
         aria-label="Product filters"
-        className={`${
-          mobileOpen ? 'block' : 'hidden'
-        } lg:sticky lg:top-32 lg:block lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto`}
+        className="hidden lg:sticky lg:top-32 lg:block lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto"
       >
         <div className="space-y-6 rounded-lg bg-white p-5 ring-1 ring-gray-200">
           <header className="flex items-center justify-between">
             <h2 className="text-base font-bold">Filters</h2>
-            {hasActiveFilters(draft) && (
-              <button
-                type="button"
-                onClick={clearAll}
-                className="text-xs font-medium text-primary-600 hover:underline"
-              >
-                Clear all
-              </button>
-            )}
+            {filterHeader}
           </header>
-
-          {/* Sort — desktop only; mobile has its own next to the Filters button. */}
-          <div className="hidden lg:block">
-            <SortSelect value={draft.sort} onChange={(v) => commit({ ...draft, sort: v })} />
-          </div>
-
-          {/* Category */}
-          <Group title="Category">
-            <ul className="space-y-2">
-              {tree.map((parent) => {
-                const expanded =
-                  draft.categorySlugs.includes(parent.slug) ||
-                  parent.children.some((c) => draft.categorySlugs.includes(c.slug));
-                return (
-                  <li key={parent.id}>
-                    <CheckboxRow
-                      label={parent.name}
-                      checked={draft.categorySlugs.includes(parent.slug)}
-                      onChange={() => toggleArr('categorySlugs', parent.slug)}
-                    />
-                    {expanded && parent.children.length > 0 && (
-                      <ul className="ml-5 mt-1 space-y-1">
-                        {parent.children.map((c) => (
-                          <li key={c.id}>
-                            <CheckboxRow
-                              label={c.name}
-                              size="sm"
-                              checked={draft.categorySlugs.includes(c.slug)}
-                              onChange={() => toggleArr('categorySlugs', c.slug)}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </Group>
-
-          {/* Brand */}
-          <Group title="Brand">
-            <ul className="max-h-56 space-y-2 overflow-y-auto pr-1">
-              {brands.map((b) => (
-                <li key={b.id}>
-                  <CheckboxRow
-                    label={b.name}
-                    checked={draft.brandSlugs.includes(b.slug)}
-                    onChange={() => toggleArr('brandSlugs', b.slug)}
-                  />
-                </li>
-              ))}
-            </ul>
-          </Group>
-
-          {/* Price */}
-          <Group title="Price (GYD)">
-            <PriceRangeSlider
-              bounds={priceBounds}
-              value={{ min: draft.minPrice, max: draft.maxPrice }}
-              onCommit={setPriceRange}
-            />
-          </Group>
-
-          {/* Availability + sale */}
-          <Group title="Availability">
-            <ul className="space-y-2">
-              <li>
-                <CheckboxRow
-                  label="In stock only"
-                  checked={draft.inStock}
-                  onChange={() => commit({ ...draft, inStock: !draft.inStock })}
-                />
-              </li>
-              <li>
-                <CheckboxRow
-                  label="On sale"
-                  checked={draft.onSale}
-                  onChange={() => commit({ ...draft, onSale: !draft.onSale })}
-                />
-              </li>
-            </ul>
-          </Group>
-
-          {/* Mobile close */}
-          <div className="lg:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileOpen(false)}
-              className="flex w-full items-center justify-center gap-1 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-50"
-            >
-              <XMarkIcon className="h-4 w-4" aria-hidden="true" />
-              Close filters
-            </button>
-          </div>
-
-          {pending && (
-            <p className="text-xs text-gray-500" aria-live="polite">
-              Updating results…
-            </p>
-          )}
+          {filterFields}
         </div>
       </aside>
+
+      {/* Mobile bottom sheet */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden" role="presentation">
+          <button
+            type="button"
+            aria-label="Close filters"
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Product filters"
+            className="absolute inset-x-0 bottom-0 flex max-h-[min(85dvh,calc(100dvh-env(safe-area-inset-top)))] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+          >
+            <div className="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3">
+              <h2 className="text-base font-bold">Filters</h2>
+              <div className="flex items-center gap-1">
+                {filterHeader}
+                <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                aria-label="Close filters"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100"
+              >
+                <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+              </div>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">
+              {filterFields}
+            </div>
+            <div className="shrink-0 border-t border-gray-200 p-4">
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className="flex min-h-11 w-full items-center justify-center rounded-md bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
+              >
+                Show results
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -261,7 +295,7 @@ function CheckboxRow({
 }) {
   return (
     <label
-      className={`flex cursor-pointer items-center gap-2 ${
+      className={`flex min-h-11 cursor-pointer items-center gap-3 ${
         size === 'sm' ? 'text-xs text-gray-700' : 'text-sm text-gray-800'
       }`}
     >
@@ -269,22 +303,22 @@ function CheckboxRow({
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+        className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
       />
-      {label}
+      <span className="min-w-0 flex-1">{label}</span>
     </label>
   );
 }
 
 function SortSelect({ value, onChange }: { value: SortKey; onChange: (v: SortKey) => void }) {
   return (
-    <label className="block text-sm">
+    <label className="block w-full min-w-0 text-sm">
       <span className="sr-only">Sort by</span>
       <select
         name={PARAM.sort}
         value={value}
         onChange={(e) => onChange(e.target.value as SortKey)}
-        className="rounded-md border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+        className="min-h-11 w-full max-w-full rounded-md border-gray-300 bg-white text-base shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
       >
         {SORT_OPTIONS.map((o) => (
           <option key={o.value} value={o.value}>

@@ -120,7 +120,7 @@ export default function NavDropdown({
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={panelId}
-        className={`flex items-center gap-1 hover:text-primary-100 ${
+        className={`flex items-center gap-1 hover:text-accent-400 ${
           highlight ? 'font-bold' : ''
         }`}
       >
@@ -161,7 +161,7 @@ function Items({ items, onSelect }: { items: NavItem[]; onSelect: () => void }) 
             href={it.href}
             role="menuitem"
             onClick={onSelect}
-            className="block px-4 py-2 text-sm hover:bg-primary-50 hover:text-primary-700 focus-visible:bg-primary-50 focus-visible:outline-none"
+            className="block px-4 py-2 text-sm hover:bg-primary-50 hover:text-primary-700 focus-visible:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-600"
           >
             {it.label}
           </Link>
@@ -196,7 +196,7 @@ function Groups({ groups, onSelect }: { groups: NavGroup[]; onSelect: () => void
                   href={it.href}
                   role="menuitem"
                   onClick={onSelect}
-                  className="block py-0.5 text-sm text-gray-700 hover:text-primary-600 focus-visible:text-primary-600 focus-visible:outline-none"
+                  className="block py-0.5 text-sm text-gray-700 hover:text-primary-600 focus-visible:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
                 >
                   {it.label}
                 </Link>

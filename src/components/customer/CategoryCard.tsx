@@ -19,11 +19,17 @@ export default function CategoryCard({ category }: { category: Category }) {
       // it, cards with single-word names ("Electronics") are shorter than
       // ones whose name wraps to two lines ("Home Appliances"). `justify-center`
       // keeps the icon + name visually centred when the card stretches.
-      className="group flex h-full flex-col items-center justify-center rounded-lg bg-white p-6 text-center shadow-sm ring-1 ring-gray-200 transition hover:-translate-y-0.5 hover:shadow-md"
+      className="group flex h-full flex-col items-center justify-center rounded-lg bg-white p-6 text-center shadow-sm ring-1 ring-gray-200 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none"
     >
       {category.image_url ? (
         <div className="relative h-16 w-16">
-          <Image src={category.image_url} alt={category.name} fill className="object-contain" />
+          <Image
+            src={category.image_url}
+            alt={category.name}
+            fill
+            sizes="64px"
+            className="object-contain"
+          />
         </div>
       ) : (
         <span className="text-4xl" aria-hidden>

@@ -47,9 +47,9 @@ export default async function ProductsPage({
   const lastIdx = (currentPage - 1) * PAGE_SIZE + page.rows.length;
 
   return (
-    <div className="container py-8">
+    <div className="container py-6 sm:py-8">
       <header className="mb-6">
-        <h1 className="text-3xl font-bold">All Products</h1>
+        <h1 className="text-pretty text-2xl font-bold sm:text-3xl">All Products</h1>
         <p className="mt-1 text-sm text-gray-600 tabular-nums">
           {page.totalCount === 0
             ? 'No products match the current filters.'

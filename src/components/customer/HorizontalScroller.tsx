@@ -61,8 +61,14 @@ export default function HorizontalScroller({ children, ariaLabel, gap = 3 }: Pro
   function scroll(direction: -1 | 1) {
     const el = ref.current;
     if (!el) return;
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     // 85% of viewport so a chunk of the next item peeks out — easier to track.
-    el.scrollBy({ left: el.clientWidth * 0.85 * direction, behavior: 'smooth' });
+    el.scrollBy({
+      left: el.clientWidth * 0.85 * direction,
+      behavior: prefersReduced ? 'auto' : 'smooth',
+    });
   }
 
   const gapClass = { 2: 'gap-2', 3: 'gap-3', 4: 'gap-4', 6: 'gap-6' }[gap];
@@ -80,13 +86,13 @@ export default function HorizontalScroller({ children, ariaLabel, gap = 3 }: Pro
       {canScrollLeft && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-gray-50 to-transparent"
+          className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-accent-100 to-transparent"
         />
       )}
       {canScrollRight && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-gray-50 to-transparent"
+          className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-accent-100 to-transparent"
         />
       )}
 

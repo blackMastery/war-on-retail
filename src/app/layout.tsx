@@ -34,9 +34,11 @@ export const metadata: Metadata = {
 
 // `theme-color` matches the page background so iOS Safari's chrome blends in.
 export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f9fafb' },
-    { media: '(prefers-color-scheme: dark)', color: '#111827' },
+    { media: '(prefers-color-scheme: light)', color: '#FFF8E1' },
+    { media: '(prefers-color-scheme: dark)', color: '#0A0A0A' },
   ],
 };
 

@@ -39,7 +39,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const isNew = isNewArrival(product.created_at);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 transition hover:shadow-md">
+    <article className="group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 transition-shadow hover:shadow-md">
       {/* Image area */}
       <div className="relative aspect-square bg-gray-100">
         {product.featured_image_url ? (
@@ -48,7 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             alt={product.name}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 motion-reduce:transform-none group-hover:scale-105"
           />
         ) : (
           <div
@@ -68,7 +68,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
           )}
           {product.is_featured && (
-            <span className="rounded bg-yellow-500 px-2 py-0.5 text-xs font-bold text-white">
+            <span className="rounded bg-accent-500 px-2 py-0.5 text-xs font-bold text-gray-900">
               Featured
             </span>
           )}

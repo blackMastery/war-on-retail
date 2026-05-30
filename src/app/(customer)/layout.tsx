@@ -29,7 +29,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
   return (
     <div className="flex min-h-screen flex-col">
       <Header categories={categories ?? []} brands={brands ?? []} />
-      <main id="main" tabIndex={-1} className="flex-1 scroll-mt-24">
+      <main id="main" tabIndex={-1} className="flex-1 scroll-mt-28 md:scroll-mt-24">
         {children}
       </main>
       <Footer />

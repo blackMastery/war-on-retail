@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChatBubbleLeftRightIcon, PaperAirplaneIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getOrCreateSessionId } from '@/lib/utils';
+import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
 import { siteConfig } from '@/config/site';
 
 type Message = { role: 'user' | 'assistant'; content: string };
@@ -12,6 +13,9 @@ const WELCOME: Message = {
   content:
     'Hi! I’m the War on Retail assistant. Ask me about products, delivery, returns, or anything else — I’ll help or connect you to our team on WhatsApp.',
 };
+
+const FAB_OFFSET = 'calc(1.25rem + var(--cookie-banner-height, 0px) + env(safe-area-inset-bottom, 0px))';
+const PANEL_OFFSET = 'calc(6rem + var(--cookie-banner-height, 0px) + env(safe-area-inset-bottom, 0px))';
 
 /** Reduced-motion-aware smooth scroll to the bottom of a container. */
 function scrollToBottom(el: HTMLElement | null) {
@@ -29,8 +33,16 @@ export default function Chatbot() {
   const [sending, setSending] = useState(false);
   const sessionId = useRef<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+
+  useEffect(() => {
+    setIsCoarsePointer(window.matchMedia('(pointer: coarse)').matches);
+  }, []);
+
+  useBodyScrollLock(open && isCoarsePointer);
 
   useEffect(() => {
     sessionId.current = getOrCreateSessionId();
@@ -53,9 +65,40 @@ export default function Chatbot() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  // Move focus into the input when the panel opens.
+  // Focus trap — keep Tab inside the open panel.
   useEffect(() => {
-    if (open) inputRef.current?.focus();
+    if (!open) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Tab') return;
+      const focusables = panel!.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), [href], select:not([disabled]), textarea:not([disabled])',
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    panel.addEventListener('keydown', onKeyDown);
+    return () => panel.removeEventListener('keydown', onKeyDown);
+  }, [open]);
+
+  // Desktop only — avoid pulling keyboard over content on mobile.
+  useEffect(() => {
+    if (!open) return;
+    const prefersFinePointer = window.matchMedia('(pointer: fine)').matches;
+    if (prefersFinePointer) inputRef.current?.focus();
   }, [open]);
 
   async function send() {
@@ -98,7 +141,11 @@ export default function Chatbot() {
         aria-label={open ? 'Close chat' : 'Open chat'}
         aria-expanded={open}
         aria-controls="wor-chat-panel"
-        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg transition-shadow hover:bg-primary-700 hover:shadow-xl"
+        className="fixed z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg transition-shadow hover:bg-primary-700 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+        style={{
+          bottom: FAB_OFFSET,
+          right: 'max(1.25rem, env(safe-area-inset-right, 0px))',
+        }}
       >
         {open ? (
           <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -110,10 +157,16 @@ export default function Chatbot() {
       {/* Panel */}
       {open && (
         <div
+          ref={panelRef}
           id="wor-chat-panel"
           role="dialog"
+          aria-modal="true"
           aria-label="War on Retail assistant"
-          className="fixed bottom-24 right-5 z-50 flex h-[32rem] w-[22rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-gray-200"
+          className="fixed z-50 flex w-auto flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-gray-200 focus:outline-none inset-x-4 sm:inset-x-auto sm:right-5 sm:w-[22rem] sm:max-w-[calc(100vw-2.5rem)]"
+          style={{
+            bottom: PANEL_OFFSET,
+            height: 'min(32rem, calc(100dvh - var(--cookie-banner-height, 0px) - 7rem))',
+          }}
         >
           <header className="bg-primary-600 px-4 py-3 text-white">
             <h2 className="font-semibold">War on Retail Assistant</h2>
@@ -125,7 +178,7 @@ export default function Chatbot() {
             role="log"
             aria-live="polite"
             aria-atomic="false"
-            className="flex-1 space-y-3 overflow-y-auto overscroll-contain bg-gray-50 px-3 py-3"
+            className="flex-1 space-y-3 overflow-y-auto overscroll-contain bg-accent-100 px-3 py-3"
           >
             {messages.map((m, i) => (
               <div
@@ -170,13 +223,13 @@ export default function Chatbot() {
               placeholder="Type your message…"
               autoComplete="off"
               enterKeyHint="send"
-              className="flex-1 rounded-full border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-primary-500"
+              className="flex-1 rounded-full border border-gray-300 px-3 py-2.5 text-base focus:border-primary-500 focus:ring-primary-500 sm:py-2 sm:text-sm"
               disabled={sending}
             />
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
               aria-label="Send message"
             >
               <PaperAirplaneIcon className="h-4 w-4" aria-hidden="true" />

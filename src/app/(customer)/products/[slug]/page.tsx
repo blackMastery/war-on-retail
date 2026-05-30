@@ -245,11 +245,13 @@ export default async function ProductDetailPage({
               {brand.name}
             </Link>
           )}
-          <h1 className="mt-1 text-3xl font-bold text-gray-900">{product.name}</h1>
+          <h1 className="mt-1 text-pretty text-2xl font-bold text-gray-900 sm:text-3xl">{product.name}</h1>
           {product.sku && <p className="mt-1 text-xs text-gray-500">SKU: {product.sku}</p>}
 
-          <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-gray-900">{formatPrice(product.price)}</span>
+          <div className="mt-4 flex flex-wrap items-baseline gap-3">
+            <span className="text-2xl font-bold tabular-nums text-gray-900 sm:text-3xl">
+              {formatPrice(product.price)}
+            </span>
             {product.compare_at_price && product.compare_at_price > product.price && (
               <span className="text-lg text-gray-400 line-through">
                 {formatPrice(product.compare_at_price)}
@@ -306,9 +308,11 @@ export default async function ProductDetailPage({
             <WishlistButton slug={product.slug} productName={product.name} />
             <a
               href={`tel:${siteConfig.phone}`}
-              className="inline-flex items-center justify-center gap-2 rounded-md border-2 border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50"
             >
-              <span aria-hidden="true">📞 </span>Call {siteConfig.phone}
+              <span aria-hidden="true">📞 </span>
+              <span className="sm:hidden">Call us</span>
+              <span className="hidden sm:inline">Call {siteConfig.phone}</span>
             </a>
           </div>
 
@@ -324,7 +328,7 @@ export default async function ProductDetailPage({
                     <dt className="col-span-1 px-4 py-2 font-medium text-gray-600 capitalize">
                       {k.replace(/_/g, ' ')}
                     </dt>
-                    <dd className="col-span-2 px-4 py-2 text-gray-900">{String(v)}</dd>
+                    <dd className="col-span-2 break-words px-4 py-2 text-gray-900">{String(v)}</dd>
                   </div>
                 ))}
               </dl>

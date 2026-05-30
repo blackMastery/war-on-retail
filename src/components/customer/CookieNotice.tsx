@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
@@ -20,8 +20,11 @@ const STORAGE_KEY = 'wor_cookie_notice_v1';
  * Renders nothing on first paint (until localStorage is read) to avoid an
  * SSR/hydration mismatch and a momentary flash on every page load for
  * returning visitors who've already dismissed.
+ *
+ * Publishes `--cookie-banner-height` so the chat FAB shifts above this bar.
  */
 export default function CookieNotice() {
+  const bannerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [dismissed, setDismissed] = useState(true);
 
@@ -34,6 +37,34 @@ export default function CookieNotice() {
       setDismissed(false);
     }
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    function clearHeight() {
+      root.style.setProperty('--cookie-banner-height', '0px');
+    }
+
+    if (!mounted || dismissed) {
+      clearHeight();
+      return;
+    }
+
+    const el = bannerRef.current;
+    if (!el) return;
+
+    function syncHeight() {
+      root.style.setProperty('--cookie-banner-height', `${el!.offsetHeight}px`);
+    }
+
+    syncHeight();
+    const ro = new ResizeObserver(syncHeight);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      clearHeight();
+    };
+  }, [mounted, dismissed]);
 
   function dismiss() {
     setDismissed(true);
@@ -48,11 +79,11 @@ export default function CookieNotice() {
 
   return (
     <div
+      ref={bannerRef}
       role="dialog"
       aria-labelledby="cookie-notice-title"
       aria-describedby="cookie-notice-body"
-      // High z so it sits above the chatbot button (z-50) and any other floating UI.
-      className="fixed bottom-0 left-0 right-0 z-[60] border-t border-gray-200 bg-white shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white shadow-lg"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="container flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
@@ -75,9 +106,11 @@ export default function CookieNotice() {
         <button
           type="button"
           onClick={dismiss}
-          className="inline-flex items-center justify-center gap-1 rounded-md bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700 sm:shrink-0"
+          aria-label="Dismiss privacy notice"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-md bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700 sm:w-auto sm:shrink-0"
         >
-          Got it
+          <span className="sm:hidden">Got it</span>
+          <span className="hidden sm:inline">Dismiss Privacy Notice</span>
           <XMarkIcon className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>

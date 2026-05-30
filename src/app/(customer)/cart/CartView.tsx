@@ -229,7 +229,7 @@ function QuantityStepper({
           if (Number.isFinite(n) && n >= 1) onChange(n);
         }}
         aria-label="Quantity"
-        className="h-9 w-12 border-0 bg-transparent text-center text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary-500"
+        className="h-9 w-12 border-0 bg-transparent text-center text-sm tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
       />
       <button
         type="button"

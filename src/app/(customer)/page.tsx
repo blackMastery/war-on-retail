@@ -190,10 +190,10 @@ export default async function Homepage() {
       {hasPromotions ? (
         <PromotionMosaic promotions={promotions} />
       ) : (
-        <section className="bg-gradient-to-r from-primary-700 to-primary-500 text-white">
+        <section className="bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white">
           <div className="container py-16 md:py-24">
             <div className="max-w-2xl">
-              <h1 className="text-balance text-4xl font-extrabold tracking-tight md:text-5xl">
+              <h1 className="text-balance text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
                 Electronics &amp; Home Appliances, Delivered Across Guyana.
               </h1>
               <p className="mt-4 text-pretty text-lg opacity-95 md:text-xl">
@@ -202,7 +202,7 @@ export default async function Homepage() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/categories"
-                  className="inline-block rounded-md bg-white px-6 py-3 font-semibold text-primary-700 hover:bg-gray-100"
+                  className="inline-block rounded-md bg-white px-6 py-3 font-semibold text-primary-700 hover:bg-accent-100"
                 >
                   Shop Categories
                 </Link>
@@ -270,7 +270,7 @@ export default async function Homepage() {
       <RecentlyViewedStrip title="Recently Viewed" minItems={2} />
 
       {/* Featured products */}
-      <section className="bg-gray-100">
+      <section className="bg-accent-200">
         <div className="container py-12">
           <div className="mb-6 flex items-end justify-between">
             <h2 className="text-2xl font-bold">Featured Products</h2>

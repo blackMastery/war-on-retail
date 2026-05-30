@@ -21,7 +21,7 @@ export default function PoliciesLayout({ children }: { children: React.ReactNode
 
       <article className="prose prose-gray max-w-3xl">{children}</article>
 
-      <aside className="mt-12 max-w-3xl rounded-lg bg-gray-50 p-5 text-sm ring-1 ring-gray-200">
+      <aside className="mt-12 max-w-3xl rounded-lg bg-accent-200 p-5 text-sm ring-1 ring-accent-300">
         <p className="font-semibold text-gray-900">Questions about this policy?</p>
         <p className="mt-1 text-gray-700">
           The fastest way is WhatsApp:{' '}

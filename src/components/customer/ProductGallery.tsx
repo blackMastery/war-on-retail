@@ -151,7 +151,7 @@ export default function ProductGallery({ images, productName, discount = 0 }: Pr
             aria-hidden="true"
             className="pointer-events-none absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
           >
-            <MagnifyingGlassPlusIcon className="h-4 w-4" />
+            <MagnifyingGlassPlusIcon className="h-4 w-4" aria-hidden="true" />
           </span>
         </div>
 
@@ -170,7 +170,7 @@ export default function ProductGallery({ images, productName, discount = 0 }: Pr
 
       {/* Thumbnails */}
       {total > 1 && (
-        <ul role="list" className="grid grid-cols-5 gap-2 sm:grid-cols-6">
+        <ul role="list" className="grid grid-cols-4 gap-2 sm:grid-cols-5">
           {images.map((src, i) => {
             const isActive = i === safeActive;
             return (
@@ -349,7 +349,7 @@ function Lightbox({
       aria-label={heading}
       tabIndex={-1}
       style={{ touchAction: 'pan-y' }}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4 outline-none"
+      className="fixed inset-0 z-[60] flex items-center justify-center overscroll-contain bg-black/90 p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/90"
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}

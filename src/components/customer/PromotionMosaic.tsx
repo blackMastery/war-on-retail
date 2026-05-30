@@ -26,7 +26,7 @@ export default function PromotionMosaic({ promotions }: { promotions: Promotion[
   const rest = promotions.filter((_, i) => i !== featuredIdx);
 
   return (
-    <section aria-label="Current specials" className="bg-gray-100">
+    <section aria-label="Current specials" className="bg-accent-200">
       <div className="container py-8 md:py-12">
         <div
           className={`grid gap-4 ${
@@ -86,7 +86,7 @@ function Tile({
         sizes="(min-width: 1024px) 66vw, 100vw"
         className={`object-cover ${
           promotion.link_url
-            ? 'transition-transform duration-300 group-hover:scale-[1.02]'
+            ? 'transition-transform duration-300 motion-reduce:transform-none group-hover:scale-[1.02]'
             : ''
         }`}
       />

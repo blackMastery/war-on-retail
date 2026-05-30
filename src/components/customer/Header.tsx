@@ -2,10 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { Bars3Icon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { siteConfig } from '@/config/site';
+import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
 import CartIcon from './CartIcon';
 import SearchBar from './SearchBar';
 import NavDropdown, { type NavGroup, type NavItem } from './NavDropdown';
@@ -30,18 +32,21 @@ type Props = {
   brands: Brand[];
 };
 
-/**
- * Top-level shortcut categories to surface as their own dropdowns in the
- * primary nav. Anything not on this list still appears inside the "All
- * Categories" mega-menu — this just controls which ones get a dedicated tab.
- */
 const FEATURED_CATEGORY_SLUGS = ['electronics', 'home-appliances', 'kitchen-appliances'];
 
 export default function Header({ categories, brands }: Props) {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
-  // Derive nav data once per render.
+  useBodyScrollLock(mobileMenuOpen);
+
+  // Close drawers on navigation.
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setMobileSearchOpen(false);
+  }, [pathname]);
+
   const { topLevel, childrenOf, featured } = useMemo(() => {
     const top = categories.filter((c) => !c.parent_id);
     const kidsBy = new Map<string, Category[]>();
@@ -71,16 +76,29 @@ export default function Header({ categories, brands }: Props) {
     href: `/brands/${b.slug}`,
   }));
 
+  function openSearch() {
+    setMobileMenuOpen(false);
+    setMobileSearchOpen(true);
+  }
+
+  function openMenu() {
+    setMobileSearchOpen(false);
+    setMobileMenuOpen((v) => !v);
+  }
+
   return (
     <header
       className="sticky top-0 z-40 bg-white shadow-sm"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Utility bar */}
-      <div className="bg-gray-900 text-white">
-        <div className="container flex items-center justify-between py-2 text-xs sm:text-sm">
-          <div className="flex min-w-0 items-center gap-4">
-            <a href={`tel:${siteConfig.phone}`} className="hover:text-primary-300">
+      <div className="bg-surface-dark text-white">
+        <div className="container flex items-center justify-between gap-2 py-2 text-xs sm:text-sm">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+            <a
+              href={`tel:${siteConfig.phone}`}
+              className="truncate hover:text-accent-400"
+            >
               <span aria-hidden="true">📞 </span>
               {siteConfig.phone}
             </a>
@@ -93,15 +111,15 @@ export default function Header({ categories, brands }: Props) {
             href={`https://wa.me/${siteConfig.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-primary-300"
+            className="shrink-0 hover:text-accent-400"
           >
-            WhatsApp us
+            WhatsApp
           </a>
         </div>
       </div>
 
       {/* Main bar */}
-      <div className="container flex items-center gap-4 py-4">
+      <div className="container flex items-center gap-2 py-3 sm:gap-4 sm:py-4">
         <Link
           href="/"
           aria-label={`${siteConfig.name} home`}
@@ -114,21 +132,21 @@ export default function Header({ categories, brands }: Props) {
             width={180}
             height={85}
             priority
-            className="h-12 w-auto"
+            className="h-10 w-auto sm:h-12"
           />
         </Link>
 
-        <div className="ml-4 hidden min-w-0 flex-1 md:flex">
+        <div className="ml-2 hidden min-w-0 flex-1 md:ml-4 md:flex">
           <SearchBar />
         </div>
 
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
           <button
             type="button"
-            onClick={() => setMobileSearchOpen((v) => !v)}
-            aria-label="Toggle search"
+            onClick={() => (mobileSearchOpen ? setMobileSearchOpen(false) : openSearch())}
+            aria-label={mobileSearchOpen ? 'Close search' : 'Open search'}
             aria-expanded={mobileSearchOpen}
-            className="rounded-full p-2 hover:bg-gray-100 md:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 md:hidden"
           >
             <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
           </button>
@@ -136,10 +154,10 @@ export default function Header({ categories, brands }: Props) {
           <CartIcon />
           <button
             type="button"
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            aria-label="Toggle navigation"
+            onClick={openMenu}
+            aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={mobileMenuOpen}
-            className="rounded-full p-2 hover:bg-gray-100 md:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 md:hidden"
           >
             {mobileMenuOpen ? (
               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -151,15 +169,15 @@ export default function Header({ categories, brands }: Props) {
       </div>
 
       {mobileSearchOpen && (
-        <div className="container pb-3 md:hidden">
+        <div className="container border-t pb-3 pt-3 md:hidden">
           <SearchBar />
         </div>
       )}
 
-      {/* Primary nav — desktop */}
-      <nav aria-label="Primary" className="bg-primary-600 text-white">
-        <div className="container hidden items-center gap-6 py-3 text-sm font-medium md:flex">
-          <Link href="/products" className="hover:text-primary-100">
+      {/* Primary nav — desktop only */}
+      <nav aria-label="Primary" className="hidden bg-primary-600 text-white md:block">
+        <div className="container flex items-center gap-6 py-3 text-sm font-medium">
+          <Link href="/products" className="hover:text-accent-400">
             All Products
           </Link>
 
@@ -169,13 +187,12 @@ export default function Header({ categories, brands }: Props) {
 
           {featured.map((c) => {
             const subs = childrenOf(c.id);
-            // If a featured top-level has no children, fall back to a plain link.
             if (subs.length === 0) {
               return (
                 <Link
                   key={c.id}
                   href={`/categories/${c.slug}`}
-                  className="hover:text-primary-100"
+                  className="hover:text-accent-400"
                 >
                   {c.name}
                 </Link>
@@ -193,7 +210,7 @@ export default function Header({ categories, brands }: Props) {
             );
           })}
 
-          <Link href="/deals" className="font-bold hover:text-primary-100">
+          <Link href="/deals" className="font-bold hover:text-accent-400">
             <span aria-hidden="true">🔥 </span>Deals
           </Link>
         </div>
@@ -202,7 +219,10 @@ export default function Header({ categories, brands }: Props) {
       {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="border-t bg-white md:hidden">
-          <nav aria-label="Mobile primary" className="container flex flex-col gap-1 py-3 text-sm">
+          <nav
+            aria-label="Mobile primary"
+            className="container flex max-h-[min(70dvh,calc(100dvh-8rem))] flex-col gap-1 overflow-y-auto overscroll-contain py-3 text-sm"
+          >
             <MobileLink href="/products" onSelect={() => setMobileMenuOpen(false)}>
               All Products
             </MobileLink>
@@ -294,7 +314,6 @@ export default function Header({ categories, brands }: Props) {
   );
 }
 
-/** A single tap target inside the mobile nav drawer. */
 function MobileLink({
   href,
   children,
@@ -310,17 +329,13 @@ function MobileLink({
     <Link
       href={href}
       onClick={onSelect}
-      className={`rounded-md px-2 py-2 hover:bg-gray-100 ${className}`}
+      className={`flex min-h-11 items-center rounded-md px-3 py-2 hover:bg-gray-100 active:bg-gray-100 ${className}`}
     >
       {children}
     </Link>
   );
 }
 
-/**
- * Collapsible mobile section using <details>/<summary>. Native semantics +
- * keyboard handling come for free; we just style the chevron.
- */
 function MobileSection({
   label,
   children,
@@ -330,10 +345,10 @@ function MobileSection({
 }) {
   return (
     <details className="group rounded-md">
-      <summary className="flex cursor-pointer items-center justify-between rounded-md px-2 py-2 hover:bg-gray-100">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-md px-3 py-2 hover:bg-gray-100 active:bg-gray-100 [&::-webkit-details-marker]:hidden">
         <span>{label}</span>
         <ChevronDownIcon
-          className="h-4 w-4 text-gray-500 transition-transform group-open:rotate-180"
+          className="h-4 w-4 shrink-0 text-gray-500 transition-transform motion-reduce:transition-none group-open:rotate-180"
           aria-hidden="true"
         />
       </summary>

@@ -27,7 +27,7 @@ export default function WishlistIcon() {
             : `Wishlist, ${count} ${count === 1 ? 'item' : 'items'}`
           : 'Wishlist'
       }
-      className="relative inline-flex items-center justify-center rounded-full p-2 hover:bg-gray-100"
+      className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
     >
       <HeartIcon className="h-6 w-6" aria-hidden="true" />
       {showBadge && (

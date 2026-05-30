@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: 249 250 251;
+  --background: 255 248 225;
   --foreground: 17 24 39;
   color-scheme: light;
 }
@@ -11,13 +11,14 @@
 @layer base {
   html {
     @apply antialiased;
+    overflow-x: clip;
     /* Kills the 300ms tap delay on iOS for every link/button. */
     touch-action: manipulation;
   }
   body {
-    @apply bg-gray-50 text-gray-900;
-    /* Honour iPhone notch/home-indicator on full-bleed sections. */
-    padding-top: env(safe-area-inset-top);
+    @apply bg-accent-100 text-gray-900;
+    overflow-x: clip;
+    /* Bottom inset for home indicator; top handled by sticky Header. */
     padding-bottom: env(safe-area-inset-bottom);
   }
   /* Honest focus rings for keyboard users. */

@@ -8,7 +8,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear();
 
 export default function Footer() {
   return (
-    <footer className="mt-16 bg-gray-900 text-gray-300">
+    <footer className="mt-16 bg-surface-dark text-gray-300">
       <div className="container py-12">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>

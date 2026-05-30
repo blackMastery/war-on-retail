@@ -109,6 +109,7 @@ export default function PriceRangeSlider({ bounds, value, onCommit, step }: Prop
           <span className="sr-only">Minimum price</span>
           <input
             id={minId}
+            name="min_price"
             type="number"
             inputMode="numeric"
             min={safeBounds.min}
@@ -136,6 +137,7 @@ export default function PriceRangeSlider({ bounds, value, onCommit, step }: Prop
           <span className="sr-only">Maximum price</span>
           <input
             id={maxId}
+            name="max_price"
             type="number"
             inputMode="numeric"
             min={safeBounds.min}

@@ -31,11 +31,11 @@ export default function SearchBar({ placeholder = 'Search for products, brands, 
         autoCorrect="off"
         spellCheck={false}
         enterKeyHint="search"
-        className="w-full rounded-full border border-gray-300 bg-white py-2.5 pl-4 pr-12 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+        className="w-full rounded-full border border-gray-300 bg-white py-3 pl-4 pr-14 text-base shadow-sm focus:border-primary-500 focus:ring-primary-500 md:py-2.5 md:text-sm"
       />
       <button
         type="submit"
-        className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full bg-primary-600 p-2 text-white hover:bg-primary-700"
+        className="absolute right-1 top-1/2 flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700"
         aria-label="Search"
       >
         <MagnifyingGlassIcon className="h-4 w-4" aria-hidden="true" />
