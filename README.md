@@ -63,7 +63,8 @@ cp .env.local.example .env.local
 ```bash
 npm run dev
 # → http://localhost:3000
-# → http://localhost:3000/admin (sign in with an email in ADMIN_ALLOWED_EMAILS)
+# → http://localhost:3000/admin (sign in with email + password — bootstrap the
+#   first admin with `npm run create-admin`; see "Add (or revoke) admins" below)
 ```
 
 ## Tech stack
@@ -91,9 +92,10 @@ src/
 ├── app/
 │   ├── (customer)/        # public storefront (route group)
 │   ├── admin/
-│   │   ├── login/         # magic-link sign-in (no chrome)
-│   │   ├── auth/callback/ # OTP callback route
-│   │   └── (panel)/       # authenticated admin pages (sidebar layout)
+│   │   ├── login/                 # email + password sign-in (no chrome)
+│   │   ├── auth/callback/         # OAuth / password-reset code-exchange route
+│   │   ├── auth/reset-password/   # "set a new password" page (after reset email)
+│   │   └── (panel)/               # authenticated admin pages (sidebar layout)
 │   ├── api/chatbot/       # POST endpoint for the chat widget
 │   ├── layout.tsx
 │   ├── globals.css
@@ -117,30 +119,39 @@ supabase/migrations/       # SQL — apply in filename order
 
 ### Add (or revoke) admins
 
-The source of truth for `/admin` access is the `public.admin_users` table, which
-is foreign-keyed to `auth.users`. `ADMIN_ALLOWED_EMAILS` is only a bootstrap
-hatch for the very first admin.
+Sign-in is **email + password** (Supabase `signInWithPassword`). The source of
+truth for `/admin` access is the `public.admin_users` table, which is
+foreign-keyed to `auth.users`. `ADMIN_ALLOWED_EMAILS` remains as a bootstrap
+hatch in case the DB row gets deleted.
 
 **First admin (bootstrap, one-time):**
-1. Put your email in `ADMIN_ALLOWED_EMAILS` in `.env.local`.
-2. Sign in once at [/admin/login](http://localhost:3000/admin/login) — magic link.
-3. Inside the panel you'll see a yellow "Bootstrap access" banner with the exact
-   SQL to run. Paste it into the Supabase **SQL editor**:
-   ```sql
-   select make_admin('you@example.com');
+1. Make sure `.env.local` has `NEXT_PUBLIC_SUPABASE_URL` and
+   `SUPABASE_SERVICE_ROLE_KEY`.
+2. Run:
+   ```bash
+   npm run create-admin -- --email you@example.com --password 'StrongPass!1'
+   # or interactively, with no flags:
+   npm run create-admin
    ```
-4. Remove your email from `ADMIN_ALLOWED_EMAILS` and restart `npm run dev`.
-   You're now persisted via the DB.
+   The script creates the `auth.users` row with a known password (skipping the
+   email-confirmation step) and calls `make_admin(email)` to promote the user.
+3. Sign in at [/admin/login](http://localhost:3000/admin/login) with that email
+   and password. You're persisted via the DB.
 
-**Promote another user:**
-1. Have them sign in once at `/admin/login` so a row appears in `auth.users`.
-   (They'll bounce off the not-authorised page; that's fine — the auth row gets
-   created on the magic-link request.)
-2. In the SQL editor:
+**Promote an existing auth user (no password set yet):**
+1. In the Supabase dashboard, send the user an invite (Auth → Users → Invite),
+   then run in the SQL editor once they've accepted:
    ```sql
    select make_admin('teammate@example.com', 'Their Full Name');
    -- or: select make_admin('owner@example.com', 'Owner', 'super_admin');
    ```
+2. Have them open [/admin/login](http://localhost:3000/admin/login), click
+   **Forgot your password?**, and set their password from the email link.
+
+**Forgot/reset a password:**
+On `/admin/login`, click **Forgot your password?**, enter the email, and follow
+the link in the email. It lands on `/admin/auth/reset-password` (with a session
+already attached) where the user picks a new password.
 
 **Revoke (soft-delete, audit trail kept):**
 ```sql

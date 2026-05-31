@@ -13,7 +13,7 @@ export default async function AdminLoginPage({
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md ring-1 ring-gray-200">
         <h1 className="text-2xl font-bold">War on Retail — Admin</h1>
         <p className="mt-1 text-sm text-gray-600">
-          Sign in with the email on your allow-list. We'll send you a magic link.
+          Sign in with the email and password set up for your admin account.
         </p>
         {error && (
           <p className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-700">
