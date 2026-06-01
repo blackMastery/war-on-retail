@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useId, useMemo, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdjustmentsHorizontalIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import {
   filtersToQuery,
   hasActiveFilters,
@@ -273,11 +274,58 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
   );
 }
 
-function Group({ title, children }: { title: string; children: React.ReactNode }) {
+/**
+ * Collapsible filter section. Defaults to open so first-time users can see
+ * what's filterable; the rotating chevron + `aria-expanded` on the button
+ * give it solid keyboard/AT semantics. Body animation uses the
+ * grid-template-rows 0fr→1fr trick (the same one in `Header.MobileSection`)
+ * so we don't need to measure children to animate auto-height.
+ *
+ * `<fieldset>` + `<legend>` semantics are preserved — the legend hosts the
+ * toggle button so screen readers still announce the group name when the
+ * checkboxes are tabbed into.
+ */
+function Group({
+  title,
+  children,
+  defaultOpen = true,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const uid = useId();
+  const bodyId = `${uid}-body`;
   return (
     <fieldset>
-      <legend className="mb-2 text-sm font-semibold text-gray-900">{title}</legend>
-      {children}
+      <legend className="w-full">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-controls={bodyId}
+          className="flex w-full items-center justify-between rounded-md py-1 text-left text-sm font-semibold text-gray-900 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        >
+          <span>{title}</span>
+          <ChevronDownIcon
+            className={`h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200 motion-reduce:transition-none ${
+              open ? 'rotate-180' : ''
+            }`}
+            aria-hidden="true"
+          />
+        </button>
+      </legend>
+      <div
+        id={bodyId}
+        className={`grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none ${
+          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="pt-2">{children}</div>
+        </div>
+      </div>
     </fieldset>
   );
 }
