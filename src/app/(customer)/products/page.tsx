@@ -12,8 +12,13 @@ import {
 } from '@/lib/products/filters';
 import type { Product } from '@/types/database';
 
+import { pageMetadata } from '@/lib/page-seo';
+
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'All Products' };
+
+export async function generateMetadata() {
+  return pageMetadata('products', { title: 'All Products' });
+}
 
 const PAGE_SIZE = 24;
 

@@ -1,9 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
 import { getStoreSettings } from '@/lib/store-settings';
+import { pageMetadata } from '@/lib/page-seo';
 import CheckoutWizard from './CheckoutWizard';
 
-export const metadata = { title: 'Checkout' };
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata() {
+  return pageMetadata('checkout', { title: 'Checkout' });
+}
 
 /**
  * Server entry for the three-step checkout wizard.

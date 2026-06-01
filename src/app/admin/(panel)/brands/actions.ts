@@ -16,6 +16,9 @@ const BrandInput = z.object({
   website_url: z.string().url('Must be a full https:// URL').optional().nullable().or(z.literal('')),
   display_order: z.coerce.number().int().default(0),
   is_active: z.coerce.boolean().default(true),
+  meta_title: z.string().optional().nullable(),
+  meta_description: z.string().optional().nullable(),
+  meta_keywords: z.string().optional().nullable(),
 });
 
 export type BrandFormState = {
@@ -45,6 +48,8 @@ export async function upsertBrand(
 
   const input = parsed.data;
   const slug = (input.slug?.trim() || generateSlug(input.name)).slice(0, 120);
+  const clean = (s: string | null | undefined) =>
+    s && s.trim() ? s.trim() : null;
   const payload = {
     name: input.name,
     slug,
@@ -53,6 +58,9 @@ export async function upsertBrand(
     website_url: input.website_url && input.website_url !== '' ? input.website_url : null,
     display_order: input.display_order,
     is_active: input.is_active,
+    meta_title: clean(input.meta_title),
+    meta_description: clean(input.meta_description),
+    meta_keywords: clean(input.meta_keywords),
   };
 
   const supabase = createAdminClient();

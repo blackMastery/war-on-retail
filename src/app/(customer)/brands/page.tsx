@@ -1,8 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
 import BrandCard from '@/components/customer/BrandCard';
+import { pageMetadata } from '@/lib/page-seo';
 
 export const revalidate = 300;
-export const metadata = { title: 'All Brands' };
+
+export async function generateMetadata() {
+  return pageMetadata('brands', { title: 'All Brands' });
+}
 
 export default async function BrandsIndexPage() {
   const supabase = await createClient();

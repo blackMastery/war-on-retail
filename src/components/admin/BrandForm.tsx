@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { upsertBrand, type BrandFormState } from '@/app/admin/(panel)/brands/actions';
 import BrandLogoField from '@/components/admin/BrandLogoField';
+import SeoMetaFields from '@/components/admin/SeoMetaFields';
 import type { Brand } from '@/types/database';
 
 const initial: BrandFormState = {};
@@ -85,6 +86,26 @@ export default function BrandForm({ brand }: { brand?: Brand }) {
       <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
         <h2 className="mb-3 font-semibold">Logo</h2>
         <BrandLogoField initialUrl={brand?.logo_url ?? null} />
+      </section>
+
+      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+        <h2 className="font-semibold">SEO</h2>
+        <p className="text-xs text-gray-500">
+          Optional. Used by the brand landing page&apos;s {`<title>`}, meta
+          description, and meta keywords tags.
+        </p>
+        <SeoMetaFields
+          defaultValues={{
+            meta_title: brand?.meta_title,
+            meta_description: brand?.meta_description,
+            meta_keywords: brand?.meta_keywords,
+          }}
+          fieldErrors={state.fieldErrors}
+          fallback={{
+            title: brand ? `${brand.name} · War on Retail` : undefined,
+            description: brand?.description ?? undefined,
+          }}
+        />
       </section>
 
       <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">

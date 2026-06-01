@@ -1,7 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
+import { pageMetadata } from '@/lib/page-seo';
 
 export const revalidate = 300;
-export const metadata = { title: 'FAQ' };
+
+export async function generateMetadata() {
+  return pageMetadata('faq', { title: 'FAQ' });
+}
 
 export default async function FAQPage() {
   const supabase = await createClient();

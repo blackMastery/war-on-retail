@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { upsertProduct, type ProductFormState } from '@/app/admin/(panel)/products/actions';
 import ProductImagesField from '@/components/admin/ProductImagesField';
+import SeoMetaFields from '@/components/admin/SeoMetaFields';
 import SpecificationsField from '@/components/admin/SpecificationsField';
 import type { Brand, Category, Product } from '@/types/database';
 
@@ -170,6 +171,8 @@ export default function ProductForm({ product, categories, brands }: Props) {
         <ProductImagesField
           initialFeaturedUrl={product?.featured_image_url ?? null}
           initialUrls={product?.image_urls ?? []}
+          initialImageMeta={product?.image_meta ?? {}}
+          initialFeaturedAlt={product?.featured_image_alt ?? null}
         />
       </Section>
 
@@ -181,6 +184,26 @@ export default function ProductForm({ product, categories, brands }: Props) {
         </p>
         <SpecificationsField
           initial={(product?.specifications ?? {}) as Record<string, unknown>}
+        />
+      </Section>
+
+      <Section title="SEO">
+        <p className="text-xs text-gray-600">
+          Optional. When blank, the product page builds these automatically
+          from brand + name and the short / long description.
+        </p>
+        <SeoMetaFields
+          defaultValues={{
+            meta_title: product?.meta_title,
+            meta_description: product?.meta_description,
+            meta_keywords: product?.meta_keywords,
+          }}
+          fieldErrors={state.fieldErrors}
+          fallback={{
+            title: product?.name ? `${product.name} · War on Retail` : undefined,
+            description:
+              product?.short_description ?? product?.description ?? undefined,
+          }}
         />
       </Section>
 

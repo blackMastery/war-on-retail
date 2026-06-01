@@ -8,12 +8,15 @@ import {
   MagnifyingGlassPlusIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+import type { ProductImageMeta } from '@/types/database';
 
 type Props = {
   images: string[];
   productName: string;
   /** Optional discount % — shown as a badge over the main image. */
   discount?: number;
+  /** Per-image admin-set alt/caption/keywords, keyed by URL. */
+  imageMeta?: Record<string, ProductImageMeta>;
 };
 
 // Gesture thresholds (in CSS pixels).
@@ -40,12 +43,28 @@ const TAP_MAX_DURATION = 500; // ms
  * and `tabIndex={0}`, with onKeyDown handling Enter/Space (open lightbox) and
  * arrows (navigate).
  */
-export default function ProductGallery({ images, productName, discount = 0 }: Props) {
+export default function ProductGallery({
+  images,
+  productName,
+  discount = 0,
+  imageMeta,
+}: Props) {
   const [active, setActive] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const total = images.length;
   const safeActive = total === 0 ? 0 : Math.min(active, total - 1);
   const current = images[safeActive];
+
+  // Prefer admin-set alt text; fall back to the per-position generated one.
+  // Empty strings are treated as missing so an admin who clears a field gets
+  // the helpful default rather than an empty alt.
+  const altFor = useCallback(
+    (url: string | undefined, index: number) => {
+      const overridden = url ? imageMeta?.[url]?.alt?.trim() : '';
+      return overridden || `${productName} — image ${index + 1}`;
+    },
+    [imageMeta, productName],
+  );
 
   const next = useCallback(() => total && setActive((i) => (i + 1) % total), [total]);
   const prev = useCallback(() => total && setActive((i) => (i - 1 + total) % total), [total]);
@@ -135,7 +154,7 @@ export default function ProductGallery({ images, productName, discount = 0 }: Pr
         >
           <Image
             src={current}
-            alt={`${productName} — image ${safeActive + 1}`}
+            alt={altFor(current, safeActive)}
             fill
             sizes="(min-width: 768px) 50vw, 100vw"
             priority={safeActive === 0}
@@ -206,6 +225,7 @@ export default function ProductGallery({ images, productName, discount = 0 }: Pr
           onActive={setActive}
           onClose={() => setZoomed(false)}
           productName={productName}
+          imageMeta={imageMeta}
         />
       )}
     </div>
@@ -246,12 +266,14 @@ function Lightbox({
   onActive,
   onClose,
   productName,
+  imageMeta,
 }: {
   images: string[];
   active: number;
   onActive: (i: number) => void;
   onClose: () => void;
   productName: string;
+  imageMeta?: Record<string, ProductImageMeta>;
 }) {
   const total = images.length;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -341,6 +363,11 @@ function Lightbox({
     [productName, active, total],
   );
 
+  // Admin-set alt for the active image, falling back to the heading.
+  const currentUrl = images[active];
+  const altOverride = currentUrl ? imageMeta?.[currentUrl]?.alt?.trim() : '';
+  const lightboxAlt = altOverride || heading;
+
   return (
     <div
       ref={containerRef}
@@ -397,7 +424,7 @@ function Lightbox({
       >
         <Image
           src={images[active]}
-          alt={heading}
+          alt={lightboxAlt}
           fill
           sizes="100vw"
           priority

@@ -39,7 +39,7 @@ export async function generateMetadata({
   const { data: product } = await supabase
     .from('products')
     .select(
-      'name, slug, short_description, description, meta_title, meta_description, featured_image_url, image_urls, price, compare_at_price, stock_quantity, track_inventory, is_active, brand_id, sku',
+      'name, slug, short_description, description, meta_title, meta_description, meta_keywords, featured_image_url, image_urls, price, compare_at_price, stock_quantity, track_inventory, is_active, brand_id, sku',
     )
     .eq('slug', slug)
     .maybeSingle();
@@ -103,9 +103,16 @@ export async function generateMetadata({
   const isOutOfStock = product.track_inventory && product.stock_quantity === 0;
   const price = typeof product.price === 'string' ? Number(product.price) : product.price;
 
+  // Admin-set keywords are comma-separated. Anything else → undefined so Next
+  // omits the meta tag rather than emitting an empty list.
+  const keywords = product.meta_keywords
+    ? product.meta_keywords.split(',').map((s) => s.trim()).filter(Boolean)
+    : undefined;
+
   return {
     title,
     description,
+    keywords,
     alternates: { canonical: canonicalPath },
     robots: {
       index: true,
@@ -173,6 +180,27 @@ export default async function ProductDetailPage({
   ]);
 
   const discount = calculateDiscount(product.price, product.compare_at_price);
+  // Compose the per-image metadata lookup the gallery needs. The featured
+  // image's alt lives on its own column (so the customer detail page can pre-
+  // render it without fishing through the JSON), but we mirror it into
+  // `image_meta` so the gallery can do a uniform URL-keyed lookup.
+  const galleryImageMeta: Record<string, import('@/types/database').ProductImageMeta> = {
+    ...(product.image_meta ?? {}),
+    ...(product.featured_image_url
+      ? {
+          [product.featured_image_url]: {
+            alt:
+              product.image_meta?.[product.featured_image_url]?.alt ??
+              product.featured_image_alt ??
+              null,
+            caption:
+              product.image_meta?.[product.featured_image_url]?.caption ?? null,
+            keywords:
+              product.image_meta?.[product.featured_image_url]?.keywords ?? null,
+          },
+        }
+      : {}),
+  };
   const allImages = [product.featured_image_url, ...(product.image_urls ?? [])].filter(
     Boolean,
   ) as string[];
@@ -233,6 +261,7 @@ export default async function ProductDetailPage({
           images={allImages}
           productName={product.name}
           discount={discount}
+          imageMeta={galleryImageMeta}
         />
 
         {/* Detail */}

@@ -1,5 +1,28 @@
 import { siteConfig } from '@/config/site';
-import type { Brand, Product } from '@/types/database';
+import type { Brand, Product, ProductImageMeta } from '@/types/database';
+
+/**
+ * Per-image JSON-LD. When the admin has set caption/keywords/alt, emit an
+ * ImageObject so Google can index those signals. Otherwise the bare URL
+ * string is fine (also valid Schema.org).
+ */
+function imageEntry(
+  url: string,
+  meta: ProductImageMeta | undefined,
+): string | Record<string, unknown> {
+  if (!meta) return url;
+  const alt = meta.alt?.trim();
+  const caption = meta.caption?.trim();
+  const keywords = meta.keywords?.trim();
+  if (!alt && !caption && !keywords) return url;
+  return {
+    '@type': 'ImageObject',
+    contentUrl: url,
+    ...(caption ? { caption } : {}),
+    ...(alt && !caption ? { name: alt } : {}),
+    ...(keywords ? { keywords } : {}),
+  };
+}
 
 /**
  * Builds a Schema.org `Product` JSON-LD payload for a product detail page.
@@ -27,14 +50,32 @@ export function buildProductJsonLd(opts: {
 
   const isOutOfStock = product.track_inventory && product.stock_quantity === 0;
 
+  // Build the image list, using ImageObject for any image that has admin-set
+  // metadata. Featured-image alt is mirrored in via the product page; here
+  // we just look up by URL.
+  const imageMeta = product.image_meta ?? {};
+  const imageEntries = images.length
+    ? images.map((u) => imageEntry(u, imageMeta[u]))
+    : undefined;
+
+  // meta_keywords is comma-separated on the row.
+  const keywords = product.meta_keywords
+    ? product.meta_keywords.split(',').map((s) => s.trim()).filter(Boolean)
+    : undefined;
+
   const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
     url,
     sku: product.sku ?? undefined,
-    image: images.length ? images : undefined,
-    description: product.description ?? product.short_description ?? undefined,
+    image: imageEntries,
+    description:
+      product.meta_description ??
+      product.description ??
+      product.short_description ??
+      undefined,
+    keywords: keywords && keywords.length ? keywords : undefined,
     brand: brand ? { '@type': 'Brand', name: brand.name } : undefined,
     offers: {
       '@type': 'Offer',

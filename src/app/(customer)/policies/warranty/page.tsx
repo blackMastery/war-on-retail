@@ -1,10 +1,12 @@
-import type { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
+import { pageMetadata } from '@/lib/page-seo';
 
-export const metadata: Metadata = {
-  title: 'Warranty',
-  description: `Manufacturer warranty terms and how to make a claim with ${siteConfig.name}.`,
-};
+export async function generateMetadata() {
+  return pageMetadata('policies-warranty', {
+    title: 'Warranty',
+    description: `Manufacturer warranty terms and how to make a claim with ${siteConfig.name}.`,
+  });
+}
 
 const LAST_UPDATED = '2026-05-27';
 

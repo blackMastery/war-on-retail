@@ -3,6 +3,7 @@
 import { useActionState, useMemo } from 'react';
 import { upsertCategory, type CategoryFormState } from '@/app/admin/(panel)/categories/actions';
 import CategoryImageField from '@/components/admin/CategoryImageField';
+import SeoMetaFields from '@/components/admin/SeoMetaFields';
 import type { Category } from '@/types/database';
 
 const initial: CategoryFormState = {};
@@ -113,6 +114,26 @@ export default function CategoryForm({ category, allCategories }: Props) {
       <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
         <h2 className="mb-3 font-semibold">Image</h2>
         <CategoryImageField initialUrl={category?.image_url ?? null} />
+      </section>
+
+      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+        <h2 className="font-semibold">SEO</h2>
+        <p className="text-xs text-gray-500">
+          Optional. Used by the category landing page&apos;s {`<title>`}, meta
+          description, and meta keywords tags.
+        </p>
+        <SeoMetaFields
+          defaultValues={{
+            meta_title: category?.meta_title,
+            meta_description: category?.meta_description,
+            meta_keywords: category?.meta_keywords,
+          }}
+          fieldErrors={state.fieldErrors}
+          fallback={{
+            title: category ? `${category.name} · War on Retail` : undefined,
+            description: category?.description ?? undefined,
+          }}
+        />
       </section>
 
       <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">

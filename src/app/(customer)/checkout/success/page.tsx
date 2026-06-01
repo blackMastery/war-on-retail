@@ -1,10 +1,14 @@
 import Link from 'next/link';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { siteConfig } from '@/config/site';
+import { pageMetadata } from '@/lib/page-seo';
 import ClearCartOnMount from '../ClearCartOnMount';
 
-export const metadata = { title: 'Order placed' };
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata() {
+  return pageMetadata('checkout-success', { title: 'Order placed' });
+}
 
 export default async function CheckoutSuccessPage({
   searchParams,

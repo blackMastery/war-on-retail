@@ -10,59 +10,73 @@ import ProductGrid from '@/components/customer/ProductGrid';
 import PromotionMosaic from '@/components/customer/PromotionMosaic';
 import RecentlyViewedStrip from '@/components/customer/RecentlyViewedStrip';
 import { NEW_ARRIVAL_WINDOW_DAYS, newArrivalCutoffIso } from '@/config/catalog';
+import { getPageSeo } from '@/lib/page-seo';
 
 // Short revalidate so newly-scheduled promotions appear within a minute.
 export const revalidate = 60;
 
-// Homepage SEO. Distinct from the root layout's defaults: the title is
-// `absolute` so the "· War on Retail" template doesn't append (the brand
-// already appears in the lead phrase), and the description is tuned for
-// the keywords a Guyanese shopper actually types.
-const homeTitle = `${siteConfig.name} — Electronics & Home Appliances in Guyana`;
-const homeDescription =
+// Compile-time defaults — tuned for the keywords a Guyanese shopper actually
+// types. The admin can override any of these via /admin/pages → Home.
+const HOME_TITLE_DEFAULT = `${siteConfig.name} — Electronics & Home Appliances in Guyana`;
+const HOME_DESCRIPTION_DEFAULT =
   'Shop TVs, fridges, washing machines, computers, and personal-care electronics in Guyana. Authentic products, manufacturer warranties, fast delivery in Georgetown and nationwide. Buy via WhatsApp or browse online.';
+const HOME_KEYWORDS_DEFAULT = [
+  'electronics Guyana',
+  'home appliances Guyana',
+  'TVs Georgetown',
+  'fridges Guyana',
+  'washing machines Guyana',
+  'computers Guyana',
+  'kitchen appliances Guyana',
+  'personal care electronics',
+  'War on Retail',
+];
 
-export const metadata: Metadata = {
-  title: { absolute: homeTitle },
-  description: homeDescription,
-  alternates: { canonical: '/' },
-  keywords: [
-    'electronics Guyana',
-    'home appliances Guyana',
-    'TVs Georgetown',
-    'fridges Guyana',
-    'washing machines Guyana',
-    'computers Guyana',
-    'kitchen appliances Guyana',
-    'personal care electronics',
-    'War on Retail',
-  ],
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getPageSeo('home');
+  const title = seo?.meta_title?.trim() || HOME_TITLE_DEFAULT;
+  const description = seo?.meta_description?.trim() || HOME_DESCRIPTION_DEFAULT;
+  const keywords = seo?.meta_keywords
+    ? seo.meta_keywords.split(',').map((s) => s.trim()).filter(Boolean)
+    : HOME_KEYWORDS_DEFAULT;
+  const indexable = seo?.robots_index ?? true;
+
+  return {
+    // `absolute` so the root template doesn't append the brand twice — the
+    // brand is already part of the lead phrase.
+    title: { absolute: title },
+    description,
+    alternates: { canonical: '/' },
+    keywords,
+    robots: indexable
+      ? {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+          },
+        }
+      : { index: false, follow: false },
+    openGraph: {
+      title,
+      description,
+      url: siteConfig.url,
+      type: 'website',
+      siteName: siteConfig.name,
+      locale: 'en_GY',
+      images: [{ url: '/logo.png', alt: siteConfig.name }],
     },
-  },
-  openGraph: {
-    title: homeTitle,
-    description: homeDescription,
-    url: siteConfig.url,
-    type: 'website',
-    siteName: siteConfig.name,
-    locale: 'en_GY',
-    images: [{ url: '/logo.png', alt: siteConfig.name }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: homeTitle,
-    description: homeDescription,
-    images: ['/logo.png'],
-  },
-};
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/logo.png'],
+    },
+  };
+}
 
 /**
  * Organization + WebSite JSON-LD.

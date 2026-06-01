@@ -1,10 +1,12 @@
-import type { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
+import { pageMetadata } from '@/lib/page-seo';
 
-export const metadata: Metadata = {
-  title: 'Terms of Service',
-  description: `Terms of use for the ${siteConfig.name} website and store.`,
-};
+export async function generateMetadata() {
+  return pageMetadata('policies-terms', {
+    title: 'Terms of Service',
+    description: `Terms of use for the ${siteConfig.name} website and store.`,
+  });
+}
 
 const LAST_UPDATED = '2026-05-27';
 

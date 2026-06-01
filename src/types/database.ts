@@ -22,6 +22,9 @@ export type CategoryRow = {
   parent_id: string | null;
   display_order: number;
   is_active: boolean;
+  meta_title: string | null;
+  meta_description: string | null;
+  meta_keywords: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -34,6 +37,9 @@ type CategoryInsert = {
   parent_id?: string | null;
   display_order?: number;
   is_active?: boolean;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -49,6 +55,9 @@ export type BrandRow = {
   website_url: string | null;
   display_order: number;
   is_active: boolean;
+  meta_title: string | null;
+  meta_description: string | null;
+  meta_keywords: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -61,12 +70,27 @@ type BrandInsert = {
   website_url?: string | null;
   display_order?: number;
   is_active?: boolean;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
   created_at?: string;
   updated_at?: string;
 };
 type BrandUpdate = Partial<BrandInsert>;
 
 // ---------- Products ----------
+/**
+ * Per-image metadata, looked up by image URL. Stored on the product row in
+ * the `image_meta` jsonb column. The featured image gets an extra column
+ * (`featured_image_alt`) but its caption/keywords also live here for
+ * lookup-by-URL consistency on the customer side.
+ */
+export type ProductImageMeta = {
+  alt: string | null;
+  caption: string | null;
+  keywords: string | null;
+};
+
 export type ProductRow = {
   id: string;
   name: string;
@@ -83,10 +107,13 @@ export type ProductRow = {
   category_id: string | null;
   brand_id: string | null;
   featured_image_url: string | null;
+  featured_image_alt: string | null;
   image_urls: string[];
+  image_meta: Record<string, ProductImageMeta>;
   specifications: Json;
   meta_title: string | null;
   meta_description: string | null;
+  meta_keywords: string | null;
   is_active: boolean;
   is_featured: boolean;
   created_at: string;
@@ -108,10 +135,13 @@ type ProductInsert = {
   category_id?: string | null;
   brand_id?: string | null;
   featured_image_url?: string | null;
+  featured_image_alt?: string | null;
   image_urls?: string[];
+  image_meta?: Record<string, ProductImageMeta>;
   specifications?: Json;
   meta_title?: string | null;
   meta_description?: string | null;
+  meta_keywords?: string | null;
   is_active?: boolean;
   is_featured?: boolean;
   created_at?: string;
@@ -385,6 +415,35 @@ type StoreSettingsInsert = {
 };
 type StoreSettingsUpdate = Partial<StoreSettingsInsert>;
 
+// ---------- Page SEO (one row per static customer route) ----------
+export type PageSeoRow = {
+  /** Stable slug-style id, e.g. `home`, `about`, `policies-privacy`. */
+  id: string;
+  /** Canonical URL path the row corresponds to (`/`, `/about`, …). Read-only on the admin side. */
+  path: string;
+  /** Human label rendered in the admin pages list. */
+  label: string;
+  meta_title: string | null;
+  meta_description: string | null;
+  meta_keywords: string | null;
+  /** Default true; flipped to false for cart/wishlist/checkout/search. */
+  robots_index: boolean;
+  created_at: string;
+  updated_at: string;
+};
+type PageSeoInsert = {
+  id: string;
+  path: string;
+  label: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
+  robots_index?: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+type PageSeoUpdate = Partial<PageSeoInsert>;
+
 // ---------- Database root ----------
 // Each Table needs `Relationships: []` — @supabase/postgrest-js >=2.x requires
 // it to satisfy the `GenericTable` constraint, otherwise typed selects collapse
@@ -472,6 +531,12 @@ export type Database = {
         Update: StoreSettingsUpdate;
         Relationships: Empty;
       };
+      page_seo: {
+        Row: PageSeoRow;
+        Insert: PageSeoInsert;
+        Update: PageSeoUpdate;
+        Relationships: Empty;
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -515,3 +580,4 @@ export type PaymentMethod = PaymentMethodRow;
 export type Order = OrderRow;
 export type OrderItem = OrderItemRow;
 export type StoreSettings = StoreSettingsRow;
+export type PageSeo = PageSeoRow;

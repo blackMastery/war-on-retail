@@ -16,6 +16,9 @@ const CategoryInput = z.object({
   parent_id: z.string().uuid().optional().nullable().or(z.literal('')),
   display_order: z.coerce.number().int().default(0),
   is_active: z.coerce.boolean().default(true),
+  meta_title: z.string().optional().nullable(),
+  meta_description: z.string().optional().nullable(),
+  meta_keywords: z.string().optional().nullable(),
 });
 
 export type CategoryFormState = {
@@ -88,6 +91,9 @@ export async function upsertCategory(
     }
   }
 
+  const clean = (s: string | null | undefined) =>
+    s && s.trim() ? s.trim() : null;
+
   const payload = {
     name: input.name,
     slug,
@@ -96,6 +102,9 @@ export async function upsertCategory(
     parent_id: parentId,
     display_order: input.display_order,
     is_active: input.is_active,
+    meta_title: clean(input.meta_title),
+    meta_description: clean(input.meta_description),
+    meta_keywords: clean(input.meta_keywords),
   };
 
   const supabase = createAdminClient();

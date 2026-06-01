@@ -6,7 +6,16 @@ import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/admin/auth';
 import { generateSlug } from '@/lib/utils';
-import type { Json } from '@/types/database';
+import type { Json, ProductImageMeta } from '@/types/database';
+
+const ImageMetaShape = z.record(
+  z.string(),
+  z.object({
+    alt: z.string().nullable().optional().default(null),
+    caption: z.string().nullable().optional().default(null),
+    keywords: z.string().nullable().optional().default(null),
+  }),
+);
 
 const ProductInput = z.object({
   id: z.string().uuid().optional(),
@@ -24,11 +33,18 @@ const ProductInput = z.object({
   category_id: z.string().uuid().optional().nullable(),
   brand_id: z.string().uuid().optional().nullable(),
   featured_image_url: z.string().url().optional().nullable().or(z.literal('')),
+  featured_image_alt: z.string().optional().nullable(),
   // JSON-encoded string[] of gallery image URLs (everything except the featured).
   image_urls_json: z.string().optional().nullable(),
+  // JSON-encoded Record<url, { alt, caption, keywords }> covering every image
+  // (gallery + featured). Orphans are pruned server-side.
+  image_meta_json: z.string().optional().nullable(),
   is_active: z.coerce.boolean().default(true),
   is_featured: z.coerce.boolean().default(false),
   specifications_json: z.string().optional().nullable(),
+  meta_title: z.string().optional().nullable(),
+  meta_description: z.string().optional().nullable(),
+  meta_keywords: z.string().optional().nullable(),
 });
 
 export type ProductFormState = {
@@ -84,6 +100,41 @@ export async function upsertProduct(_prev: ProductFormState, fd: FormData): Prom
     }
   }
 
+  // Per-image metadata: validate shape, then prune anything not referenced
+  // by the current featured/gallery URLs (admins who delete an image
+  // shouldn't keep stale alt-text rows hanging around).
+  let imageMeta: Record<string, ProductImageMeta> = {};
+  if (input.image_meta_json) {
+    try {
+      const parsed = JSON.parse(input.image_meta_json);
+      const checked = ImageMetaShape.safeParse(parsed);
+      if (checked.success) {
+        const live = new Set<string>([
+          ...(input.featured_image_url ? [input.featured_image_url] : []),
+          ...imageUrls,
+        ]);
+        const clean = (v: string | null | undefined) =>
+          v && v.trim() ? v.trim() : null;
+        for (const [url, meta] of Object.entries(checked.data)) {
+          if (!live.has(url)) continue;
+          const alt = clean(meta.alt);
+          const caption = clean(meta.caption);
+          const keywords = clean(meta.keywords);
+          if (alt || caption || keywords) {
+            imageMeta[url] = { alt, caption, keywords };
+          }
+        }
+      }
+    } catch {
+      // Bad JSON → fall through with imageMeta = {}. We deliberately don't
+      // hard-fail so a malformed JSON blob can't lock the admin out of the
+      // edit page (they can re-fill the alt fields and resave).
+    }
+  }
+
+  const clean = (s: string | null | undefined) =>
+    s && s.trim() ? s.trim() : null;
+
   const payload = {
     name: input.name,
     slug,
@@ -99,10 +150,15 @@ export async function upsertProduct(_prev: ProductFormState, fd: FormData): Prom
     category_id: input.category_id || null,
     brand_id: input.brand_id || null,
     featured_image_url: input.featured_image_url || null,
+    featured_image_alt: clean(input.featured_image_alt),
     image_urls: imageUrls,
+    image_meta: imageMeta,
     is_active: input.is_active,
     is_featured: input.is_featured,
     specifications: specifications as Json,
+    meta_title: clean(input.meta_title),
+    meta_description: clean(input.meta_description),
+    meta_keywords: clean(input.meta_keywords),
   };
 
   const supabase = createAdminClient();

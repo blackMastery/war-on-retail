@@ -1,8 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
 import CategoryCard from '@/components/customer/CategoryCard';
+import { pageMetadata } from '@/lib/page-seo';
 
 export const revalidate = 300;
-export const metadata = { title: 'All Categories' };
+
+export async function generateMetadata() {
+  return pageMetadata('categories', { title: 'All Categories' });
+}
 
 export default async function CategoriesIndexPage() {
   const supabase = await createClient();

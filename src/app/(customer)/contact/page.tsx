@@ -1,6 +1,9 @@
 import { siteConfig } from '@/config/site';
+import { pageMetadata } from '@/lib/page-seo';
 
-export const metadata = { title: 'Contact us' };
+export async function generateMetadata() {
+  return pageMetadata('contact', { title: 'Contact us' });
+}
 
 export default function ContactPage() {
   return (

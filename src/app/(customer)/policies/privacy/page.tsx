@@ -1,10 +1,12 @@
-import type { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
+import { pageMetadata } from '@/lib/page-seo';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy',
-  description: `How ${siteConfig.name} collects, uses, and stores customer data.`,
-};
+export async function generateMetadata() {
+  return pageMetadata('policies-privacy', {
+    title: 'Privacy Policy',
+    description: `How ${siteConfig.name} collects, uses, and stores customer data.`,
+  });
+}
 
 // Last meaningful update — shown to the visitor for trust.
 const LAST_UPDATED = '2026-05-27';

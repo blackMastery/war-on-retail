@@ -1,11 +1,11 @@
-import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/page-seo';
 import CartView from './CartView';
 
-export const metadata: Metadata = {
-  title: 'Cart',
-  // No need to index the cart page — it's a per-visitor state view, never SEO-relevant.
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata() {
+  // Defaults to noindex (per-visitor state view) — the page_seo row's
+  // `robots_index` is seeded false; the admin can flip it on at their own risk.
+  return pageMetadata('cart', { title: 'Cart' });
+}
 
 export default function CartPage() {
   return (

@@ -3,10 +3,14 @@ import ProductGrid from '@/components/customer/ProductGrid';
 import Pagination from '@/components/customer/Pagination';
 import ResultCount from '@/components/customer/ResultCount';
 import { PAGE_SIZE, paginate, parsePage } from '@/lib/pagination';
+import { pageMetadata } from '@/lib/page-seo';
 import type { Product } from '@/types/database';
 
 export const revalidate = 60;
-export const metadata = { title: 'Deals' };
+
+export async function generateMetadata() {
+  return pageMetadata('deals', { title: 'Deals' });
+}
 
 export default async function DealsPage({
   searchParams,

@@ -1,10 +1,12 @@
-import type { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
+import { pageMetadata } from '@/lib/page-seo';
 
-export const metadata: Metadata = {
-  title: 'Shipping & Returns',
-  description: `Delivery, returns, and exchange information for ${siteConfig.name}.`,
-};
+export async function generateMetadata() {
+  return pageMetadata('policies-shipping', {
+    title: 'Shipping & Returns',
+    description: `Delivery, returns, and exchange information for ${siteConfig.name}.`,
+  });
+}
 
 const LAST_UPDATED = '2026-05-27';
 

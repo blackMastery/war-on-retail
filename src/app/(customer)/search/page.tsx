@@ -4,9 +4,13 @@ import Pagination from '@/components/customer/Pagination';
 import ResultCount from '@/components/customer/ResultCount';
 import { PAGE_SIZE, paginate, parsePage } from '@/lib/pagination';
 import { buildIlikeOrClause } from '@/lib/products/search';
+import { pageMetadata } from '@/lib/page-seo';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Search' };
+
+export async function generateMetadata() {
+  return pageMetadata('search', { title: 'Search' });
+}
 
 export default async function SearchPage({
   searchParams,

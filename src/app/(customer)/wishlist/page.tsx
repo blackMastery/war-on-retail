@@ -1,11 +1,9 @@
-import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/page-seo';
 import WishlistView from './WishlistView';
 
-export const metadata: Metadata = {
-  title: 'Wishlist',
-  // Per-visitor state — no SEO value, don't index.
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata() {
+  return pageMetadata('wishlist', { title: 'Wishlist' });
+}
 
 export default function WishlistPage() {
   return (

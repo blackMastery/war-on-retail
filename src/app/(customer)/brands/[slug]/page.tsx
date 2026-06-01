@@ -12,11 +12,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const supabase = await createClient();
   const { data } = await supabase
     .from('brands')
-    .select('name, description')
+    .select('name, description, meta_title, meta_description, meta_keywords')
     .eq('slug', slug)
     .maybeSingle();
   if (!data) return { title: 'Brand not found' };
-  return { title: data.name, description: data.description ?? undefined };
+  const keywords = data.meta_keywords
+    ? data.meta_keywords.split(',').map((s) => s.trim()).filter(Boolean)
+    : undefined;
+  return {
+    title: data.meta_title?.trim() || data.name,
+    description:
+      data.meta_description?.trim() || data.description?.trim() || undefined,
+    keywords,
+  };
 }
 
 export default async function BrandPage({
