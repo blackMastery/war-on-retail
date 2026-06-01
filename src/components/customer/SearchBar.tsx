@@ -166,7 +166,11 @@ export default function SearchBar({
       aria-owns={listboxId}
       className="relative w-full"
     >
-      <form onSubmit={onSubmit} className="relative w-full" role="search">
+      <form
+        onSubmit={onSubmit}
+        className="flex w-full items-center rounded-full border border-gray-300 bg-white p-1 shadow-sm focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500"
+        role="search"
+      >
         <label htmlFor={inputId} className="sr-only">
           Search
         </label>
@@ -190,11 +194,11 @@ export default function SearchBar({
           aria-activedescendant={
             highlight >= 0 && results[highlight] ? optionId(highlight) : undefined
           }
-          className="w-full rounded-full border border-gray-300 bg-white py-3 pl-4 pr-14 text-base shadow-sm focus:border-primary-500 focus:ring-primary-500 md:py-2.5 md:text-sm"
+          className="min-w-0 flex-1 rounded-full border-0 bg-transparent py-2 pl-3 text-base focus:border-transparent focus:outline-none focus:ring-0 md:py-1.5 md:pl-4 md:text-sm"
         />
         <button
           type="submit"
-          className="absolute right-1 top-1/2 flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 md:h-9 md:w-9"
           aria-label="Search"
         >
           <MagnifyingGlassIcon className="h-4 w-4" aria-hidden="true" />

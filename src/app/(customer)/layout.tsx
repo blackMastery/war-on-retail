@@ -3,15 +3,15 @@ import Header from '@/components/customer/Header';
 import Footer from '@/components/customer/Footer';
 import Chatbot from '@/components/customer/Chatbot';
 import CookieNotice from '@/components/customer/CookieNotice';
+import { getStoreSettings } from '@/lib/store-settings';
 
 export const revalidate = 120;
 
 export default async function CustomerLayout({ children }: { children: React.ReactNode }) {
-  // Fetch nav data once at the layout level — every page shares it, no need
-  // to repeat the queries per route. 120 s revalidation keeps it fresh
-  // without hammering Supabase on every request.
+  // Fetch nav data + admin-edited store settings once at the layout level —
+  // every page shares them, no need to repeat the queries per route.
   const supabase = await createClient();
-  const [{ data: categories }, { data: brands }] = await Promise.all([
+  const [{ data: categories }, { data: brands }, settings] = await Promise.all([
     supabase
       .from('categories')
       .select('id, name, slug, parent_id, display_order, image_url')
@@ -24,15 +24,29 @@ export default async function CustomerLayout({ children }: { children: React.Rea
       .eq('is_active', true)
       .order('display_order')
       .order('name'),
+    getStoreSettings(),
   ]);
+
+  // Header is a client component; pass only the slice it needs so the
+  // bundle stays small.
+  const headerSettings = {
+    name: settings.name,
+    phone: settings.phone,
+    whatsapp: settings.whatsapp,
+    hoursWeekdays: settings.hours.weekdays,
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header categories={categories ?? []} brands={brands ?? []} />
+      <Header
+        categories={categories ?? []}
+        brands={brands ?? []}
+        settings={headerSettings}
+      />
       <main id="main" tabIndex={-1} className="flex-1 scroll-mt-28 md:scroll-mt-24">
         {children}
       </main>
-      <Footer />
+      <Footer settings={settings} />
       <Chatbot />
       <CookieNotice />
     </div>

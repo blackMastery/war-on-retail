@@ -30,8 +30,15 @@ export function buildPattern(raw: string): string {
  * Convenience: build the comma-joined OR-clause body
  * (e.g. `name.ilike.%tv%,sku.ilike.%tv%`) ready to hand to PostgREST's
  * `.or(...)` builder.
+ *
+ * `fields` defaults to `SEARCH_FIELDS` (the product-search default), but the
+ * admin orders / customers pages pass their own field lists to match against
+ * `order_number` / `name` / `phone` etc.
  */
-export function buildIlikeOrClause(raw: string): string {
+export function buildIlikeOrClause(
+  raw: string,
+  fields: readonly string[] = SEARCH_FIELDS,
+): string {
   const pattern = buildPattern(raw);
-  return SEARCH_FIELDS.map((f) => `${f}.ilike.${pattern}`).join(',');
+  return fields.map((f) => `${f}.ilike.${pattern}`).join(',');
 }

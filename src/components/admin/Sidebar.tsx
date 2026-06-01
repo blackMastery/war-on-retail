@@ -8,12 +8,16 @@ import { useRouter } from 'next/navigation';
 
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: '📊' },
+  { href: '/admin/orders', label: 'Orders', icon: '🧾' },
+  { href: '/admin/customers', label: 'Customers', icon: '👥' },
   { href: '/admin/products', label: 'Products', icon: '📦' },
   { href: '/admin/products/import', label: 'CSV Import', icon: '⬆️' },
   { href: '/admin/promotions', label: 'Promotions', icon: '🎯' },
   { href: '/admin/categories', label: 'Categories', icon: '🗂' },
   { href: '/admin/brands', label: 'Brands', icon: '🏷' },
+  { href: '/admin/payment-methods', label: 'Payment methods', icon: '💳' },
   { href: '/admin/chatbot', label: 'Chatbot FAQs', icon: '🤖' },
+  { href: '/admin/settings', label: 'Store settings', icon: '⚙️' },
 ] as const;
 
 export default function Sidebar({ email, bootstrap }: { email: string; bootstrap?: boolean }) {

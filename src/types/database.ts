@@ -235,6 +235,156 @@ type PromotionInsert = {
 };
 type PromotionUpdate = Partial<PromotionInsert>;
 
+// ---------- Customers ----------
+export type CustomerRow = {
+  id: string;
+  name: string;
+  /** Normalised: leading `+` if present, otherwise digits-only. See `normalise_phone()` in SQL. */
+  phone: string;
+  created_at: string;
+  updated_at: string;
+};
+type CustomerInsert = {
+  id?: string;
+  name: string;
+  phone: string;
+  created_at?: string;
+  updated_at?: string;
+};
+type CustomerUpdate = Partial<CustomerInsert>;
+
+// ---------- Payment methods ----------
+export type PaymentMethodRow = {
+  id: string;
+  name: string;
+  description: string | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+};
+type PaymentMethodInsert = {
+  id?: string;
+  name: string;
+  description?: string | null;
+  is_active?: boolean;
+  display_order?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+type PaymentMethodUpdate = Partial<PaymentMethodInsert>;
+
+// ---------- Orders ----------
+export type OrderStatus = 'pending' | 'approved' | 'fulfilled' | 'cancelled';
+export type FulfillmentType = 'delivery' | 'pickup';
+
+export type OrderRow = {
+  id: string;
+  /** Human-readable, year-tagged: e.g. WOR-2026-000042. */
+  order_number: string;
+  customer_id: string;
+  fulfillment_type: FulfillmentType;
+  delivery_city: string | null;
+  delivery_address: string | null;
+  payment_method_id: string;
+  subtotal: number;
+  status: OrderStatus;
+  admin_notes: string | null;
+  placed_at: string;
+  created_at: string;
+  updated_at: string;
+};
+type OrderInsert = {
+  id?: string;
+  order_number?: string;
+  customer_id: string;
+  fulfillment_type: FulfillmentType;
+  delivery_city?: string | null;
+  delivery_address?: string | null;
+  payment_method_id: string;
+  subtotal: number;
+  status?: OrderStatus;
+  admin_notes?: string | null;
+  placed_at?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+type OrderUpdate = Partial<OrderInsert>;
+
+// ---------- Order items ----------
+export type OrderItemRow = {
+  id: string;
+  order_id: string;
+  /** NULL after the source product is hard-deleted; snapshot fields below survive. */
+  product_id: string | null;
+  product_slug: string;
+  product_name: string;
+  product_sku: string | null;
+  unit_price: number;
+  quantity: number;
+  line_total: number;
+  created_at: string;
+};
+type OrderItemInsert = {
+  id?: string;
+  order_id: string;
+  product_id?: string | null;
+  product_slug: string;
+  product_name: string;
+  product_sku?: string | null;
+  unit_price: number;
+  quantity: number;
+  line_total: number;
+  created_at?: string;
+};
+type OrderItemUpdate = Partial<OrderItemInsert>;
+
+// ---------- Store settings (singleton row, id='default') ----------
+export type StoreSettingsRow = {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  email: string;
+  phone: string;
+  /** Digits only, no leading `+`. Used in `https://wa.me/{whatsapp}` URLs. */
+  whatsapp: string;
+  admin_email: string;
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+  hours_weekdays: string;
+  hours_saturday: string;
+  hours_sunday: string;
+  facebook_url: string | null;
+  instagram_url: string | null;
+  twitter_url: string | null;
+  created_at: string;
+  updated_at: string;
+};
+type StoreSettingsInsert = {
+  id?: string;
+  name?: string;
+  description?: string;
+  url?: string;
+  email?: string;
+  phone?: string;
+  whatsapp?: string;
+  admin_email?: string;
+  address?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  hours_weekdays?: string;
+  hours_saturday?: string;
+  hours_sunday?: string;
+  facebook_url?: string | null;
+  instagram_url?: string | null;
+  twitter_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+type StoreSettingsUpdate = Partial<StoreSettingsInsert>;
+
 // ---------- Database root ----------
 // Each Table needs `Relationships: []` — @supabase/postgrest-js >=2.x requires
 // it to satisfy the `GenericTable` constraint, otherwise typed selects collapse
@@ -292,12 +442,58 @@ export type Database = {
         Update: PromotionUpdate;
         Relationships: Empty;
       };
+      customers: {
+        Row: CustomerRow;
+        Insert: CustomerInsert;
+        Update: CustomerUpdate;
+        Relationships: Empty;
+      };
+      payment_methods: {
+        Row: PaymentMethodRow;
+        Insert: PaymentMethodInsert;
+        Update: PaymentMethodUpdate;
+        Relationships: Empty;
+      };
+      orders: {
+        Row: OrderRow;
+        Insert: OrderInsert;
+        Update: OrderUpdate;
+        Relationships: Empty;
+      };
+      order_items: {
+        Row: OrderItemRow;
+        Insert: OrderItemInsert;
+        Update: OrderItemUpdate;
+        Relationships: Empty;
+      };
+      store_settings: {
+        Row: StoreSettingsRow;
+        Insert: StoreSettingsInsert;
+        Update: StoreSettingsUpdate;
+        Relationships: Empty;
+      };
     };
     Views: Record<string, never>;
     Functions: {
       search_products: {
         Args: { q: string; max_rows?: number; page_offset?: number };
         Returns: ProductRow[];
+      };
+      place_order: {
+        Args: {
+          p_customer: { name: string; phone: string };
+          p_fulfillment:
+            | { type: 'delivery'; city?: string | null; address: string }
+            | { type: 'pickup' };
+          p_payment_method_id: string;
+          p_items: Array<{ product_id: string; quantity: number }>;
+        };
+        // Note: `order_id` not `id` — see the function definition for why.
+        Returns: Array<{ order_id: string; order_number: string }>;
+      };
+      cancel_order: {
+        Args: { p_id: string };
+        Returns: OrderRow;
       };
     };
     Enums: Record<string, never>;
@@ -314,3 +510,8 @@ export type FAQCategory = FAQCategoryRow;
 export type ChatbotConversation = ChatbotConversationRow;
 export type AdminUser = AdminUserRow;
 export type Promotion = PromotionRow;
+export type Customer = CustomerRow;
+export type PaymentMethod = PaymentMethodRow;
+export type Order = OrderRow;
+export type OrderItem = OrderItemRow;
+export type StoreSettings = StoreSettingsRow;

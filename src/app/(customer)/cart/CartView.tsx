@@ -152,17 +152,25 @@ export default function CartView() {
           </dl>
 
           <p className="text-xs text-gray-500">
-            Delivery and final pricing are confirmed by our team on WhatsApp. We'll respond with
-            availability and arrange delivery to your area.
+            Pick delivery or pickup, choose how you'd like to pay, and we'll confirm
+            availability before anything is charged.
           </p>
+
+          <Link
+            href="/checkout"
+            className="flex w-full items-center justify-center gap-2 rounded-md bg-primary-600 px-6 py-3 font-semibold text-white hover:bg-primary-700"
+          >
+            Continue to checkout
+            <span aria-hidden="true">→</span>
+          </Link>
 
           <a
             href={inquiryUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-green-600 px-6 py-2.5 text-sm font-semibold text-green-700 hover:bg-green-50"
           >
-            <span aria-hidden="true">💬 </span>Send inquiry via WhatsApp
+            <span aria-hidden="true">💬 </span>Prefer to chat? Inquire via WhatsApp
           </a>
 
           <div className="flex flex-col gap-2 text-xs">

@@ -1,36 +1,44 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
-import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/lib/store-settings';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
-  title: {
-    default: siteConfig.name,
-    template: `%s · ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  // Favicon (`src/app/icon.png`) and Apple touch icon (`src/app/apple-icon.png`)
-  // are picked up automatically via the App Router file convention — regenerate
-  // them with `npm run favicon`. The OG / Twitter images below point at the wide
-  // logo.png on purpose: social previews look right with the rectangular tag.
-  openGraph: {
-    title: siteConfig.name,
-    description: siteConfig.description,
-    url: siteConfig.url,
-    siteName: siteConfig.name,
-    type: 'website',
-    images: [{ url: '/logo.png', alt: siteConfig.name }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: ['/logo.png'],
-  },
-};
+/**
+ * Root SEO metadata is now driven by the admin-edited store settings, with
+ * env-var fallbacks. `generateMetadata` (async) lets us await `getStoreSettings()`;
+ * the resulting tags update without a redeploy when the admin saves.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const s = await getStoreSettings();
+  return {
+    metadataBase: new URL(s.url),
+    title: {
+      default: s.name,
+      template: `%s · ${s.name}`,
+    },
+    description: s.description,
+    // Favicon (`src/app/icon.png`) and Apple touch icon (`src/app/apple-icon.png`)
+    // are picked up automatically via the App Router file convention — regenerate
+    // them with `npm run favicon`. The OG / Twitter images below point at the wide
+    // logo.png on purpose: social previews look right with the rectangular tag.
+    openGraph: {
+      title: s.name,
+      description: s.description,
+      url: s.url,
+      siteName: s.name,
+      type: 'website',
+      images: [{ url: '/logo.png', alt: s.name }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: s.name,
+      description: s.description,
+      images: ['/logo.png'],
+    },
+  };
+}
 
 // `theme-color` matches the page background so iOS Safari's chrome blends in.
 export const viewport: Viewport = {

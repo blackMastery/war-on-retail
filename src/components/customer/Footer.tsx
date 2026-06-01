@@ -1,12 +1,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { siteConfig } from '@/config/site';
 import { footerLinks } from '@/config/navigation';
+import type { ResolvedStoreSettings } from '@/lib/store-settings';
 
 // Computed at module-load on the server — stable for SSR + hydration.
 const COPYRIGHT_YEAR = new Date().getFullYear();
 
-export default function Footer() {
+/**
+ * Site footer. Reads brand/contact/address/social from the resolved store
+ * settings (DB row with env fallbacks) so the admin can change phone, email,
+ * address, etc. from /admin/settings without a redeploy.
+ */
+export default function Footer({ settings }: { settings: ResolvedStoreSettings }) {
+  const { name, description, phone, email, address, social } = settings;
   return (
     <footer className="mt-16 bg-surface-dark text-gray-300">
       <div className="container py-12">
@@ -14,24 +20,24 @@ export default function Footer() {
           <div>
             <Image
               src="/logo.png"
-              alt={siteConfig.name}
+              alt={name}
               width={180}
               height={85}
               className="h-12 w-auto"
             />
-            <p className="mt-3 text-pretty text-sm">{siteConfig.description}</p>
+            <p className="mt-3 text-pretty text-sm">{description}</p>
             <p className="mt-4 text-sm">
-              <a href={`tel:${siteConfig.phone}`} className="hover:text-white">
+              <a href={`tel:${phone}`} className="hover:text-white">
                 <span aria-hidden="true">📞 </span>
-                {siteConfig.phone}
+                {phone}
               </a>
               <br />
-              <a href={`mailto:${siteConfig.email}`} className="hover:text-white">
+              <a href={`mailto:${email}`} className="hover:text-white">
                 <span aria-hidden="true">✉ </span>
-                {siteConfig.email}
+                {email}
               </a>
               <br />
-              {siteConfig.address}
+              {address}
             </p>
           </div>
 
@@ -42,42 +48,48 @@ export default function Footer() {
 
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-gray-800 pt-6 text-xs text-gray-400 sm:flex-row sm:items-center">
           <p>
-            © {COPYRIGHT_YEAR} <span translate="no">{siteConfig.name}</span>. All rights reserved.
+            © {COPYRIGHT_YEAR} <span translate="no">{name}</span>. All rights reserved.
           </p>
           <ul className="flex gap-4">
-            <li>
-              <a
-                href={siteConfig.social.facebook}
-                aria-label={`${siteConfig.name} on Facebook`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white"
-              >
-                Facebook
-              </a>
-            </li>
-            <li>
-              <a
-                href={siteConfig.social.instagram}
-                aria-label={`${siteConfig.name} on Instagram`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white"
-              >
-                Instagram
-              </a>
-            </li>
-            <li>
-              <a
-                href={siteConfig.social.twitter}
-                aria-label={`${siteConfig.name} on Twitter`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white"
-              >
-                Twitter
-              </a>
-            </li>
+            {social.facebook && (
+              <li>
+                <a
+                  href={social.facebook}
+                  aria-label={`${name} on Facebook`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white"
+                >
+                  Facebook
+                </a>
+              </li>
+            )}
+            {social.instagram && (
+              <li>
+                <a
+                  href={social.instagram}
+                  aria-label={`${name} on Instagram`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white"
+                >
+                  Instagram
+                </a>
+              </li>
+            )}
+            {social.twitter && (
+              <li>
+                <a
+                  href={social.twitter}
+                  aria-label={`${name} on Twitter`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white"
+                >
+                  Twitter
+                </a>
+              </li>
+            )}
           </ul>
         </div>
       </div>

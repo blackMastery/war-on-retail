@@ -14,7 +14,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { siteConfig } from '@/config/site';
+import type { HeaderSettings } from './header-types';
 import { categoryIconFor } from '@/lib/category-icons';
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
 import CartIcon from './CartIcon';
@@ -41,11 +41,13 @@ type Brand = {
 type Props = {
   categories: Category[];
   brands: Brand[];
+  /** Store settings the header chrome needs — name, phone, weekday hours, whatsapp. */
+  settings: HeaderSettings;
 };
 
 const FEATURED_CATEGORY_SLUGS = ['electronics', 'home-appliances', 'kitchen-appliances'];
 
-export default function Header({ categories, brands }: Props) {
+export default function Header({ categories, brands, settings }: Props) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -140,19 +142,19 @@ export default function Header({ categories, brands }: Props) {
         <div className="container flex items-center justify-between gap-2 py-2 text-xs sm:text-sm">
           <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <a
-              href={`tel:${siteConfig.phone}`}
+              href={`tel:${settings.phone}`}
               className="truncate hover:text-accent-400"
             >
               <span aria-hidden="true">📞 </span>
-              {siteConfig.phone}
+              {settings.phone}
             </a>
             <span aria-hidden="true" className="hidden opacity-50 md:inline">
               |
             </span>
-            <span className="hidden opacity-80 md:inline">{siteConfig.hours.weekdays}</span>
+            <span className="hidden opacity-80 md:inline">{settings.hoursWeekdays}</span>
           </div>
           <a
-            href={`https://wa.me/${siteConfig.whatsapp}`}
+            href={`https://wa.me/${settings.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 hover:text-accent-400"
@@ -166,13 +168,13 @@ export default function Header({ categories, brands }: Props) {
       <div className="container flex items-center gap-2 py-3 sm:gap-4 sm:py-4">
         <Link
           href="/"
-          aria-label={`${siteConfig.name} home`}
+          aria-label={`${settings.name} home`}
           translate="no"
           className="flex shrink-0 items-center"
         >
           <Image
             src="/logo.png"
-            alt={siteConfig.name}
+            alt={settings.name}
             width={180}
             height={85}
             priority
@@ -304,14 +306,14 @@ export default function Header({ categories, brands }: Props) {
           <div className="flex shrink-0 items-center justify-between border-b border-gray-200 px-3 py-3 sm:px-4 sm:py-4">
             <Link
               href="/"
-              aria-label={`${siteConfig.name} home`}
+              aria-label={`${settings.name} home`}
               translate="no"
               onClick={() => setMobileMenuOpen(false)}
               className="flex shrink-0 items-center"
             >
               <Image
                 src="/logo.png"
-                alt={siteConfig.name}
+                alt={settings.name}
                 width={180}
                 height={85}
                 className="h-10 w-auto sm:h-12"
