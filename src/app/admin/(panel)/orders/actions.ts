@@ -8,11 +8,14 @@ import type { OrderStatus } from '@/types/database';
 
 /**
  * Status transition map. Each transition is one-way and gated; anything not
- * listed here is refused. This is the single source of truth shared between
- * the action validators and the UI (which uses it to decide which buttons
- * to show on the detail page).
+ * listed here is refused.
+ *
+ * Not exported from this file — `'use server'` modules can only export async
+ * functions. The UI (`OrderStatusActions.tsx`) duplicates the relevant
+ * "which buttons to show" logic inline via a `switch (status)` because that
+ * code lives on the client and shouldn't import server-action helpers anyway.
  */
-export const LEGAL_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+const LEGAL_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   pending: ['approved', 'cancelled'],
   approved: ['fulfilled', 'cancelled'],
   fulfilled: [],
