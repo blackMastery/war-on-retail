@@ -47,7 +47,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
         {children}
       </main>
       <Footer settings={settings} />
-      <Chatbot />
+      <Chatbot settings={{ name: settings.name, whatsapp: settings.whatsapp }} />
       <CookieNotice />
     </div>
   );

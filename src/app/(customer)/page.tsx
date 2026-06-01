@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { siteConfig } from '@/config/site';
+import { getStoreSettings, type ResolvedStoreSettings } from '@/lib/store-settings';
 import CategoryCard from '@/components/customer/CategoryCard';
 import BrandCard from '@/components/customer/BrandCard';
 import HorizontalScroller from '@/components/customer/HorizontalScroller';
@@ -15,11 +15,8 @@ import { getPageSeo } from '@/lib/page-seo';
 // Short revalidate so newly-scheduled promotions appear within a minute.
 export const revalidate = 60;
 
-// Compile-time defaults — tuned for the keywords a Guyanese shopper actually
-// types. The admin can override any of these via /admin/pages → Home.
-const HOME_TITLE_DEFAULT = `${siteConfig.name} — Electronics & Home Appliances in Guyana`;
-const HOME_DESCRIPTION_DEFAULT =
-  'Shop TVs, fridges, washing machines, computers, and personal-care electronics in Guyana. Authentic products, manufacturer warranties, fast delivery in Georgetown and nationwide. Buy via WhatsApp or browse online.';
+// Compile-time keyword defaults — tuned for the keywords a Guyanese shopper
+// actually types. The admin can override any of these via /admin/pages → Home.
 const HOME_KEYWORDS_DEFAULT = [
   'electronics Guyana',
   'home appliances Guyana',
@@ -31,10 +28,14 @@ const HOME_KEYWORDS_DEFAULT = [
   'personal care electronics',
   'War on Retail',
 ];
+const HOME_DESCRIPTION_DEFAULT =
+  'Shop TVs, fridges, washing machines, computers, and personal-care electronics in Guyana. Authentic products, manufacturer warranties, fast delivery in Georgetown and nationwide. Buy via WhatsApp or browse online.';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getPageSeo('home');
-  const title = seo?.meta_title?.trim() || HOME_TITLE_DEFAULT;
+  const [seo, settings] = await Promise.all([getPageSeo('home'), getStoreSettings()]);
+  // Defaults compose admin-edited store name with a tuned-for-Guyana phrase.
+  const titleDefault = `${settings.name} — Electronics & Home Appliances in Guyana`;
+  const title = seo?.meta_title?.trim() || titleDefault;
   const description = seo?.meta_description?.trim() || HOME_DESCRIPTION_DEFAULT;
   const keywords = seo?.meta_keywords
     ? seo.meta_keywords.split(',').map((s) => s.trim()).filter(Boolean)
@@ -63,11 +64,11 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: siteConfig.url,
+      url: settings.url,
       type: 'website',
-      siteName: siteConfig.name,
+      siteName: settings.name,
       locale: 'en_GY',
-      images: [{ url: '/logo.png', alt: siteConfig.name }],
+      images: [{ url: '/logo.png', alt: settings.name }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -89,43 +90,46 @@ export async function generateMetadata(): Promise<Metadata> {
  *   appears on branded SERPs (e.g. searching "war on retail" shows a search
  *   field below the result).
  */
-function buildHomeJsonLd() {
-  const base = siteConfig.url.replace(/\/+$/, '');
+function buildHomeJsonLd(settings: ResolvedStoreSettings) {
+  const base = settings.url.replace(/\/+$/, '');
+  // sameAs accepts only present social profiles — admin can clear any of the
+  // three URLs to hide them from the footer + remove them here.
+  const sameAs = [
+    settings.social.facebook,
+    settings.social.instagram,
+    settings.social.twitter,
+  ].filter((u): u is string => !!u);
   const organization = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     '@id': `${base}/#organization`,
-    name: siteConfig.name,
+    name: settings.name,
     url: base,
     logo: `${base}/logo.png`,
-    description: siteConfig.description,
+    description: settings.description,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Georgetown',
+      streetAddress: settings.address,
       addressCountry: 'GY',
     },
     contactPoint: [
       {
         '@type': 'ContactPoint',
-        telephone: `+${siteConfig.whatsapp}`,
+        telephone: `+${settings.whatsapp}`,
         contactType: 'customer service',
         areaServed: 'GY',
         availableLanguage: ['English'],
       },
     ],
-    sameAs: [
-      siteConfig.social.facebook,
-      siteConfig.social.instagram,
-      siteConfig.social.twitter,
-    ],
+    ...(sameAs.length ? { sameAs } : {}),
   };
   const website = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${base}/#website`,
     url: base,
-    name: siteConfig.name,
-    description: siteConfig.description,
+    name: settings.name,
+    description: settings.description,
     publisher: { '@id': `${base}/#organization` },
     potentialAction: {
       '@type': 'SearchAction',
@@ -140,7 +144,10 @@ function buildHomeJsonLd() {
 }
 
 export default async function Homepage() {
-  const supabase = await createClient();
+  const [supabase, settings] = await Promise.all([
+    createClient(),
+    getStoreSettings(),
+  ]);
   const nowIso = new Date().toISOString();
 
   // Active promotions in-window. RLS already filters this, but we mirror the
@@ -190,7 +197,7 @@ export default async function Homepage() {
   ]);
 
   const hasPromotions = !!promotions && promotions.length > 0;
-  const jsonLd = buildHomeJsonLd();
+  const jsonLd = buildHomeJsonLd(settings);
 
   return (
     <div>

@@ -10,7 +10,6 @@ import {
 } from '@/lib/cart/store';
 import { buildInquiryUrl } from '@/lib/cart/whatsapp';
 import { formatPrice } from '@/lib/utils';
-import { siteConfig } from '@/config/site';
 
 /**
  * Renders the live cart. Client-only because the cart is in localStorage.
@@ -21,8 +20,16 @@ import { siteConfig } from '@/config/site';
  *   - **Hydrated + empty** → friendly empty state with a back-to-shopping link.
  *   - **Hydrated + has items** → line-item list with qty steppers + subtotal +
  *     WhatsApp inquiry button.
+ *
+ * The parent server page (`cart/page.tsx`) reads the live store settings and
+ * threads them in so the WhatsApp link, the brand name in the inquiry text,
+ * and the "or call us" fallback all reflect admin edits.
  */
-export default function CartView() {
+export default function CartView({
+  storeInfo,
+}: {
+  storeInfo: { name: string; phone: string; whatsapp: string };
+}) {
   const hydrated = useCartHydrated();
   const items = useCartStore((s) => s.items);
   const subtotal = useCartStore(selectSubtotal);
@@ -57,7 +64,7 @@ export default function CartView() {
     );
   }
 
-  const inquiryUrl = buildInquiryUrl(items);
+  const inquiryUrl = buildInquiryUrl(items, storeInfo);
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
@@ -193,8 +200,8 @@ export default function CartView() {
 
           <p className="text-center text-xs text-gray-400">
             Or call us:{' '}
-            <a href={`tel:${siteConfig.phone}`} className="font-medium hover:text-gray-700">
-              {siteConfig.phone}
+            <a href={`tel:${storeInfo.phone}`} className="font-medium hover:text-gray-700">
+              {storeInfo.phone}
             </a>
           </p>
         </div>

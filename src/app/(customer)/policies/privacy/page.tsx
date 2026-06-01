@@ -1,17 +1,19 @@
-import { siteConfig } from '@/config/site';
 import { pageMetadata } from '@/lib/page-seo';
+import { getStoreSettings } from '@/lib/store-settings';
 
 export async function generateMetadata() {
+  const settings = await getStoreSettings();
   return pageMetadata('policies-privacy', {
     title: 'Privacy Policy',
-    description: `How ${siteConfig.name} collects, uses, and stores customer data.`,
+    description: `How ${settings.name} collects, uses, and stores customer data.`,
   });
 }
 
 // Last meaningful update — shown to the visitor for trust.
 const LAST_UPDATED = '2026-05-27';
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const settings = await getStoreSettings();
   return (
     <>
       <h1>Privacy Policy</h1>
@@ -20,7 +22,7 @@ export default function PrivacyPolicyPage() {
       </p>
 
       <p>
-        This policy explains what data {siteConfig.name} collects when you visit our website,
+        This policy explains what data {settings.name} collects when you visit our website,
         how we use it, and what choices you have. We've tried to write it in plain language
         rather than legalese — if anything is unclear, please ask.
       </p>

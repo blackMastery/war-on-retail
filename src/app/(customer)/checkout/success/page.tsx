@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import { siteConfig } from '@/config/site';
 import { pageMetadata } from '@/lib/page-seo';
+import { getStoreSettings } from '@/lib/store-settings';
 import ClearCartOnMount from '../ClearCartOnMount';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,8 @@ export default async function CheckoutSuccessPage({
   searchParams: Promise<{ order?: string }>;
 }) {
   const { order } = await searchParams;
-
+  const settings = await getStoreSettings();
+  const followUpText = `Hi ${settings.name}, I just placed order ${order}.`;
   return (
     <div className="container py-16">
       {/* Safety net — the wizard already clears on submit, but if the user
@@ -33,8 +34,8 @@ export default async function CheckoutSuccessPage({
           Order placed
         </h1>
         <p className="mt-2 text-gray-600">
-          Thanks — we've got it. Someone from{' '}
-          <span translate="no">{siteConfig.name}</span> will reach the phone you
+          Thanks — we&apos;ve got it. Someone from{' '}
+          <span translate="no">{settings.name}</span> will reach the phone you
           provided to confirm availability and arrange payment.
         </p>
 
@@ -60,10 +61,8 @@ export default async function CheckoutSuccessPage({
             Keep shopping
           </Link>
           <a
-            href={`https://wa.me/${siteConfig.whatsapp}${
-              order
-                ? `?text=${encodeURIComponent(`Hi War on Retail, I just placed order ${order}.`)}`
-                : ''
+            href={`https://wa.me/${settings.whatsapp}${
+              order ? `?text=${encodeURIComponent(followUpText)}` : ''
             }`}
             target="_blank"
             rel="noopener noreferrer"

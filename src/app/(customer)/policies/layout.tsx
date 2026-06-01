@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/lib/store-settings';
 
 /**
  * Shared chrome for `/policies/*` pages. Gives every policy page a consistent
@@ -7,9 +7,11 @@ import { siteConfig } from '@/config/site';
  *
  * The content of each page is plain JSX with `prose` typography — no MDX
  * pipeline, no CMS layer — so editing a policy is a code change. That's
- * intentional for a small retailer; policy churn is low.
+ * intentional for a small retailer; policy churn is low. Contact details
+ * still resolve at runtime from the admin-edited store settings.
  */
-export default function PoliciesLayout({ children }: { children: React.ReactNode }) {
+export default async function PoliciesLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getStoreSettings();
   return (
     <div className="container py-10">
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-gray-500">
@@ -26,20 +28,20 @@ export default function PoliciesLayout({ children }: { children: React.ReactNode
         <p className="mt-1 text-gray-700">
           The fastest way is WhatsApp:{' '}
           <a
-            href={`https://wa.me/${siteConfig.whatsapp}`}
+            href={`https://wa.me/${settings.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-primary-600 hover:underline"
           >
-            +{siteConfig.whatsapp}
+            +{settings.whatsapp}
           </a>
           . You can also email{' '}
-          <a href={`mailto:${siteConfig.email}`} className="font-medium text-primary-600 hover:underline">
-            {siteConfig.email}
+          <a href={`mailto:${settings.email}`} className="font-medium text-primary-600 hover:underline">
+            {settings.email}
           </a>{' '}
           or call{' '}
-          <a href={`tel:${siteConfig.phone}`} className="font-medium text-primary-600 hover:underline">
-            {siteConfig.phone}
+          <a href={`tel:${settings.phone}`} className="font-medium text-primary-600 hover:underline">
+            {settings.phone}
           </a>
           .
         </p>

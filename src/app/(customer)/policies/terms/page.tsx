@@ -1,16 +1,18 @@
-import { siteConfig } from '@/config/site';
 import { pageMetadata } from '@/lib/page-seo';
+import { getStoreSettings } from '@/lib/store-settings';
 
 export async function generateMetadata() {
+  const settings = await getStoreSettings();
   return pageMetadata('policies-terms', {
     title: 'Terms of Service',
-    description: `Terms of use for the ${siteConfig.name} website and store.`,
+    description: `Terms of use for the ${settings.name} website and store.`,
   });
 }
 
 const LAST_UPDATED = '2026-05-27';
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const settings = await getStoreSettings();
   return (
     <>
       <h1>Terms of Service</h1>
@@ -19,17 +21,17 @@ export default function TermsPage() {
       </p>
 
       <p>
-        These terms cover your use of the {siteConfig.name} website and the inquiry process
+        These terms cover your use of the {settings.name} website and the inquiry process
         that follows. By browsing, adding items to a cart, or sending us a WhatsApp inquiry
         from this site, you agree to these terms.
       </p>
 
       <h2>About us</h2>
       <p>
-        {siteConfig.name} is an electronics and home-appliance retailer based in {siteConfig.address}.
+        {settings.name} is an electronics and home-appliance retailer based in {settings.address}.
         You can reach us at{' '}
-        <a href={`tel:${siteConfig.phone}`}>{siteConfig.phone}</a> or by emailing{' '}
-        <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
+        <a href={`tel:${settings.phone}`}>{settings.phone}</a> or by emailing{' '}
+        <a href={`mailto:${settings.email}`}>{settings.email}</a>.
       </p>
 
       <h2>How the site works</h2>
@@ -95,7 +97,7 @@ export default function TermsPage() {
 
       <h2>Intellectual property</h2>
       <p>
-        The {siteConfig.name} brand, logo, and site design are our property. Product names,
+        The {settings.name} brand, logo, and site design are our property. Product names,
         logos, and images belong to their respective manufacturers and are used to describe
         and sell legitimate products.
       </p>

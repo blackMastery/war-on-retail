@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { calculateDiscount, formatPrice } from '@/lib/utils';
-import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/lib/store-settings';
 import AddToCartButton from '@/components/customer/AddToCartButton';
 import ProductCard from '@/components/customer/ProductCard';
 import ProductGallery from '@/components/customer/ProductGallery';
@@ -34,7 +34,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
+  const [supabase, settings] = await Promise.all([createClient(), getStoreSettings()]);
 
   const { data: product } = await supabase
     .from('products')
@@ -66,7 +66,7 @@ export async function generateMetadata({
     : { data: null };
 
   const canonicalPath = `/products/${product.slug}`;
-  const canonical = `${siteConfig.url.replace(/\/+$/, '')}${canonicalPath}`;
+  const canonical = `${settings.url.replace(/\/+$/, '')}${canonicalPath}`;
 
   // Title — prefer admin-set meta_title, fall back to "{Brand} {Name}".
   // The root layout's title template appends " · War on Retail" automatically.
@@ -88,7 +88,7 @@ export async function generateMetadata({
     const lead = brand?.name
       ? `Buy the ${brand.name} ${product.name}`
       : `Buy ${product.name}`;
-    return `${lead} for ${formatPrice(product.price)} at ${siteConfig.name}. Authentic products, manufacturer warranty, delivery across Guyana.`;
+    return `${lead} for ${formatPrice(product.price)} at ${settings.name}. Authentic products, manufacturer warranty, delivery across Guyana.`;
   })();
   const description = truncateAtWord(generatedDescription, 200);
 
@@ -129,7 +129,7 @@ export async function generateMetadata({
       description,
       url: canonical,
       type: 'website',
-      siteName: siteConfig.name,
+      siteName: settings.name,
       locale: 'en_GY',
       images: [{ url: ogImageUrl, alt: ogImageAlt }],
     },
@@ -159,7 +159,7 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const [supabase, settings] = await Promise.all([createClient(), getStoreSettings()]);
 
   const { data: product } = await supabase
     .from('products')
@@ -223,7 +223,12 @@ export default async function ProductDetailPage({
   );
 
   // Schema.org Product structured data — fed to Google's rich-result parser.
-  const jsonLd = buildProductJsonLd({ product, brand, images: allImages });
+  const jsonLd = buildProductJsonLd({
+    product,
+    brand,
+    images: allImages,
+    storeInfo: { name: settings.name, url: settings.url },
+  });
 
   return (
     <div className="container py-8">
@@ -327,7 +332,7 @@ export default async function ProductDetailPage({
               disabled={isOutOfStock}
             />
             <a
-              href={`https://wa.me/${siteConfig.whatsapp}?text=${inquiryMessage}`}
+              href={`https://wa.me/${settings.whatsapp}?text=${inquiryMessage}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-md bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
@@ -336,12 +341,12 @@ export default async function ProductDetailPage({
             </a>
             <WishlistButton slug={product.slug} productName={product.name} />
             <a
-              href={`tel:${siteConfig.phone}`}
+              href={`tel:${settings.phone}`}
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-surface-dark bg-surface-dark px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-900"
             >
               <span aria-hidden="true">📞 </span>
               <span className="sm:hidden">Call us</span>
-              <span className="hidden sm:inline">Call {siteConfig.phone}</span>
+              <span className="hidden sm:inline">Call {settings.phone}</span>
             </a>
           </div>
 

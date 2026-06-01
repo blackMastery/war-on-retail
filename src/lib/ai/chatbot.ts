@@ -1,7 +1,7 @@
 import 'server-only';
 import Anthropic from '@anthropic-ai/sdk';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/lib/store-settings';
 import type { FAQ, Product } from '@/types/database';
 
 // OpenAI is loaded lazily — only when we actually need the fallback — so the
@@ -57,11 +57,16 @@ async function searchProducts(message: string, limit = 5): Promise<Product[]> {
   return (data ?? []) as Product[];
 }
 
-function fallbackReply(): string {
-  return `I'm not sure off the top of my head — but our team is fast. WhatsApp us at https://wa.me/${siteConfig.whatsapp} or call ${siteConfig.phone} and we'll sort you out.`;
+/** Brand-aware fallback line — uses the live store-settings phone + WhatsApp. */
+function fallbackReply(info: { whatsapp: string; phone: string }): string {
+  return `I'm not sure off the top of my head — but our team is fast. WhatsApp us at https://wa.me/${info.whatsapp} or call ${info.phone} and we'll sort you out.`;
 }
 
-function buildSystemPrompt(faqs: FAQ[], products: Product[]): string {
+function buildSystemPrompt(
+  faqs: FAQ[],
+  products: Product[],
+  info: { name: string; whatsapp: string; phone: string },
+): string {
   const faqContext = faqs
     .slice(0, 20)
     .map((f) => `Q: ${f.question}\nA: ${f.answer}`)
@@ -74,14 +79,14 @@ function buildSystemPrompt(faqs: FAQ[], products: Product[]): string {
     )
     .join('\n');
 
-  return `You are the customer-service assistant for ${siteConfig.name}, an electronics and home-appliance retailer in Guyana.
+  return `You are the customer-service assistant for ${info.name}, an electronics and home-appliance retailer in Guyana.
 
 Rules:
 - Be concise — 1–3 short sentences. Friendly, factual.
 - Prices are in Guyanese dollars (GYD).
 - If the answer is in the FAQs below, quote or lightly rephrase it.
 - If you recommend products, list 1–3 from the catalogue below with names and links (relative paths like /products/slug).
-- If you don't know, say so and direct the user to WhatsApp ${siteConfig.whatsapp} or phone ${siteConfig.phone}.
+- If you don't know, say so and direct the user to WhatsApp ${info.whatsapp} or phone ${info.phone}.
 - Never invent products, prices, stock, or policies.
 
 FAQs:
@@ -95,12 +100,13 @@ async function askAnthropic(opts: {
   message: string;
   faqs: FAQ[];
   products: Product[];
+  storeInfo: { name: string; whatsapp: string; phone: string };
 }): Promise<string | null> {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return null;
 
   const client = new Anthropic({ apiKey: key });
-  const system = buildSystemPrompt(opts.faqs, opts.products);
+  const system = buildSystemPrompt(opts.faqs, opts.products, opts.storeInfo);
 
   try {
     const res = await client.messages.create({
@@ -125,12 +131,13 @@ async function askOpenAI(opts: {
   message: string;
   faqs: FAQ[];
   products: Product[];
+  storeInfo: { name: string; whatsapp: string; phone: string };
 }): Promise<string | null> {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return null;
 
   const client = await getOpenAI();
-  const system = buildSystemPrompt(opts.faqs, opts.products);
+  const system = buildSystemPrompt(opts.faqs, opts.products, opts.storeInfo);
 
   try {
     const res = await client.chat.completions.create({
@@ -150,8 +157,16 @@ async function askOpenAI(opts: {
 
 export async function answerMessage(message: string): Promise<ChatReply> {
   const supabase = createAdminClient();
-  const { data: faqs } = await supabase.from('faqs').select('*').eq('is_active', true);
+  const [{ data: faqs }, settings] = await Promise.all([
+    supabase.from('faqs').select('*').eq('is_active', true),
+    getStoreSettings(),
+  ]);
   const allFaqs = (faqs ?? []) as FAQ[];
+  const storeInfo = {
+    name: settings.name,
+    whatsapp: settings.whatsapp,
+    phone: settings.phone,
+  };
 
   // 1) Try direct FAQ retrieval first — fastest, cheapest, deterministic.
   const { faq, score } = bestFaq(message, allFaqs);
@@ -169,15 +184,15 @@ export async function answerMessage(message: string): Promise<ChatReply> {
   //    Anthropic preferred; OpenAI used only when ANTHROPIC_API_KEY is absent.
   const products = await searchProducts(message);
   const llm =
-    (await askAnthropic({ message, faqs: allFaqs, products })) ??
-    (await askOpenAI({ message, faqs: allFaqs, products }));
+    (await askAnthropic({ message, faqs: allFaqs, products, storeInfo })) ??
+    (await askOpenAI({ message, faqs: allFaqs, products, storeInfo }));
   if (llm) {
     return { reply: llm, matchedFaqId: null, confidence: score, source: 'llm' };
   }
 
   // 3) Last-resort fallback — no key configured or the API errored.
   return {
-    reply: fallbackReply(),
+    reply: fallbackReply(storeInfo),
     matchedFaqId: null,
     confidence: 0,
     source: 'fallback',

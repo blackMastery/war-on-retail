@@ -1,18 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChatBubbleLeftRightIcon, PaperAirplaneIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getOrCreateSessionId } from '@/lib/utils';
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
-import { siteConfig } from '@/config/site';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
-const WELCOME: Message = {
-  role: 'assistant',
-  content:
-    'Hi! I’m the War on Retail assistant. Ask me about products, delivery, returns, or anything else — I’ll help or connect you to our team on WhatsApp.',
-};
+/**
+ * Bare minimum the chat widget needs to keep its connection-error replies
+ * brand-aware. Threaded in from the customer layout's `getStoreSettings()` so
+ * the admin's saved store name + WhatsApp number always match.
+ */
+export type ChatbotSettings = { name: string; whatsapp: string };
 
 const FAB_OFFSET = 'calc(1.25rem + var(--cookie-banner-height, 0px) + env(safe-area-inset-bottom, 0px))';
 const PANEL_OFFSET = 'calc(6rem + var(--cookie-banner-height, 0px) + env(safe-area-inset-bottom, 0px))';
@@ -26,10 +26,19 @@ function scrollToBottom(el: HTMLElement | null) {
   el.scrollTo({ top: el.scrollHeight, behavior: prefersReduced ? 'auto' : 'smooth' });
 }
 
-export default function Chatbot() {
+export default function Chatbot({ settings }: { settings: ChatbotSettings }) {
   const [open, setOpen] = useState(false);
+  // Compose the welcome line once per `settings.name` change. Memoised so
+  // resetting the conversation doesn't recompute the string on every render.
+  const welcome = useMemo<Message>(
+    () => ({
+      role: 'assistant',
+      content: `Hi! I’m the ${settings.name} assistant. Ask me about products, delivery, returns, or anything else — I’ll help or connect you to our team on WhatsApp.`,
+    }),
+    [settings.name],
+  );
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>([WELCOME]);
+  const [messages, setMessages] = useState<Message[]>([welcome]);
   const [sending, setSending] = useState(false);
   const sessionId = useRef<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -116,14 +125,14 @@ export default function Chatbot() {
       const data = (await res.json()) as { reply?: string; error?: string };
       const reply =
         data.reply ??
-        `I’m having trouble responding right now. Please reach us on WhatsApp: https://wa.me/${siteConfig.whatsapp}`;
+        `I’m having trouble responding right now. Please reach us on WhatsApp: https://wa.me/${settings.whatsapp}`;
       setMessages((m) => [...m, { role: 'assistant', content: reply }]);
     } catch {
       setMessages((m) => [
         ...m,
         {
           role: 'assistant',
-          content: `Sorry — connection error. Please try again or message us on WhatsApp: https://wa.me/${siteConfig.whatsapp}`,
+          content: `Sorry — connection error. Please try again or message us on WhatsApp: https://wa.me/${settings.whatsapp}`,
         },
       ]);
     } finally {

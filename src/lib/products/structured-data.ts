@@ -1,5 +1,15 @@
-import { siteConfig } from '@/config/site';
 import type { Brand, Product, ProductImageMeta } from '@/types/database';
+
+/**
+ * Slice of the store settings the JSON-LD output needs — the canonical
+ * https:// URL and the brand name used as the offer seller. Caller threads
+ * these in from `getStoreSettings()` so the structured data reflects admin
+ * edits instead of compile-time env defaults.
+ */
+export type StructuredDataStoreInfo = {
+  name: string;
+  url: string;
+};
 
 /**
  * Per-image JSON-LD. When the admin has set caption/keywords/alt, emit an
@@ -40,9 +50,10 @@ export function buildProductJsonLd(opts: {
   product: Product;
   brand: Pick<Brand, 'name'> | null;
   images: string[];
+  storeInfo: StructuredDataStoreInfo;
 }): Record<string, unknown> {
-  const { product, brand, images } = opts;
-  const base = siteConfig.url.replace(/\/+$/, '');
+  const { product, brand, images, storeInfo } = opts;
+  const base = storeInfo.url.replace(/\/+$/, '');
   const url = `${base}/products/${product.slug}`;
 
   // PostgREST sometimes returns numerics as strings; coerce to be safe.
@@ -87,7 +98,7 @@ export function buildProductJsonLd(opts: {
         ? 'https://schema.org/OutOfStock'
         : 'https://schema.org/InStock',
       itemCondition: 'https://schema.org/NewCondition',
-      seller: { '@type': 'Organization', name: siteConfig.name },
+      seller: { '@type': 'Organization', name: storeInfo.name },
       // Valid through: 1 year out. Google warns if missing on time-bound offers;
       // for general retail this just means "this offer doesn't expire soon".
       priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)

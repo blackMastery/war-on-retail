@@ -1,4 +1,5 @@
 import { pageMetadata } from '@/lib/page-seo';
+import { getStoreSettings } from '@/lib/store-settings';
 import CartView from './CartView';
 
 export async function generateMetadata() {
@@ -7,11 +8,18 @@ export async function generateMetadata() {
   return pageMetadata('cart', { title: 'Cart' });
 }
 
-export default function CartPage() {
+export default async function CartPage() {
+  const settings = await getStoreSettings();
   return (
     <div className="container py-10">
       <h1 className="text-3xl font-bold">Your cart</h1>
-      <CartView />
+      <CartView
+        storeInfo={{
+          name: settings.name,
+          phone: settings.phone,
+          whatsapp: settings.whatsapp,
+        }}
+      />
     </div>
   );
 }

@@ -1,16 +1,18 @@
-import { siteConfig } from '@/config/site';
 import { pageMetadata } from '@/lib/page-seo';
+import { getStoreSettings } from '@/lib/store-settings';
 
 export async function generateMetadata() {
+  const settings = await getStoreSettings();
   return pageMetadata('policies-warranty', {
     title: 'Warranty',
-    description: `Manufacturer warranty terms and how to make a claim with ${siteConfig.name}.`,
+    description: `Manufacturer warranty terms and how to make a claim with ${settings.name}.`,
   });
 }
 
 const LAST_UPDATED = '2026-05-27';
 
-export default function WarrantyPolicyPage() {
+export default async function WarrantyPolicyPage() {
+  const settings = await getStoreSettings();
   return (
     <>
       <h1>Warranty</h1>
@@ -70,11 +72,11 @@ export default function WarrantyPolicyPage() {
         <li>
           Message us on WhatsApp at{' '}
           <a
-            href={`https://wa.me/${siteConfig.whatsapp}`}
+            href={`https://wa.me/${settings.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
           >
-            +{siteConfig.whatsapp}
+            +{settings.whatsapp}
           </a>{' '}
           with the product name, the date of purchase, and a description of the issue. Photos
           or a short video help us diagnose faster.

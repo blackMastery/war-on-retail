@@ -1,6 +1,14 @@
 import { formatPrice } from '@/lib/utils';
-import { siteConfig } from '@/config/site';
 import type { CartItem } from './types';
+
+/**
+ * Minimal slice of store settings these helpers need. The customer cart
+ * threads these in from `getStoreSettings()` server-side — keeping them
+ * passed-in (rather than imported from `siteConfig`) means the admin's saved
+ * brand name + WhatsApp number show up immediately, with no `siteConfig`
+ * fallback drift.
+ */
+export type CartStoreInfo = { name: string; whatsapp: string };
 
 /**
  * Builds the body of the WhatsApp inquiry message a customer sends from
@@ -19,11 +27,11 @@ import type { CartItem } from './types';
  *
  *   Please confirm availability and let me know about delivery. Thanks!
  */
-export function buildInquiryMessage(items: CartItem[]): string {
+export function buildInquiryMessage(items: CartItem[], info: CartStoreInfo): string {
   if (items.length === 0) return '';
 
   const lines: string[] = [];
-  lines.push(`Hi ${siteConfig.name}, I'd like to inquire about:`);
+  lines.push(`Hi ${info.name}, I'd like to inquire about:`);
   lines.push('');
 
   let subtotal = 0;
@@ -45,7 +53,7 @@ export function buildInquiryMessage(items: CartItem[]): string {
 }
 
 /** Returns the full WhatsApp deep-link URL with the inquiry message URL-encoded. */
-export function buildInquiryUrl(items: CartItem[]): string {
-  const body = buildInquiryMessage(items);
-  return `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(body)}`;
+export function buildInquiryUrl(items: CartItem[], info: CartStoreInfo): string {
+  const body = buildInquiryMessage(items, info);
+  return `https://wa.me/${info.whatsapp}?text=${encodeURIComponent(body)}`;
 }

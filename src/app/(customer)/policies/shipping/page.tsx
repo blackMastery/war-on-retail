@@ -1,16 +1,18 @@
-import { siteConfig } from '@/config/site';
 import { pageMetadata } from '@/lib/page-seo';
+import { getStoreSettings } from '@/lib/store-settings';
 
 export async function generateMetadata() {
+  const settings = await getStoreSettings();
   return pageMetadata('policies-shipping', {
     title: 'Shipping & Returns',
-    description: `Delivery, returns, and exchange information for ${siteConfig.name}.`,
+    description: `Delivery, returns, and exchange information for ${settings.name}.`,
   });
 }
 
 const LAST_UPDATED = '2026-05-27';
 
-export default function ShippingPolicyPage() {
+export default async function ShippingPolicyPage() {
+  const settings = await getStoreSettings();
   return (
     <>
       <h1>Shipping &amp; Returns</h1>
@@ -66,11 +68,11 @@ export default function ShippingPolicyPage() {
       <p>
         To start a return, message us on WhatsApp at{' '}
         <a
-          href={`https://wa.me/${siteConfig.whatsapp}`}
+          href={`https://wa.me/${settings.whatsapp}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          +{siteConfig.whatsapp}
+          +{settings.whatsapp}
         </a>{' '}
         with your order details. We'll arrange pickup or drop-off and confirm the refund or
         exchange.
