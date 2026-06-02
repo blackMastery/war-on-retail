@@ -1,6 +1,6 @@
 'use server';
 
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 import { uploadToBucket, type AdminUploadResult } from '@/lib/admin/storage';
 
 /**
@@ -8,6 +8,6 @@ import { uploadToBucket, type AdminUploadResult } from '@/lib/admin/storage';
  * public URL. Used by the brand form's logo picker.
  */
 export async function uploadBrandLogo(fd: FormData): Promise<AdminUploadResult> {
-  await requireAdmin();
+  await requirePageAccess('brands');
   return uploadToBucket('brand-logos', fd);
 }

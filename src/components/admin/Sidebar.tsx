@@ -5,25 +5,30 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { ADMIN_PAGES, DASHBOARD_KEY } from '@/lib/admin/pages';
 
-const NAV = [
-  { href: '/admin', label: 'Dashboard', icon: '📊' },
-  { href: '/admin/orders', label: 'Orders', icon: '🧾' },
-  { href: '/admin/customers', label: 'Customers', icon: '👥' },
-  { href: '/admin/products', label: 'Products', icon: '📦' },
-  { href: '/admin/products/import', label: 'CSV Import', icon: '⬆️' },
-  { href: '/admin/promotions', label: 'Promotions', icon: '🎯' },
-  { href: '/admin/pages', label: 'Pages', icon: '📄' },
-  { href: '/admin/categories', label: 'Categories', icon: '🗂' },
-  { href: '/admin/brands', label: 'Brands', icon: '🏷' },
-  { href: '/admin/payment-methods', label: 'Payment methods', icon: '💳' },
-  { href: '/admin/chatbot', label: 'Chatbot FAQs', icon: '🤖' },
-  { href: '/admin/settings', label: 'Store settings', icon: '⚙️' },
-] as const;
-
-export default function Sidebar({ email, bootstrap }: { email: string; bootstrap?: boolean }) {
+export default function Sidebar({
+  email,
+  bootstrap,
+  isFullAccess,
+  allowedPages,
+}: {
+  email: string;
+  bootstrap?: boolean;
+  isFullAccess: boolean;
+  allowedPages: string[];
+}) {
   const pathname = usePathname();
   const router = useRouter();
+
+  // Full-access admins see everything; everyone else sees the always-on
+  // dashboard plus the sections explicitly granted to them.
+  const granted = new Set(allowedPages);
+  const nav = ADMIN_PAGES.filter((page) => {
+    if (page.superAdminOnly) return isFullAccess;
+    if (isFullAccess || page.key === DASHBOARD_KEY) return true;
+    return granted.has(page.key);
+  });
 
   async function signOut() {
     const supabase = createClient();
@@ -49,7 +54,7 @@ export default function Sidebar({ email, bootstrap }: { email: string; bootstrap
       </div>
 
       <nav className="flex-1 space-y-1 p-3">
-        {NAV.map((item) => {
+        {nav.map((item) => {
           const active =
             item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
           return (
@@ -74,7 +79,7 @@ export default function Sidebar({ email, bootstrap }: { email: string; bootstrap
           <div className="mb-2 rounded-md bg-yellow-50 p-2 text-[11px] leading-tight text-yellow-800 ring-1 ring-yellow-200">
             <p className="font-semibold">Bootstrap access</p>
             <p className="mt-0.5">
-              You're in via <code>ADMIN_ALLOWED_EMAILS</code>. Persist this:
+              You&apos;re in via <code>ADMIN_ALLOWED_EMAILS</code>. Persist this:
             </p>
             <pre className="mt-1 select-all whitespace-pre-wrap font-mono">{`select make_admin('${email}');`}</pre>
             <p className="mt-1">Run it in the Supabase SQL editor, then remove your email from the env.</p>

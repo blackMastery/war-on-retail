@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import Papa from 'papaparse';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 import { generateSlug } from '@/lib/utils';
 import type { Json } from '@/types/database';
 
@@ -47,7 +47,7 @@ function asNumber(v: string | undefined): number | null {
 }
 
 export async function importProductsCsv(_: unknown, fd: FormData): Promise<ImportResult> {
-  await requireAdmin();
+  await requirePageAccess('products');
 
   const file = fd.get('csv') as File | null;
   if (!file || file.size === 0) {

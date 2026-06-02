@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 
 const PaymentMethodInput = z.object({
   id: z.string().uuid().optional(),
@@ -29,7 +29,7 @@ export async function upsertPaymentMethod(
   _prev: PaymentMethodFormState,
   fd: FormData,
 ): Promise<PaymentMethodFormState> {
-  await requireAdmin();
+  await requirePageAccess('payment-methods');
   const parsed = PaymentMethodInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -68,7 +68,7 @@ export async function upsertPaymentMethod(
  * the raw error.
  */
 export async function deletePaymentMethod(id: string, opts: { hard?: boolean } = {}) {
-  await requireAdmin();
+  await requirePageAccess('payment-methods');
   const supabase = createAdminClient();
 
   if (opts.hard) {

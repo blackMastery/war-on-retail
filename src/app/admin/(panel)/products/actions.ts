@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 import { generateSlug } from '@/lib/utils';
 import type { Json, ProductImageMeta } from '@/types/database';
 
@@ -67,7 +67,7 @@ function parseForm(fd: FormData) {
 }
 
 export async function upsertProduct(_prev: ProductFormState, fd: FormData): Promise<ProductFormState> {
-  await requireAdmin();
+  await requirePageAccess('products');
   const parsed = ProductInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -184,7 +184,7 @@ export async function upsertProduct(_prev: ProductFormState, fd: FormData): Prom
 }
 
 export async function deleteProduct(id: string) {
-  await requireAdmin();
+  await requirePageAccess('products');
   const supabase = createAdminClient();
   const { error } = await supabase.from('products').delete().eq('id', id);
   if (error) throw new Error(error.message);

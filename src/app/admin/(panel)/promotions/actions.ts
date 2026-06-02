@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 
 // Mirrors the DB check constraint in `20260101000800_promotions_link.sql`.
 // Allows: internal path (/...), https?:// URL, or empty (display-only).
@@ -58,7 +58,7 @@ export async function upsertPromotion(
   _prev: PromotionFormState,
   fd: FormData,
 ): Promise<PromotionFormState> {
-  await requireAdmin();
+  await requirePageAccess('promotions');
   const parsed = PromotionInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -95,7 +95,7 @@ export async function upsertPromotion(
 }
 
 export async function deletePromotion(id: string) {
-  await requireAdmin();
+  await requirePageAccess('promotions');
   const supabase = createAdminClient();
   const { error } = await supabase.from('promotions').delete().eq('id', id);
   if (error) throw new Error(error.message);

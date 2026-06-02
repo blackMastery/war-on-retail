@@ -1,6 +1,6 @@
 'use server';
 
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 import { uploadToBucket, type AdminUploadResult } from '@/lib/admin/storage';
 
 export type ImageUploadResult = AdminUploadResult;
@@ -10,6 +10,6 @@ export type ImageUploadResult = AdminUploadResult;
  * public URL. Used by the product form's gallery picker.
  */
 export async function uploadProductImage(fd: FormData): Promise<ImageUploadResult> {
-  await requireAdmin();
+  await requirePageAccess('products');
   return uploadToBucket('product-images', fd);
 }

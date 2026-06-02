@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 
 /**
  * One Zod schema for the whole settings form. Optional URL fields accept
@@ -67,7 +67,7 @@ export async function updateStoreSettings(
   _prev: StoreSettingsFormState,
   fd: FormData,
 ): Promise<StoreSettingsFormState> {
-  await requireAdmin();
+  await requirePageAccess('settings');
 
   const parsed = StoreSettingsInput.safeParse(parseForm(fd));
   if (!parsed.success) {

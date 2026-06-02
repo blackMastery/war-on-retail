@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 
 const FaqInput = z.object({
   id: z.string().uuid().optional(),
@@ -17,7 +17,7 @@ const FaqInput = z.object({
 export type FaqFormState = { error?: string };
 
 export async function upsertFaq(_prev: FaqFormState, fd: FormData): Promise<FaqFormState> {
-  await requireAdmin();
+  await requirePageAccess('chatbot');
   const raw = Object.fromEntries(fd.entries());
   raw.is_active = String(fd.get('is_active') === 'on' || fd.get('is_active') === 'true');
 
@@ -52,7 +52,7 @@ export async function upsertFaq(_prev: FaqFormState, fd: FormData): Promise<FaqF
 }
 
 export async function deleteFaq(id: string) {
-  await requireAdmin();
+  await requirePageAccess('chatbot');
   const supabase = createAdminClient();
   await supabase.from('faqs').delete().eq('id', id);
   revalidatePath('/admin/chatbot');

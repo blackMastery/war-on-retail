@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 
 const PageSeoInput = z.object({
   id: z.string().min(1),
@@ -33,7 +33,7 @@ export async function upsertPageSeo(
   _prev: PageSeoFormState,
   fd: FormData,
 ): Promise<PageSeoFormState> {
-  await requireAdmin();
+  await requirePageAccess('pages');
   const parsed = PageSeoInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};

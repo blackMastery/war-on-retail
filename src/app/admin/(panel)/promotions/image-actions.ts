@@ -1,6 +1,6 @@
 'use server';
 
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 import { uploadToBucket, type AdminUploadResult } from '@/lib/admin/storage';
 
 export type PromotionImageUploadResult = AdminUploadResult;
@@ -12,6 +12,6 @@ export type PromotionImageUploadResult = AdminUploadResult;
 export async function uploadPromotionImage(
   fd: FormData,
 ): Promise<PromotionImageUploadResult> {
-  await requireAdmin();
+  await requirePageAccess('promotions');
   return uploadToBucket('promotions', fd);
 }

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 import type { OrderStatus } from '@/types/database';
 
 /**
@@ -42,7 +42,7 @@ async function readStatus(id: string): Promise<OrderStatus> {
 }
 
 async function transitionTo(id: string, next: OrderStatus) {
-  await requireAdmin();
+  await requirePageAccess('orders');
   const current = await readStatus(id);
   if (!LEGAL_TRANSITIONS[current].includes(next)) {
     throw new Error(`Cannot move a ${current} order to ${next}.`);
@@ -70,7 +70,7 @@ export async function fulfillOrder(id: string) {
  * same transaction.
  */
 export async function cancelOrder(id: string) {
-  await requireAdmin();
+  await requirePageAccess('orders');
   const supabase = createAdminClient();
   const { error } = await supabase.rpc('cancel_order', { p_id: id });
   if (error) {
@@ -87,7 +87,7 @@ export async function cancelOrder(id: string) {
 const NotesInput = z.string().max(4000, 'Notes are too long').optional().nullable();
 
 export async function updateOrderNotes(id: string, notes: string | null) {
-  await requireAdmin();
+  await requirePageAccess('orders');
   const parsed = NotesInput.safeParse(notes);
   if (!parsed.success) throw new Error(parsed.error.errors[0]?.message ?? 'Invalid notes');
   const supabase = createAdminClient();

@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 import { generateSlug } from '@/lib/utils';
 
 const BrandInput = z.object({
@@ -36,7 +36,7 @@ export async function upsertBrand(
   _prev: BrandFormState,
   fd: FormData,
 ): Promise<BrandFormState> {
-  await requireAdmin();
+  await requirePageAccess('brands');
   const parsed = BrandInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -89,7 +89,7 @@ export async function upsertBrand(
  * is ON DELETE SET NULL so products survive either way.
  */
 export async function deleteBrand(id: string, opts: { hard?: boolean } = {}) {
-  await requireAdmin();
+  await requirePageAccess('brands');
   const supabase = createAdminClient();
   const { error } = opts.hard
     ? await supabase.from('brands').delete().eq('id', id)

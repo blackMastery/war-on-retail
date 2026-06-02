@@ -9,11 +9,16 @@ export const dynamic = 'force-dynamic';
  * don't get caught in a redirect loop.
  */
 export default async function AdminPanelLayout({ children }: { children: React.ReactNode }) {
-  const { user, via } = await requireAdmin();
+  const { user, via, isFullAccess, allowedPages } = await requireAdmin();
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar email={user.email ?? ''} bootstrap={via === 'env-bootstrap'} />
+      <Sidebar
+        email={user.email ?? ''}
+        bootstrap={via === 'env-bootstrap'}
+        isFullAccess={isFullAccess}
+        allowedPages={Array.from(allowedPages)}
+      />
       <main className="flex-1 overflow-x-hidden">
         <div className="container max-w-6xl py-8">{children}</div>
       </main>

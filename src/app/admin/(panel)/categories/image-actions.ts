@@ -1,6 +1,6 @@
 'use server';
 
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 import { uploadToBucket, type AdminUploadResult } from '@/lib/admin/storage';
 
 /**
@@ -8,6 +8,6 @@ import { uploadToBucket, type AdminUploadResult } from '@/lib/admin/storage';
  * returns its public URL. Used by the category form's image picker.
  */
 export async function uploadCategoryImage(fd: FormData): Promise<AdminUploadResult> {
-  await requireAdmin();
+  await requirePageAccess('categories');
   return uploadToBucket('category-images', fd);
 }

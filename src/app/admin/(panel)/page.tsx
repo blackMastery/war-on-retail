@@ -22,7 +22,12 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   cancelled: 'Cancelled',
 };
 
-export default async function AdminDashboard() {
+export default async function AdminDashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const supabase = createAdminClient();
 
   // head:true count queries return a count without ever materialising the
@@ -96,6 +101,13 @@ export default async function AdminDashboard() {
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <p className="text-sm text-gray-600">Overview of orders, catalogue, and recent activity.</p>
       </header>
+
+      {error === 'forbidden' && (
+        <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-800 ring-1 ring-amber-200">
+          You don’t have access to that section. Ask a store owner to grant it from{' '}
+          <span className="font-medium">Team</span>.
+        </div>
+      )}
 
       <section>
         <div className="mb-3 flex items-end justify-between gap-3">

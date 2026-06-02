@@ -241,6 +241,19 @@ type AdminUserInsert = {
 };
 type AdminUserUpdate = Partial<AdminUserInsert>;
 
+// ---------- Admin page permissions ----------
+export type AdminUserPageRow = {
+  admin_user_id: string;
+  page_key: string;
+  created_at: string;
+};
+type AdminUserPageInsert = {
+  admin_user_id: string;
+  page_key: string;
+  created_at?: string;
+};
+type AdminUserPageUpdate = Partial<AdminUserPageInsert>;
+
 // ---------- Promotions ----------
 export type PromotionRow = {
   id: string;
@@ -513,6 +526,12 @@ export type Database = {
         Update: AdminUserUpdate;
         Relationships: Empty;
       };
+      admin_user_pages: {
+        Row: AdminUserPageRow;
+        Insert: AdminUserPageInsert;
+        Update: AdminUserPageUpdate;
+        Relationships: Empty;
+      };
       promotions: {
         Row: PromotionRow;
         Insert: PromotionInsert;
@@ -577,6 +596,14 @@ export type Database = {
       cancel_order: {
         Args: { p_id: string };
         Returns: OrderRow;
+      };
+      make_admin: {
+        Args: { p_email: string; p_full_name?: string; p_role?: 'admin' | 'super_admin' };
+        Returns: AdminUserRow;
+      };
+      revoke_admin: {
+        Args: { p_email: string };
+        Returns: AdminUserRow;
       };
     };
     Enums: Record<string, never>;

@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/admin/auth';
+import { requirePageAccess } from '@/lib/admin/auth';
 import { generateSlug } from '@/lib/utils';
 
 const CategoryInput = z.object({
@@ -65,7 +65,7 @@ export async function upsertCategory(
   _prev: CategoryFormState,
   fd: FormData,
 ): Promise<CategoryFormState> {
-  await requireAdmin();
+  await requirePageAccess('categories');
   const parsed = CategoryInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -135,7 +135,7 @@ export async function upsertCategory(
  * categories orphaned (which makes them top-level).
  */
 export async function deleteCategory(id: string, opts: { hard?: boolean } = {}) {
-  await requireAdmin();
+  await requirePageAccess('categories');
   const supabase = createAdminClient();
   const { error } = opts.hard
     ? await supabase.from('categories').delete().eq('id', id)
