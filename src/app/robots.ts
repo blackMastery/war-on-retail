@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/lib/store-settings';
 
 /**
  * Crawl rules.
@@ -17,9 +17,14 @@ import { siteConfig } from '@/config/site';
  *     `?page=2`). They're canonical via the URL itself; if duplicate-content
  *     concerns ever come up we'd add a `<link rel="canonical">` to the base
  *     `/products` instead of disallowing.
+ *
+ * The `host` and the sitemap URL both come from the admin-edited canonical
+ * URL (`store_settings.url`), so changing it in `/admin/settings` propagates
+ * to robots.txt automatically.
  */
-export default function robots(): MetadataRoute.Robots {
-  const base = siteConfig.url.replace(/\/+$/, '');
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const settings = await getStoreSettings();
+  const base = settings.url.replace(/\/+$/, '');
   return {
     rules: [
       {
