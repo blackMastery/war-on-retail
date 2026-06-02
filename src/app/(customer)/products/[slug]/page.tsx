@@ -12,6 +12,7 @@ import RecentlyViewedTracker from '@/components/customer/RecentlyViewedTracker';
 import WishlistButton from '@/components/customer/WishlistButton';
 import { fetchMoreFromBrand, fetchRelatedProducts } from '@/lib/products/recommendations';
 import { buildProductJsonLd } from '@/lib/products/structured-data';
+import { productAvailability } from '@/lib/products/availability';
 
 export const revalidate = 60;
 
@@ -39,7 +40,7 @@ export async function generateMetadata({
   const { data: product } = await supabase
     .from('products')
     .select(
-      'name, slug, short_description, description, meta_title, meta_description, meta_keywords, featured_image_url, image_urls, price, compare_at_price, stock_quantity, track_inventory, is_active, brand_id, sku',
+      'name, slug, short_description, description, meta_title, meta_description, meta_keywords, featured_image_url, image_urls, price, compare_at_price, stock_quantity, track_inventory, is_pre_order_enabled, is_active, brand_id, sku',
     )
     .eq('slug', slug)
     .maybeSingle();
@@ -100,7 +101,14 @@ export async function generateMetadata({
     ? `${brand.name} ${product.name}`
     : product.name;
 
-  const isOutOfStock = product.track_inventory && product.stock_quantity === 0;
+  // Three-way availability classification — drives the structured-data
+  // `availability` meta tag below. `preorder` is the Facebook/Pinterest
+  // product-pin enum that signals "buyable now, ships later".
+  const metaAvailability = productAvailability({
+    track_inventory: product.track_inventory,
+    stock_quantity: product.stock_quantity,
+    is_pre_order_enabled: product.is_pre_order_enabled,
+  });
   const price = typeof product.price === 'string' ? Number(product.price) : product.price;
 
   // Admin-set keywords are comma-separated. Anything else → undefined so Next
@@ -145,7 +153,12 @@ export async function generateMetadata({
     other: {
       'product:price:amount': price.toFixed(2),
       'product:price:currency': 'GYD',
-      'product:availability': isOutOfStock ? 'out of stock' : 'in stock',
+      'product:availability':
+        metaAvailability === 'pre-order'
+          ? 'preorder'
+          : metaAvailability === 'out-of-stock'
+            ? 'out of stock'
+            : 'in stock',
       'product:condition': 'new',
       ...(product.sku ? { 'product:retailer_item_id': product.sku } : {}),
       ...(brand?.name ? { 'product:brand': brand.name } : {}),
@@ -204,7 +217,9 @@ export default async function ProductDetailPage({
   const allImages = [product.featured_image_url, ...(product.image_urls ?? [])].filter(
     Boolean,
   ) as string[];
-  const isOutOfStock = product.track_inventory && product.stock_quantity === 0;
+  const availability = productAvailability(product);
+  const isOutOfStock = availability === 'out-of-stock';
+  const isPreOrder = availability === 'pre-order';
   const specs = (product.specifications ?? {}) as Record<string, unknown>;
 
   // Recommendations: a mixed-signal "You may also like" row plus an optional
@@ -297,8 +312,28 @@ export default async function ProductDetailPage({
             <p className="mt-4 text-gray-700">{product.short_description}</p>
           )}
 
-          <div className="mt-6 rounded-md bg-gray-50 p-4 ring-1 ring-gray-200">
-            {isOutOfStock ? (
+          <div
+            className={`mt-6 rounded-md p-4 ring-1 ${
+              isPreOrder
+                ? 'bg-blue-50 ring-blue-200'
+                : 'bg-gray-50 ring-gray-200'
+            }`}
+          >
+            {isPreOrder ? (
+              <div className="space-y-1 text-sm">
+                <p className="font-semibold text-blue-800">
+                  Pre-order — ships once restocked
+                </p>
+                {product.pre_order_message ? (
+                  <p className="text-blue-900">{product.pre_order_message}</p>
+                ) : (
+                  <p className="text-blue-900">
+                    Our team will confirm the expected ship date by phone
+                    after you place the order.
+                  </p>
+                )}
+              </div>
+            ) : isOutOfStock ? (
               <p className="font-semibold text-red-600">Currently out of stock</p>
             ) : (
               <p className="text-sm">
@@ -329,7 +364,7 @@ export default async function ProductDetailPage({
                 imageUrl: product.featured_image_url,
                 sku: product.sku,
               }}
-              disabled={isOutOfStock}
+              mode={isOutOfStock ? 'unavailable' : isPreOrder ? 'preorder' : 'add'}
             />
             <a
               href={`https://wa.me/${settings.whatsapp}?text=${inquiryMessage}`}

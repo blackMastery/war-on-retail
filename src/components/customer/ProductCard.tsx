@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { calculateDiscount, formatPrice, cn } from '@/lib/utils';
 import { isNewArrival } from '@/config/catalog';
+import { productAvailability } from '@/lib/products/availability';
 import AddToCartButton from './AddToCartButton';
 import WishlistButton from './WishlistButton';
 import type { Product } from '@/types/database';
@@ -41,10 +42,11 @@ export default function ProductCard({
 }: ProductCardProps) {
   const isStrip = layout === 'strip';
   const discount = calculateDiscount(product.price, product.compare_at_price);
-  const isOutOfStock = product.track_inventory && product.stock_quantity === 0;
+  const availability = productAvailability(product);
+  const isOutOfStock = availability === 'out-of-stock';
+  const isPreOrder = availability === 'pre-order';
   const isLowStock =
-    product.track_inventory &&
-    product.stock_quantity > 0 &&
+    availability === 'in-stock' &&
     product.stock_quantity <= product.low_stock_threshold;
   const isNew = isNewArrival(product.created_at);
 
@@ -95,6 +97,11 @@ export default function ProductCard({
           {isNew && (
             <span className="rounded bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white sm:px-2 sm:text-xs">
               New
+            </span>
+          )}
+          {isPreOrder && (
+            <span className="rounded bg-blue-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white sm:px-2 sm:text-xs">
+              Pre-order
             </span>
           )}
         </div>
@@ -158,7 +165,7 @@ export default function ProductCard({
         <div className={cn('relative z-10 mt-auto', isStrip ? 'pt-3' : 'pt-2 sm:pt-3')}>
           <AddToCartButton
             variant="compact"
-            disabled={isOutOfStock}
+            mode={isOutOfStock ? 'unavailable' : isPreOrder ? 'preorder' : 'add'}
             product={{
               productId: product.id,
               slug: product.slug,

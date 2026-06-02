@@ -592,6 +592,7 @@ function StepPayment({
 
 function OrderSummary({ items, subtotal }: { items: CartItem[]; subtotal: number }) {
   const totalUnits = items.reduce((sum, i) => sum + i.quantity, 0);
+  const hasPreOrder = items.some((i) => i.isPreOrder);
   return (
     <aside className="lg:sticky lg:top-32 lg:self-start">
       <div className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
@@ -622,6 +623,11 @@ function OrderSummary({ items, subtotal }: { items: CartItem[]; subtotal: number
                 <span className="block text-xs text-gray-500 tabular-nums">
                   Qty {item.quantity} · {formatPrice(item.price)}
                 </span>
+                {item.isPreOrder && (
+                  <span className="mt-1 inline-flex w-fit items-center rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-800">
+                    Pre-order
+                  </span>
+                )}
               </span>
               <span className="shrink-0 self-start text-sm font-semibold tabular-nums text-gray-900">
                 {formatPrice(item.price * item.quantity)}
@@ -629,6 +635,13 @@ function OrderSummary({ items, subtotal }: { items: CartItem[]; subtotal: number
             </li>
           ))}
         </ul>
+        {hasPreOrder && (
+          <p className="rounded-md bg-blue-50 p-3 text-xs text-blue-900">
+            Items marked <span className="font-semibold">Pre-order</span> will be
+            confirmed and shipped once stock arrives — payment is collected
+            after we confirm.
+          </p>
+        )}
         <dl className="space-y-2 border-t border-gray-200 pt-3 text-sm">
           <div className="flex justify-between">
             <dt className="text-gray-600">Items ({totalUnits})</dt>

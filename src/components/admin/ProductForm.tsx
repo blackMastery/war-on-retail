@@ -133,6 +133,39 @@ export default function ProductForm({ product, categories, brands }: Props) {
         </div>
       </Section>
 
+      <Section title="Pre-orders">
+        <p className="text-xs text-gray-600">
+          When ticked, customers can still buy this product after stock runs
+          out — the order line is flagged as a pre-order and admins
+          reconcile inventory manually when shipping.
+        </p>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            name="is_pre_order_enabled"
+            defaultChecked={product?.is_pre_order_enabled ?? false}
+            className="rounded text-primary-600"
+          />
+          Allow pre-orders when out of stock
+        </label>
+        <label className="block text-sm">
+          <span className="font-medium text-gray-700">
+            Pre-order message <span className="font-normal text-gray-500">(optional)</span>
+          </span>
+          <textarea
+            name="pre_order_message"
+            rows={2}
+            defaultValue={product?.pre_order_message ?? ''}
+            placeholder="e.g. Ships within 3–4 weeks. Confirmed by our team."
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+          />
+          <span className="mt-1 block text-xs text-gray-500">
+            Shown next to the customer&apos;s Pre-order CTA when the product is
+            out of stock. Leave blank to use a generic line.
+          </span>
+        </label>
+      </Section>
+
       <Section title="Classification">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Category">

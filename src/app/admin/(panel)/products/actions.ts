@@ -41,6 +41,8 @@ const ProductInput = z.object({
   image_meta_json: z.string().optional().nullable(),
   is_active: z.coerce.boolean().default(true),
   is_featured: z.coerce.boolean().default(false),
+  is_pre_order_enabled: z.coerce.boolean().default(false),
+  pre_order_message: z.string().optional().nullable(),
   specifications_json: z.string().optional().nullable(),
   meta_title: z.string().optional().nullable(),
   meta_description: z.string().optional().nullable(),
@@ -58,6 +60,9 @@ function parseForm(fd: FormData) {
   raw.track_inventory = String(fd.get('track_inventory') === 'on' || fd.get('track_inventory') === 'true');
   raw.is_active = String(fd.get('is_active') === 'on' || fd.get('is_active') === 'true');
   raw.is_featured = String(fd.get('is_featured') === 'on' || fd.get('is_featured') === 'true');
+  raw.is_pre_order_enabled = String(
+    fd.get('is_pre_order_enabled') === 'on' || fd.get('is_pre_order_enabled') === 'true',
+  );
   return raw;
 }
 
@@ -155,6 +160,8 @@ export async function upsertProduct(_prev: ProductFormState, fd: FormData): Prom
     image_meta: imageMeta,
     is_active: input.is_active,
     is_featured: input.is_featured,
+    is_pre_order_enabled: input.is_pre_order_enabled,
+    pre_order_message: clean(input.pre_order_message),
     specifications: specifications as Json,
     meta_title: clean(input.meta_title),
     meta_description: clean(input.meta_description),

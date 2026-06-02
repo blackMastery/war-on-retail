@@ -114,6 +114,10 @@ export type ProductRow = {
   meta_title: string | null;
   meta_description: string | null;
   meta_keywords: string | null;
+  /** When true, an out-of-stock product is offered as a pre-order rather than blocked. */
+  is_pre_order_enabled: boolean;
+  /** Optional admin blurb shown beside the customer Pre-order CTA. */
+  pre_order_message: string | null;
   is_active: boolean;
   is_featured: boolean;
   created_at: string;
@@ -142,6 +146,8 @@ type ProductInsert = {
   meta_title?: string | null;
   meta_description?: string | null;
   meta_keywords?: string | null;
+  is_pre_order_enabled?: boolean;
+  pre_order_message?: string | null;
   is_active?: boolean;
   is_featured?: boolean;
   created_at?: string;
@@ -353,6 +359,8 @@ export type OrderItemRow = {
   unit_price: number;
   quantity: number;
   line_total: number;
+  /** True when this line was placed as a pre-order (stock was insufficient + product allowed it). */
+  is_pre_order: boolean;
   created_at: string;
 };
 type OrderItemInsert = {
@@ -365,6 +373,7 @@ type OrderItemInsert = {
   unit_price: number;
   quantity: number;
   line_total: number;
+  is_pre_order?: boolean;
   created_at?: string;
 };
 type OrderItemUpdate = Partial<OrderItemInsert>;

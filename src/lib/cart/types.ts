@@ -25,4 +25,14 @@ export type CartItem = {
   sku: string | null;
   /** Whole number ≥ 1. */
   quantity: number;
+  /**
+   * Snapshot of whether the customer was looking at a Pre-order CTA when they
+   * added the line. Purely a UI hint for the cart/checkout pills — server
+   * authoritatively re-classifies at `place_order` based on live stock +
+   * the product's `is_pre_order_enabled` flag.
+   *
+   * Optional + default-false on hydration so legacy localStorage rows from
+   * before this field existed don't need a migration.
+   */
+  isPreOrder?: boolean;
 };

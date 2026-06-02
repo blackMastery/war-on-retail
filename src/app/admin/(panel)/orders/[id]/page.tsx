@@ -51,6 +51,7 @@ export default async function AdminOrderDetailPage({
     | { name: string; description: string | null }
     | null;
   const status = order.status as OrderStatus;
+  const hasPreOrder = (items ?? []).some((it) => it.is_pre_order);
 
   return (
     <div className="space-y-6">
@@ -71,13 +72,20 @@ export default async function AdminOrderDetailPage({
             })}
           </p>
         </div>
-        <span
-          className={`inline-block rounded-full px-3 py-1 text-sm font-medium capitalize ${
-            STATUS_TONE[status]
-          }`}
-        >
-          {status}
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={`inline-block rounded-full px-3 py-1 text-sm font-medium capitalize ${
+              STATUS_TONE[status]
+            }`}
+          >
+            {status}
+          </span>
+          {hasPreOrder && (
+            <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+              Pre-order
+            </span>
+          )}
+        </div>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -158,7 +166,14 @@ export default async function AdminOrderDetailPage({
                 {(items ?? []).map((it) => (
                   <tr key={it.id}>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900">{it.product_name}</div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium text-gray-900">{it.product_name}</span>
+                        {it.is_pre_order && (
+                          <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-800">
+                            Pre-order
+                          </span>
+                        )}
+                      </div>
                       {it.product_id ? (
                         <Link
                           href={`/products/${it.product_slug}`}

@@ -1,15 +1,30 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CheckIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, ClockIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { useCartStore } from '@/lib/cart/store';
 import type { CartItem } from '@/lib/cart/types';
 
+type Mode = 'add' | 'preorder' | 'unavailable';
+
 type Props = {
-  /** The product to add — same fields as a CartItem minus `quantity`. */
-  product: Omit<CartItem, 'quantity'>;
-  /** True when the product is out of stock — button is disabled and labelled accordingly. */
+  /** The product to add — same fields as a CartItem minus `quantity` + `isPreOrder`. */
+  product: Omit<CartItem, 'quantity' | 'isPreOrder'>;
+  /**
+   * Legacy disable hook (kept for callers that haven't migrated to `mode`).
+   * When set, behaves the same as `mode='unavailable'`.
+   */
   disabled?: boolean;
+  /**
+   * Drives the button's label, tone, and disabled state.
+   *   - `add`         — normal "Add to cart"
+   *   - `preorder`    — enabled, label = "Pre-order"; adds the line with `isPreOrder=true`
+   *   - `unavailable` — disabled, label = "Out of stock"
+   *
+   * Defaults to `add` when neither `mode` nor `disabled` is set. Callers
+   * derive this from `productAvailability(product)`.
+   */
+  mode?: Mode;
   /**
    * - `primary` — large headline button (product detail page). Inline width.
    * - `compact` — full-width small button (product card). `stopPropagation`
@@ -33,6 +48,7 @@ const FEEDBACK_MS = 1500;
 export default function AddToCartButton({
   product,
   disabled = false,
+  mode,
   variant = 'primary',
   quantity = 1,
 }: Props) {
@@ -40,25 +56,31 @@ export default function AddToCartButton({
   const [justAdded, setJustAdded] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
+  // Resolve the effective mode. `disabled=true` overrides whatever mode was
+  // passed, matching the old contract; otherwise default to "add".
+  const effectiveMode: Mode = disabled ? 'unavailable' : (mode ?? 'add');
+  const isPreOrder = effectiveMode === 'preorder';
+  const isUnavailable = effectiveMode === 'unavailable';
+
   // Clear the feedback after FEEDBACK_MS, but reset the timer if the user
   // mashes the button so they always see the latest "Added!" cycle.
   useEffect(() => {
     if (!justAdded) return;
-    setStatusMessage('Added to cart');
+    setStatusMessage(isPreOrder ? 'Added pre-order to cart' : 'Added to cart');
     const t = setTimeout(() => {
       setJustAdded(false);
       setStatusMessage('');
     }, FEEDBACK_MS);
     return () => clearTimeout(t);
-  }, [justAdded]);
+  }, [justAdded, isPreOrder]);
 
   function onClick(e: React.MouseEvent<HTMLButtonElement>) {
     // When mounted inside a product card with an overlay link, the click would
     // otherwise bubble up and trigger navigation. Stop it.
     e.preventDefault();
     e.stopPropagation();
-    if (disabled) return;
-    addItem(product, quantity);
+    if (isUnavailable) return;
+    addItem({ ...product, isPreOrder }, quantity);
     setJustAdded(true);
   }
 
@@ -68,9 +90,25 @@ export default function AddToCartButton({
     variant === 'primary'
       ? 'min-h-11 px-6 py-3'
       : 'min-h-11 w-full px-3 py-2.5 text-sm sm:py-2';
+  // Tone vocabulary:
+  //   added     → green (success)
+  //   preorder  → blue (pending stock — distinct from the regular red primary)
+  //   default   → primary red
   const colours = justAdded
     ? 'bg-green-600 text-white hover:bg-green-700'
-    : 'bg-primary-600 text-white hover:bg-primary-700';
+    : isPreOrder
+      ? 'bg-blue-600 text-white hover:bg-blue-700'
+      : 'bg-primary-600 text-white hover:bg-primary-700';
+
+  const ariaLabel = isUnavailable
+    ? 'Out of stock'
+    : justAdded
+      ? isPreOrder
+        ? 'Pre-order added to cart'
+        : 'Added to cart'
+      : isPreOrder
+        ? 'Pre-order'
+        : 'Add to cart';
 
   return (
     <>
@@ -80,14 +118,8 @@ export default function AddToCartButton({
       <button
         type="button"
         onClick={onClick}
-        disabled={disabled}
-        aria-label={
-          disabled
-            ? 'Out of stock'
-            : justAdded
-              ? 'Added to cart'
-              : 'Add to cart'
-        }
+        disabled={isUnavailable}
+        aria-label={ariaLabel}
         className={`${base} ${sizing} ${colours}`}
       >
         {justAdded ? (
@@ -95,7 +127,7 @@ export default function AddToCartButton({
             <CheckIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
             Added{variant === 'primary' ? ' to cart' : ''}
           </>
-        ) : disabled ? (
+        ) : isUnavailable ? (
           <>
             <ShoppingBagIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
             {variant === 'compact' ? (
@@ -106,6 +138,11 @@ export default function AddToCartButton({
             ) : (
               'Out of stock'
             )}
+          </>
+        ) : isPreOrder ? (
+          <>
+            <ClockIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+            Pre-order
           </>
         ) : (
           <>

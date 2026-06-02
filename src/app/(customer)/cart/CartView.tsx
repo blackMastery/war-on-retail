@@ -115,6 +115,11 @@ export default function CartView({
               {item.sku && (
                 <p className="mt-0.5 font-mono text-xs text-gray-500">SKU: {item.sku}</p>
               )}
+              {item.isPreOrder && (
+                <span className="mt-1 inline-flex w-fit items-center rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-800">
+                  Pre-order
+                </span>
+              )}
 
               <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-2">
                 <QuantityStepper
