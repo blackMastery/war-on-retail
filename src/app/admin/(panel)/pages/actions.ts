@@ -11,6 +11,9 @@ const PageSeoInput = z.object({
   meta_description: z.string().optional().nullable(),
   meta_keywords: z.string().optional().nullable(),
   robots_index: z.coerce.boolean().default(true),
+  // Markdown body for long-form pages (/about + policies). Other rows
+  // submit this field empty and it's coerced to null below.
+  body_markdown: z.string().optional().nullable(),
 });
 
 export type PageSeoFormState = {
@@ -51,6 +54,10 @@ export async function upsertPageSeo(
     meta_description: clean(input.meta_description),
     meta_keywords: clean(input.meta_keywords),
     robots_index: input.robots_index,
+    // Preserve internal whitespace in the markdown — only trim outer edges.
+    body_markdown: input.body_markdown && input.body_markdown.trim()
+      ? input.body_markdown.replace(/\r\n/g, '\n')
+      : null,
   };
 
   const supabase = createAdminClient();

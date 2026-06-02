@@ -437,6 +437,14 @@ export type PageSeoRow = {
   meta_keywords: string | null;
   /** Default true; flipped to false for cart/wishlist/checkout/search. */
   robots_index: boolean;
+  /**
+   * Admin-editable Markdown body for long-form pages (`/about` + policies).
+   * `null` for rows whose page doesn't render a body (home, products list,
+   * cart, etc.). Supports `{{site_name}}` / `{{site_phone}}` / `{{site_email}}`
+   * / `{{site_address}}` / `{{site_whatsapp}}` placeholders that the body
+   * renderer substitutes at request time.
+   */
+  body_markdown: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -448,6 +456,7 @@ type PageSeoInsert = {
   meta_description?: string | null;
   meta_keywords?: string | null;
   robots_index?: boolean;
+  body_markdown?: string | null;
   created_at?: string;
   updated_at?: string;
 };
