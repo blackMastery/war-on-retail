@@ -4,6 +4,41 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 
 /**
+ * Result of the returning-customer lookup. `found:false` covers both "no such
+ * customer" and any lookup error — the UI treats them identically (quiet hint).
+ */
+export type CustomerLookupResult =
+  | { found: true; name: string; delivery: { city: string; address: string } | null }
+  | { found: false };
+
+/**
+ * Looks up a returning customer's saved name + most recent delivery address by
+ * phone, powering the checkout's "Find my info" button. Calls the
+ * `lookup_customer_by_phone` SECURITY DEFINER RPC (granted to anon), which
+ * returns only those whitelisted fields — the `customers` table itself stays
+ * RLS-locked to anon.
+ */
+export async function lookupCustomerAction(phone: string): Promise<CustomerLookupResult> {
+  const trimmed = (phone ?? '').trim();
+  if (!trimmed) return { found: false };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('lookup_customer_by_phone', { p_phone: trimmed });
+  if (error) {
+    console.error('[checkout] customer lookup failed', error);
+    return { found: false };
+  }
+
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row?.name) return { found: false };
+
+  const delivery = row.last_delivery_address
+    ? { city: row.last_delivery_city ?? '', address: row.last_delivery_address }
+    : null;
+  return { found: true, name: row.name, delivery };
+}
+
+/**
  * Combined Zod schema for the wizard payload. Mirrors the per-step checks
  * client-side but is the *authoritative* shape — the client validation is for
  * UX; this is what protects the database.

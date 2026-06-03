@@ -702,6 +702,14 @@ export type Database = {
         Args: { p_id: string };
         Returns: OrderRow;
       };
+      lookup_customer_by_phone: {
+        Args: { p_phone: string };
+        Returns: Array<{
+          name: string;
+          last_delivery_city: string | null;
+          last_delivery_address: string | null;
+        }>;
+      };
       make_admin: {
         Args: { p_email: string; p_full_name?: string; p_role?: 'admin' | 'super_admin' };
         Returns: AdminUserRow;

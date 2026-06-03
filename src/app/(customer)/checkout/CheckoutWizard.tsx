@@ -16,7 +16,7 @@ import {
 import { formatPrice } from '@/lib/utils';
 import type { CartItem } from '@/lib/cart/types';
 import type { AppliedDiscount } from '@/types/discount';
-import { placeOrderAction } from './actions';
+import { placeOrderAction, lookupCustomerAction } from './actions';
 
 type Method = {
   id: string;
@@ -186,6 +186,15 @@ export default function CheckoutWizard({
             <StepCustomer
               value={draft.customer}
               onChange={(c) => setDraft((d) => ({ ...d, customer: c }))}
+              onApplyLookup={(r) =>
+                setDraft((d) => ({
+                  ...d,
+                  customer: { ...d.customer, name: r.name },
+                  fulfillment: r.delivery
+                    ? { type: 'delivery', city: r.delivery.city, address: r.delivery.address }
+                    : d.fulfillment,
+                }))
+              }
             />
           )}
           {step === 1 && (
@@ -337,11 +346,40 @@ function StepBar({
 function StepCustomer({
   value,
   onChange,
+  onApplyLookup,
 }: {
   value: { name: string; phone: string };
   onChange: (v: { name: string; phone: string }) => void;
+  onApplyLookup: (r: { name: string; delivery: { city: string; address: string } | null }) => void;
 }) {
   const uid = useId();
+  const [looking, setLooking] = useState(false);
+  const [hint, setHint] = useState<{ tone: 'success' | 'muted'; text: string } | null>(null);
+
+  async function findMyInfo() {
+    setHint(null);
+    const phone = value.phone.trim();
+    // Same shape check as validateStep1 — don't fire a lookup on junk input.
+    if (!/^[0-9+()\-\s]{7,20}$/.test(phone)) {
+      setHint({ tone: 'muted', text: 'Enter your phone number first.' });
+      return;
+    }
+    setLooking(true);
+    try {
+      const result = await lookupCustomerAction(phone);
+      if (result.found) {
+        onApplyLookup({ name: result.name, delivery: result.delivery });
+        setHint({ tone: 'success', text: 'Welcome back — we filled in your details.' });
+      } else {
+        setHint({ tone: 'muted', text: 'No saved info found — just fill in below.' });
+      }
+    } catch {
+      setHint({ tone: 'muted', text: 'Couldn’t check right now — just fill in below.' });
+    } finally {
+      setLooking(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
       <div>
@@ -349,6 +387,45 @@ function StepCustomer({
         <p className="mt-1 text-sm text-gray-600">
           We use this to confirm the order and arrange delivery or pickup. No
           account needed.
+        </p>
+      </div>
+      <div>
+        <label htmlFor={`${uid}-phone`} className="block text-sm font-medium text-gray-700">
+          Phone number
+        </label>
+        <div className="mt-1 flex gap-2">
+          <input
+            id={`${uid}-phone`}
+            type="tel"
+            required
+            autoComplete="tel"
+            inputMode="tel"
+            value={value.phone}
+            onChange={(e) => {
+              onChange({ ...value, phone: e.target.value });
+              if (hint) setHint(null);
+            }}
+            placeholder="+592 600 0000"
+            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          />
+          <button
+            type="button"
+            onClick={findMyInfo}
+            disabled={looking}
+            aria-label="Find my saved info by phone number"
+            className="shrink-0 rounded-md border border-primary-600 px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50 disabled:opacity-50"
+          >
+            {looking ? 'Looking…' : 'Find my info'}
+          </button>
+        </div>
+        <p className="mt-1 text-xs text-gray-500" role="status" aria-live="polite">
+          {hint ? (
+            <span className={hint.tone === 'success' ? 'font-medium text-green-700' : 'text-gray-500'}>
+              {hint.text}
+            </span>
+          ) : (
+            <>Returning customer? Enter your phone and tap “Find my info”. We’ll call or WhatsApp to confirm.</>
+          )}
         </p>
       </div>
       <div>
@@ -365,25 +442,6 @@ function StepCustomer({
           placeholder="Jane Doe"
           className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
         />
-      </div>
-      <div>
-        <label htmlFor={`${uid}-phone`} className="block text-sm font-medium text-gray-700">
-          Phone number
-        </label>
-        <input
-          id={`${uid}-phone`}
-          type="tel"
-          required
-          autoComplete="tel"
-          inputMode="tel"
-          value={value.phone}
-          onChange={(e) => onChange({ ...value, phone: e.target.value })}
-          placeholder="+592 600 0000"
-          className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-        />
-        <p className="mt-1 text-xs text-gray-500">
-          We'll call or WhatsApp this number to confirm.
-        </p>
       </div>
     </div>
   );
