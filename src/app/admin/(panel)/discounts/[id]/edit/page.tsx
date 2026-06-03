@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import DiscountCodeForm from '@/components/admin/DiscountCodeForm';
+import AuditInfo from '@/components/admin/AuditInfo';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export const metadata = { title: 'Admin · Edit discount code' };
@@ -25,6 +26,12 @@ export default async function EditDiscountPage({
         Edit <span className="font-mono">{discount.code}</span>
       </h1>
       <DiscountCodeForm discount={discount} />
+      <AuditInfo
+        createdBy={discount.created_by}
+        modifiedBy={discount.modified_by}
+        createdAt={discount.created_at}
+        updatedAt={discount.updated_at}
+      />
     </div>
   );
 }

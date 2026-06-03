@@ -29,7 +29,7 @@ export async function upsertPaymentMethod(
   _prev: PaymentMethodFormState,
   fd: FormData,
 ): Promise<PaymentMethodFormState> {
-  await requirePageAccess('payment-methods');
+  const { user } = await requirePageAccess('payment-methods');
   const parsed = PaymentMethodInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -49,10 +49,15 @@ export async function upsertPaymentMethod(
 
   const supabase = createAdminClient();
   if (input.id) {
-    const { error } = await supabase.from('payment_methods').update(payload).eq('id', input.id);
+    const { error } = await supabase
+      .from('payment_methods')
+      .update({ ...payload, modified_by: user.id })
+      .eq('id', input.id);
     if (error) return { error: error.message };
   } else {
-    const { error } = await supabase.from('payment_methods').insert(payload);
+    const { error } = await supabase
+      .from('payment_methods')
+      .insert({ ...payload, created_by: user.id, modified_by: user.id });
     if (error) return { error: error.message };
   }
 

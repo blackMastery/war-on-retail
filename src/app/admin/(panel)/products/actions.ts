@@ -67,7 +67,7 @@ function parseForm(fd: FormData) {
 }
 
 export async function upsertProduct(_prev: ProductFormState, fd: FormData): Promise<ProductFormState> {
-  await requirePageAccess('products');
+  const { user } = await requirePageAccess('products');
   const parsed = ProductInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -170,10 +170,15 @@ export async function upsertProduct(_prev: ProductFormState, fd: FormData): Prom
 
   const supabase = createAdminClient();
   if (input.id) {
-    const { error } = await supabase.from('products').update(payload).eq('id', input.id);
+    const { error } = await supabase
+      .from('products')
+      .update({ ...payload, modified_by: user.id })
+      .eq('id', input.id);
     if (error) return { error: error.message };
   } else {
-    const { error } = await supabase.from('products').insert(payload);
+    const { error } = await supabase
+      .from('products')
+      .insert({ ...payload, created_by: user.id, modified_by: user.id });
     if (error) return { error: error.message };
   }
 

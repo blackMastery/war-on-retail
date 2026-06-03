@@ -67,7 +67,7 @@ export async function updateStoreSettings(
   _prev: StoreSettingsFormState,
   fd: FormData,
 ): Promise<StoreSettingsFormState> {
-  await requirePageAccess('settings');
+  const { user } = await requirePageAccess('settings');
 
   const parsed = StoreSettingsInput.safeParse(parseForm(fd));
   if (!parsed.success) {
@@ -101,7 +101,7 @@ export async function updateStoreSettings(
   const supabase = createAdminClient();
   const { error } = await supabase
     .from('store_settings')
-    .update(payload)
+    .update({ ...payload, modified_by: user.id })
     .eq('id', 'default');
   if (error) return { error: error.message };
 

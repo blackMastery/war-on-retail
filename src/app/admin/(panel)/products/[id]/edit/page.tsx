@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
 import ProductForm from '@/components/admin/ProductForm';
+import AuditInfo from '@/components/admin/AuditInfo';
 
 export const metadata = { title: 'Admin · Edit product' };
 
@@ -20,6 +21,12 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Edit · {product.name}</h1>
       <ProductForm product={product} categories={categories ?? []} brands={brands ?? []} />
+      <AuditInfo
+        createdBy={product.created_by}
+        modifiedBy={product.modified_by}
+        createdAt={product.created_at}
+        updatedAt={product.updated_at}
+      />
     </div>
   );
 }

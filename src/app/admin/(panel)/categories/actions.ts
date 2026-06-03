@@ -65,7 +65,7 @@ export async function upsertCategory(
   _prev: CategoryFormState,
   fd: FormData,
 ): Promise<CategoryFormState> {
-  await requirePageAccess('categories');
+  const { user } = await requirePageAccess('categories');
   const parsed = CategoryInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -109,12 +109,17 @@ export async function upsertCategory(
 
   const supabase = createAdminClient();
   if (input.id) {
-    const { error } = await supabase.from('categories').update(payload).eq('id', input.id);
+    const { error } = await supabase
+      .from('categories')
+      .update({ ...payload, modified_by: user.id })
+      .eq('id', input.id);
     if (error) {
       return uniqueViolationToFieldError(error.message, slug) ?? { error: error.message };
     }
   } else {
-    const { error } = await supabase.from('categories').insert(payload);
+    const { error } = await supabase
+      .from('categories')
+      .insert({ ...payload, created_by: user.id, modified_by: user.id });
     if (error) {
       return uniqueViolationToFieldError(error.message, slug) ?? { error: error.message };
     }

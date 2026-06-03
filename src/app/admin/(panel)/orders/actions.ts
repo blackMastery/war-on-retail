@@ -42,15 +42,21 @@ async function readStatus(id: string): Promise<OrderStatus> {
 }
 
 async function transitionTo(id: string, next: OrderStatus) {
-  await requirePageAccess('orders');
+  const { user } = await requirePageAccess('orders');
   const current = await readStatus(id);
   if (!LEGAL_TRANSITIONS[current].includes(next)) {
     throw new Error(`Cannot move a ${current} order to ${next}.`);
   }
+  const now = new Date().toISOString();
   const supabase = createAdminClient();
   const { error } = await supabase
     .from('orders')
-    .update({ status: next, updated_at: new Date().toISOString() })
+    .update({
+      status: next,
+      updated_at: now,
+      status_updated_by: user.id,
+      status_updated_at: now,
+    })
     .eq('id', id);
   if (error) throw new Error(error.message);
   bumpRevalidate(id);
@@ -70,7 +76,7 @@ export async function fulfillOrder(id: string) {
  * same transaction.
  */
 export async function cancelOrder(id: string) {
-  await requirePageAccess('orders');
+  const { user } = await requirePageAccess('orders');
   const supabase = createAdminClient();
   const { error } = await supabase.rpc('cancel_order', { p_id: id });
   if (error) {
@@ -81,6 +87,13 @@ export async function cancelOrder(id: string) {
     }
     throw new Error(error.message);
   }
+  // The cancel_order RPC flips the status but doesn't know the admin; stamp the
+  // status-change audit in a follow-up update (the row is already cancelled).
+  const now = new Date().toISOString();
+  await supabase
+    .from('orders')
+    .update({ status_updated_by: user.id, status_updated_at: now })
+    .eq('id', id);
   bumpRevalidate(id);
 }
 

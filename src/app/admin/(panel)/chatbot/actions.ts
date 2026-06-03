@@ -17,7 +17,7 @@ const FaqInput = z.object({
 export type FaqFormState = { error?: string };
 
 export async function upsertFaq(_prev: FaqFormState, fd: FormData): Promise<FaqFormState> {
-  await requirePageAccess('chatbot');
+  const { user } = await requirePageAccess('chatbot');
   const raw = Object.fromEntries(fd.entries());
   raw.is_active = String(fd.get('is_active') === 'on' || fd.get('is_active') === 'true');
 
@@ -39,10 +39,15 @@ export async function upsertFaq(_prev: FaqFormState, fd: FormData): Promise<FaqF
 
   const supabase = createAdminClient();
   if (parsed.data.id) {
-    const { error } = await supabase.from('faqs').update(payload).eq('id', parsed.data.id);
+    const { error } = await supabase
+      .from('faqs')
+      .update({ ...payload, modified_by: user.id })
+      .eq('id', parsed.data.id);
     if (error) return { error: error.message };
   } else {
-    const { error } = await supabase.from('faqs').insert({ ...payload, usage_count: 0 });
+    const { error } = await supabase
+      .from('faqs')
+      .insert({ ...payload, usage_count: 0, created_by: user.id, modified_by: user.id });
     if (error) return { error: error.message };
   }
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminNameMap, labelFor, formatAuditDate } from '@/lib/admin/audit';
 import { formatPrice } from '@/lib/utils';
 import { siteConfig } from '@/config/site';
 import type { OrderStatus } from '@/types/database';
@@ -28,7 +29,7 @@ export default async function AdminOrderDetailPage({
   const { data: order } = await supabase
     .from('orders')
     .select(
-      'id, order_number, status, fulfillment_type, delivery_city, delivery_address, subtotal, discount_code, discount_amount, admin_notes, placed_at, customer_id, payment_method_id, customer:customers(id, name, phone), payment_method:payment_methods(name, description)',
+      'id, order_number, status, fulfillment_type, delivery_city, delivery_address, subtotal, discount_code, discount_amount, admin_notes, placed_at, status_updated_by, status_updated_at, customer_id, payment_method_id, customer:customers(id, name, phone), payment_method:payment_methods(name, description)',
     )
     .eq('id', id)
     .maybeSingle();
@@ -55,6 +56,7 @@ export default async function AdminOrderDetailPage({
   const discountAmount = Number(order.discount_amount ?? 0);
   const hasDiscount = discountAmount > 0 || !!order.discount_code;
   const total = Math.max(0, Number(order.subtotal) - discountAmount);
+  const statusNames = await getAdminNameMap([order.status_updated_by]);
 
   return (
     <div className="space-y-6">
@@ -87,6 +89,12 @@ export default async function AdminOrderDetailPage({
             <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
               Pre-order
             </span>
+          )}
+          {order.status_updated_by && (
+            <p className="w-full text-right text-xs text-gray-500">
+              Status changed by {labelFor(order.status_updated_by, statusNames)} ·{' '}
+              {formatAuditDate(order.status_updated_at)}
+            </p>
           )}
         </div>
       </header>

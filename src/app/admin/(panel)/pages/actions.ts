@@ -33,7 +33,7 @@ export async function upsertPageSeo(
   _prev: PageSeoFormState,
   fd: FormData,
 ): Promise<PageSeoFormState> {
-  await requirePageAccess('pages');
+  const { user } = await requirePageAccess('pages');
   const parsed = PageSeoInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -63,7 +63,7 @@ export async function upsertPageSeo(
   const supabase = createAdminClient();
   const { error } = await supabase
     .from('page_seo')
-    .update(payload)
+    .update({ ...payload, modified_by: user.id })
     .eq('id', input.id);
   if (error) return { error: error.message };
 

@@ -91,7 +91,7 @@ export async function upsertDiscountCode(
   _prev: DiscountFormState,
   fd: FormData,
 ): Promise<DiscountFormState> {
-  await requirePageAccess('discounts');
+  const { user } = await requirePageAccess('discounts');
 
   const parsed = DiscountInput.safeParse(parseForm(fd));
   if (!parsed.success) {
@@ -119,10 +119,15 @@ export async function upsertDiscountCode(
 
   const supabase = createAdminClient();
   if (input.id) {
-    const { error } = await supabase.from('discount_codes').update(payload).eq('id', input.id);
+    const { error } = await supabase
+      .from('discount_codes')
+      .update({ ...payload, modified_by: user.id })
+      .eq('id', input.id);
     if (error) return { error: mapDbError(error.message) };
   } else {
-    const { error } = await supabase.from('discount_codes').insert(payload);
+    const { error } = await supabase
+      .from('discount_codes')
+      .insert({ ...payload, created_by: user.id, modified_by: user.id });
     if (error) return { error: mapDbError(error.message) };
   }
 

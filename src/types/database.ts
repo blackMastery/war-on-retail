@@ -15,6 +15,8 @@ export type Json = string | number | boolean | null | { [k: string]: Json } | Js
 // ---------- Categories ----------
 export type CategoryRow = {
   id: string;
+  created_by: string | null;
+  modified_by: string | null;
   name: string;
   slug: string;
   description: string | null;
@@ -30,6 +32,8 @@ export type CategoryRow = {
 };
 type CategoryInsert = {
   id?: string;
+  created_by?: string | null;
+  modified_by?: string | null;
   name: string;
   slug: string;
   description?: string | null;
@@ -48,6 +52,8 @@ type CategoryUpdate = Partial<CategoryInsert>;
 // ---------- Brands ----------
 export type BrandRow = {
   id: string;
+  created_by: string | null;
+  modified_by: string | null;
   name: string;
   slug: string;
   description: string | null;
@@ -63,6 +69,8 @@ export type BrandRow = {
 };
 type BrandInsert = {
   id?: string;
+  created_by?: string | null;
+  modified_by?: string | null;
   name: string;
   slug: string;
   description?: string | null;
@@ -78,7 +86,7 @@ type BrandInsert = {
 };
 type BrandUpdate = Partial<BrandInsert>;
 
-// ---------- Products ----------
+// ---------- Products (audit: created_by/modified_by) ----------
 /**
  * Per-image metadata, looked up by image URL. Stored on the product row in
  * the `image_meta` jsonb column. The featured image gets an extra column
@@ -93,6 +101,8 @@ export type ProductImageMeta = {
 
 export type ProductRow = {
   id: string;
+  created_by: string | null;
+  modified_by: string | null;
   name: string;
   slug: string;
   description: string | null;
@@ -125,6 +135,8 @@ export type ProductRow = {
 };
 type ProductInsert = {
   id?: string;
+  created_by?: string | null;
+  modified_by?: string | null;
   name: string;
   slug: string;
   description?: string | null;
@@ -175,6 +187,8 @@ type FAQCategoryUpdate = Partial<FAQCategoryInsert>;
 // ---------- FAQs ----------
 export type FAQRow = {
   id: string;
+  created_by: string | null;
+  modified_by: string | null;
   category_id: string | null;
   question: string;
   answer: string;
@@ -186,6 +200,8 @@ export type FAQRow = {
 };
 type FAQInsert = {
   id?: string;
+  created_by?: string | null;
+  modified_by?: string | null;
   category_id?: string | null;
   question: string;
   answer: string;
@@ -257,6 +273,8 @@ type AdminUserPageUpdate = Partial<AdminUserPageInsert>;
 // ---------- Promotions ----------
 export type PromotionRow = {
   id: string;
+  created_by: string | null;
+  modified_by: string | null;
   title: string;
   image_url: string;
   /** Optional click target. Internal path (`/...`) or full https URL. NULL = display-only. */
@@ -271,6 +289,8 @@ export type PromotionRow = {
 };
 type PromotionInsert = {
   id?: string;
+  created_by?: string | null;
+  modified_by?: string | null;
   title: string;
   image_url: string;
   link_url?: string | null;
@@ -305,6 +325,8 @@ type CustomerUpdate = Partial<CustomerInsert>;
 // ---------- Payment methods ----------
 export type PaymentMethodRow = {
   id: string;
+  created_by: string | null;
+  modified_by: string | null;
   name: string;
   description: string | null;
   is_active: boolean;
@@ -314,6 +336,8 @@ export type PaymentMethodRow = {
 };
 type PaymentMethodInsert = {
   id?: string;
+  created_by?: string | null;
+  modified_by?: string | null;
   name: string;
   description?: string | null;
   is_active?: boolean;
@@ -329,6 +353,9 @@ export type FulfillmentType = 'delivery' | 'pickup';
 
 export type OrderRow = {
   id: string;
+  /** Last admin to change the order status, and when (NULL until first transition). */
+  status_updated_by: string | null;
+  status_updated_at: string | null;
   /** Human-readable, year-tagged: e.g. WOR-2026-000042. */
   order_number: string;
   customer_id: string;
@@ -351,6 +378,8 @@ export type OrderRow = {
 };
 type OrderInsert = {
   id?: string;
+  status_updated_by?: string | null;
+  status_updated_at?: string | null;
   order_number?: string;
   customer_id: string;
   fulfillment_type: FulfillmentType;
@@ -406,6 +435,7 @@ export type DiscountType = 'percentage' | 'fixed_amount' | 'bogo';
 
 export type DiscountCodeRow = {
   id: string;
+  modified_by: string | null;
   code: string;
   description: string | null;
   discount_type: DiscountType;
@@ -429,6 +459,7 @@ export type DiscountCodeRow = {
 };
 type DiscountCodeInsert = {
   id?: string;
+  modified_by?: string | null;
   code: string;
   description?: string | null;
   discount_type: DiscountType;
@@ -485,6 +516,8 @@ type DiscountCodeUsageUpdate = Partial<DiscountCodeUsageInsert>;
 // ---------- Store settings (singleton row, id='default') ----------
 export type StoreSettingsRow = {
   id: string;
+  created_by: string | null;
+  modified_by: string | null;
   name: string;
   description: string;
   url: string;
@@ -507,6 +540,8 @@ export type StoreSettingsRow = {
 };
 type StoreSettingsInsert = {
   id?: string;
+  created_by?: string | null;
+  modified_by?: string | null;
   name?: string;
   description?: string;
   url?: string;
@@ -532,6 +567,8 @@ type StoreSettingsUpdate = Partial<StoreSettingsInsert>;
 export type PageSeoRow = {
   /** Stable slug-style id, e.g. `home`, `about`, `policies-privacy`. */
   id: string;
+  created_by: string | null;
+  modified_by: string | null;
   /** Canonical URL path the row corresponds to (`/`, `/about`, …). Read-only on the admin side. */
   path: string;
   /** Human label rendered in the admin pages list. */
@@ -554,6 +591,8 @@ export type PageSeoRow = {
 };
 type PageSeoInsert = {
   id: string;
+  created_by?: string | null;
+  modified_by?: string | null;
   path: string;
   label: string;
   meta_title?: string | null;

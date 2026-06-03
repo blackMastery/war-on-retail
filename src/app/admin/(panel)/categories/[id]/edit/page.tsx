@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
 import CategoryForm from '@/components/admin/CategoryForm';
+import AuditInfo from '@/components/admin/AuditInfo';
 
 export const metadata = { title: 'Admin · Edit category' };
 
@@ -26,6 +27,12 @@ export default async function EditCategoryPage({
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Edit · {category.name}</h1>
       <CategoryForm category={category} allCategories={allCategories ?? []} />
+      <AuditInfo
+        createdBy={category.created_by}
+        modifiedBy={category.modified_by}
+        createdAt={category.created_at}
+        updatedAt={category.updated_at}
+      />
     </div>
   );
 }

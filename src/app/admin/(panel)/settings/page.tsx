@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import StoreSettingsForm from '@/components/admin/StoreSettingsForm';
+import AuditInfo from '@/components/admin/AuditInfo';
 import type { StoreSettings } from '@/types/database';
 
 export const metadata = { title: 'Admin · Store settings' };
@@ -28,6 +29,14 @@ export default async function AdminSettingsPage() {
         </p>
       </header>
       <StoreSettingsForm settings={data ?? null} />
+      {data && (
+        <AuditInfo
+          createdBy={data.created_by}
+          modifiedBy={data.modified_by}
+          createdAt={data.created_at}
+          updatedAt={data.updated_at}
+        />
+      )}
     </div>
   );
 }

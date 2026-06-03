@@ -36,7 +36,7 @@ export async function upsertBrand(
   _prev: BrandFormState,
   fd: FormData,
 ): Promise<BrandFormState> {
-  await requirePageAccess('brands');
+  const { user } = await requirePageAccess('brands');
   const parsed = BrandInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -65,12 +65,17 @@ export async function upsertBrand(
 
   const supabase = createAdminClient();
   if (input.id) {
-    const { error } = await supabase.from('brands').update(payload).eq('id', input.id);
+    const { error } = await supabase
+      .from('brands')
+      .update({ ...payload, modified_by: user.id })
+      .eq('id', input.id);
     if (error) {
       return uniqueViolationToFieldError(error.message, slug) ?? { error: error.message };
     }
   } else {
-    const { error } = await supabase.from('brands').insert(payload);
+    const { error } = await supabase
+      .from('brands')
+      .insert({ ...payload, created_by: user.id, modified_by: user.id });
     if (error) {
       return uniqueViolationToFieldError(error.message, slug) ?? { error: error.message };
     }

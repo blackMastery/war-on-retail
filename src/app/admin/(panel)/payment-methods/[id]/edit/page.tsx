@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
 import PaymentMethodForm from '@/components/admin/PaymentMethodForm';
+import AuditInfo from '@/components/admin/AuditInfo';
 
 export const metadata = { title: 'Admin · Edit payment method' };
 
@@ -22,6 +23,12 @@ export default async function EditPaymentMethodPage({
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Edit · {method.name}</h1>
       <PaymentMethodForm method={method} />
+      <AuditInfo
+        createdBy={method.created_by}
+        modifiedBy={method.modified_by}
+        createdAt={method.created_at}
+        updatedAt={method.updated_at}
+      />
     </div>
   );
 }

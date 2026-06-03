@@ -58,7 +58,7 @@ export async function upsertPromotion(
   _prev: PromotionFormState,
   fd: FormData,
 ): Promise<PromotionFormState> {
-  await requirePageAccess('promotions');
+  const { user } = await requirePageAccess('promotions');
   const parsed = PromotionInput.safeParse(parseForm(fd));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -82,10 +82,15 @@ export async function upsertPromotion(
 
   const supabase = createAdminClient();
   if (input.id) {
-    const { error } = await supabase.from('promotions').update(payload).eq('id', input.id);
+    const { error } = await supabase
+      .from('promotions')
+      .update({ ...payload, modified_by: user.id })
+      .eq('id', input.id);
     if (error) return { error: error.message };
   } else {
-    const { error } = await supabase.from('promotions').insert(payload);
+    const { error } = await supabase
+      .from('promotions')
+      .insert({ ...payload, created_by: user.id, modified_by: user.id });
     if (error) return { error: error.message };
   }
 
