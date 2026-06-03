@@ -17,6 +17,11 @@ const TYPE_OPTIONS: { value: DiscountType; label: string; hint: string }[] = [
   { value: 'bogo', label: 'Buy one get one (BOGO)', hint: '% off the cheapest item; needs ≥ 2 items' },
 ];
 
+/** Auto-generated code: brand prefix `WOR` + a 4-digit number, e.g. WOR6788. */
+function generateCode(): string {
+  return `WOR${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
 /** ISO → local `YYYY-MM-DDTHH:MM` for <input type="datetime-local">. */
 function isoToLocal(iso: string | null | undefined): string {
   if (!iso) return '';
@@ -29,6 +34,8 @@ function isoToLocal(iso: string | null | undefined): string {
 export default function DiscountCodeForm({ discount }: { discount?: DiscountCode }) {
   const [state, action, pending] = useActionState(upsertDiscountCode, initial);
   const [type, setType] = useState<DiscountType>(discount?.discount_type ?? 'percentage');
+  // New codes auto-fill with WOR####; editing keeps the saved code. Editable.
+  const [code, setCode] = useState(discount?.code ?? generateCode());
   const err = (k: string) => state.fieldErrors?.[k];
 
   const valueLabel =
@@ -50,15 +57,28 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
 
         <label className="block text-sm">
           <span className="font-medium text-gray-700">Code</span>
-          <input
-            name="code"
-            required
-            defaultValue={discount?.code}
-            placeholder="e.g. SUMMER20"
-            className={`${INPUT} font-mono uppercase`}
-          />
+          <div className="mt-1 flex gap-2">
+            <input
+              name="code"
+              required
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="e.g. WOR6788"
+              className="block w-full rounded-md border-gray-300 font-mono uppercase shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+            />
+            {!discount?.id && (
+              <button
+                type="button"
+                onClick={() => setCode(generateCode())}
+                className="shrink-0 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Regenerate
+              </button>
+            )}
+          </div>
           <span className="mt-1 block text-xs text-gray-500">
-            Case-insensitive at checkout. Stored upper-cased.
+            Auto-generated as <code>WOR####</code> — edit it or regenerate. Case-insensitive at
+            checkout; stored upper-cased.
           </span>
           {err('code') && <span className="mt-1 block text-xs text-red-600">{err('code')}</span>}
         </label>

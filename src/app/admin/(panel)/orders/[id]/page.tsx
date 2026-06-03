@@ -28,7 +28,7 @@ export default async function AdminOrderDetailPage({
   const { data: order } = await supabase
     .from('orders')
     .select(
-      'id, order_number, status, fulfillment_type, delivery_city, delivery_address, subtotal, admin_notes, placed_at, customer_id, payment_method_id, customer:customers(id, name, phone), payment_method:payment_methods(name, description)',
+      'id, order_number, status, fulfillment_type, delivery_city, delivery_address, subtotal, discount_code, discount_amount, admin_notes, placed_at, customer_id, payment_method_id, customer:customers(id, name, phone), payment_method:payment_methods(name, description)',
     )
     .eq('id', id)
     .maybeSingle();
@@ -52,6 +52,9 @@ export default async function AdminOrderDetailPage({
     | null;
   const status = order.status as OrderStatus;
   const hasPreOrder = (items ?? []).some((it) => it.is_pre_order);
+  const discountAmount = Number(order.discount_amount ?? 0);
+  const hasDiscount = discountAmount > 0 || !!order.discount_code;
+  const total = Math.max(0, Number(order.subtotal) - discountAmount);
 
   return (
     <div className="space-y-6">
@@ -203,14 +206,39 @@ export default async function AdminOrderDetailPage({
                 ))}
               </tbody>
               <tfoot>
-                <tr className="bg-gray-50">
+                <tr className={hasDiscount ? '' : 'bg-gray-50'}>
                   <td colSpan={4} className="px-4 py-3 text-right font-semibold">
                     Subtotal
                   </td>
-                  <td className="px-4 py-3 text-right text-lg font-bold tabular-nums">
+                  <td className="px-4 py-3 text-right tabular-nums">
                     {formatPrice(Number(order.subtotal))}
                   </td>
                 </tr>
+                {hasDiscount && (
+                  <tr className="text-green-700">
+                    <td colSpan={4} className="px-4 py-2 text-right font-medium">
+                      Discount
+                      {order.discount_code && (
+                        <span className="ml-1 font-mono text-xs uppercase">
+                          ({order.discount_code})
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-right tabular-nums">
+                      −{formatPrice(discountAmount)}
+                    </td>
+                  </tr>
+                )}
+                {hasDiscount && (
+                  <tr className="bg-gray-50">
+                    <td colSpan={4} className="px-4 py-3 text-right font-semibold">
+                      Total
+                    </td>
+                    <td className="px-4 py-3 text-right text-lg font-bold tabular-nums">
+                      {formatPrice(total)}
+                    </td>
+                  </tr>
+                )}
               </tfoot>
             </table>
           </div>

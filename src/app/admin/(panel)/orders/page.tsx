@@ -44,7 +44,7 @@ export default async function AdminOrdersPage({
   let query = supabase
     .from('orders')
     .select(
-      'id, order_number, status, fulfillment_type, subtotal, placed_at, customer:customers(name, phone), payment_method:payment_methods(name)',
+      'id, order_number, status, fulfillment_type, subtotal, discount_code, discount_amount, placed_at, customer:customers(name, phone), payment_method:payment_methods(name)',
       { count: 'exact' },
     );
 
@@ -162,7 +162,7 @@ export default async function AdminOrdersPage({
                 <th className="px-4 py-3">Customer</th>
                 <th className="px-4 py-3">Fulfilment</th>
                 <th className="px-4 py-3">Payment</th>
-                <th className="px-4 py-3 text-right">Subtotal</th>
+                <th className="px-4 py-3 text-right">Total</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3" />
               </tr>
@@ -178,6 +178,8 @@ export default async function AdminOrdersPage({
                 const paymentMethod = o.payment_method as unknown as
                   | { name: string }
                   | null;
+                const discountAmount = Number(o.discount_amount ?? 0);
+                const orderTotal = Math.max(0, Number(o.subtotal) - discountAmount);
                 return (
                   <tr key={o.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-mono text-xs font-medium text-gray-900">
@@ -208,7 +210,13 @@ export default async function AdminOrdersPage({
                     </td>
                     <td className="px-4 py-3 text-gray-700">{paymentMethod?.name ?? '—'}</td>
                     <td className="px-4 py-3 text-right font-medium tabular-nums">
-                      {formatPrice(Number(o.subtotal))}
+                      {formatPrice(orderTotal)}
+                      {discountAmount > 0 && (
+                        <span className="block text-xs font-normal text-green-700">
+                          −{formatPrice(discountAmount)}
+                          {o.discount_code ? ` (${o.discount_code})` : ''}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span
