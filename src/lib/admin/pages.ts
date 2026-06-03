@@ -29,6 +29,7 @@ export const ADMIN_PAGES: AdminPage[] = [
   { key: 'products', label: 'Products', href: '/admin/products', icon: '📦' },
   { key: 'products', label: 'CSV Import', href: '/admin/products/import', icon: '⬆️' },
   { key: 'promotions', label: 'Promotions', href: '/admin/promotions', icon: '🎯' },
+  { key: 'discounts', label: 'Discounts', href: '/admin/discounts', icon: '🎟️' },
   { key: 'pages', label: 'Pages', href: '/admin/pages', icon: '📄' },
   { key: 'categories', label: 'Categories', href: '/admin/categories', icon: '🗂' },
   { key: 'brands', label: 'Brands', href: '/admin/brands', icon: '🏷' },

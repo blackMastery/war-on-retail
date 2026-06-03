@@ -337,6 +337,12 @@ export type OrderRow = {
   delivery_address: string | null;
   payment_method_id: string;
   subtotal: number;
+  /** FK to the redeemed discount_codes row; NULL if none / code later deleted. */
+  discount_code_id: string | null;
+  /** Snapshot of the code text at placement (survives a later code rename/delete). */
+  discount_code: string | null;
+  /** GYD taken off the subtotal. Payable total = subtotal - discount_amount. */
+  discount_amount: number;
   status: OrderStatus;
   admin_notes: string | null;
   placed_at: string;
@@ -352,6 +358,9 @@ type OrderInsert = {
   delivery_address?: string | null;
   payment_method_id: string;
   subtotal: number;
+  discount_code_id?: string | null;
+  discount_code?: string | null;
+  discount_amount?: number;
   status?: OrderStatus;
   admin_notes?: string | null;
   placed_at?: string;
@@ -390,6 +399,88 @@ type OrderItemInsert = {
   created_at?: string;
 };
 type OrderItemUpdate = Partial<OrderItemInsert>;
+
+// ---------- Discount codes ----------
+/** The three supported discount mechanics. See `src/types/discount.ts`. */
+export type DiscountType = 'percentage' | 'fixed_amount' | 'bogo';
+
+export type DiscountCodeRow = {
+  id: string;
+  code: string;
+  description: string | null;
+  discount_type: DiscountType;
+  /** Meaning depends on type: percent (0–100) for percentage/bogo, GYD for fixed_amount. */
+  discount_value: number;
+  min_purchase_amount: number | null;
+  max_discount_amount: number | null;
+  usage_limit: number | null;
+  per_customer_limit: number | null;
+  applicable_category_ids: string[] | null;
+  applicable_product_ids: string[] | null;
+  exclude_product_ids: string[] | null;
+  valid_from: string | null;
+  valid_until: string | null;
+  is_active: boolean;
+  usage_count: number;
+  total_discount_given: number;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+type DiscountCodeInsert = {
+  id?: string;
+  code: string;
+  description?: string | null;
+  discount_type: DiscountType;
+  discount_value: number;
+  min_purchase_amount?: number | null;
+  max_discount_amount?: number | null;
+  usage_limit?: number | null;
+  per_customer_limit?: number | null;
+  applicable_category_ids?: string[] | null;
+  applicable_product_ids?: string[] | null;
+  exclude_product_ids?: string[] | null;
+  valid_from?: string | null;
+  valid_until?: string | null;
+  is_active?: boolean;
+  usage_count?: number;
+  total_discount_given?: number;
+  created_by?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+type DiscountCodeUpdate = Partial<DiscountCodeInsert>;
+
+// ---------- Discount code usage (one row per redemption) ----------
+export type DiscountCodeUsageRow = {
+  id: string;
+  discount_code_id: string;
+  /** Customer identity is the normalised phone (the app's dedup key). */
+  customer_phone: string | null;
+  customer_session_id: string | null;
+  /** Human-readable order number (WOR-YYYY-NNNNNN). */
+  order_id: string | null;
+  amount_discounted: number;
+  original_total: number;
+  final_total: number;
+  used_at: string;
+  ip_address: string | null;
+  user_agent: string | null;
+};
+type DiscountCodeUsageInsert = {
+  id?: string;
+  discount_code_id: string;
+  customer_phone?: string | null;
+  customer_session_id?: string | null;
+  order_id?: string | null;
+  amount_discounted: number;
+  original_total: number;
+  final_total: number;
+  used_at?: string;
+  ip_address?: string | null;
+  user_agent?: string | null;
+};
+type DiscountCodeUsageUpdate = Partial<DiscountCodeUsageInsert>;
 
 // ---------- Store settings (singleton row, id='default') ----------
 export type StoreSettingsRow = {
@@ -562,6 +653,18 @@ export type Database = {
         Update: OrderItemUpdate;
         Relationships: Empty;
       };
+      discount_codes: {
+        Row: DiscountCodeRow;
+        Insert: DiscountCodeInsert;
+        Update: DiscountCodeUpdate;
+        Relationships: Empty;
+      };
+      discount_code_usage: {
+        Row: DiscountCodeUsageRow;
+        Insert: DiscountCodeUsageInsert;
+        Update: DiscountCodeUsageUpdate;
+        Relationships: Empty;
+      };
       store_settings: {
         Row: StoreSettingsRow;
         Insert: StoreSettingsInsert;
@@ -589,6 +692,8 @@ export type Database = {
             | { type: 'pickup' };
           p_payment_method_id: string;
           p_items: Array<{ product_id: string; quantity: number }>;
+          /** Optional discount code, re-validated authoritatively inside the RPC. */
+          p_discount_code?: string | null;
         };
         // Note: `order_id` not `id` — see the function definition for why.
         Returns: Array<{ order_id: string; order_number: string }>;
@@ -620,6 +725,8 @@ export type FAQCategory = FAQCategoryRow;
 export type ChatbotConversation = ChatbotConversationRow;
 export type AdminUser = AdminUserRow;
 export type Promotion = PromotionRow;
+export type DiscountCode = DiscountCodeRow;
+export type DiscountCodeUsage = DiscountCodeUsageRow;
 export type Customer = CustomerRow;
 export type PaymentMethod = PaymentMethodRow;
 export type Order = OrderRow;

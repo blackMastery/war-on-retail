@@ -4,12 +4,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MinusIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import {
+  selectDiscountAmount,
   selectSubtotal,
+  selectTotal,
   useCartHydrated,
   useCartStore,
 } from '@/lib/cart/store';
 import { buildInquiryUrl } from '@/lib/cart/whatsapp';
 import { formatPrice } from '@/lib/utils';
+import DiscountCodeInput from '@/components/customer/DiscountCodeInput';
 
 /**
  * Renders the live cart. Client-only because the cart is in localStorage.
@@ -33,6 +36,9 @@ export default function CartView({
   const hydrated = useCartHydrated();
   const items = useCartStore((s) => s.items);
   const subtotal = useCartStore(selectSubtotal);
+  const discountAmount = useCartStore(selectDiscountAmount);
+  const total = useCartStore(selectTotal);
+  const appliedDiscount = useCartStore((s) => s.appliedDiscount);
   const setQuantity = useCartStore((s) => s.setQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const clear = useCartStore((s) => s.clear);
@@ -155,13 +161,26 @@ export default function CartView({
               </dt>
               <dd className="tabular-nums">{formatPrice(subtotal)}</dd>
             </div>
+            {appliedDiscount && (
+              <div className="flex justify-between text-green-700">
+                <dt>
+                  Discount{' '}
+                  <span className="font-mono text-xs uppercase">({appliedDiscount.code})</span>
+                </dt>
+                <dd className="tabular-nums">−{formatPrice(discountAmount)}</dd>
+              </div>
+            )}
             <div className="flex justify-between border-t border-gray-200 pt-3">
-              <dt className="font-semibold text-gray-900">Subtotal</dt>
+              <dt className="font-semibold text-gray-900">
+                {appliedDiscount ? 'Total' : 'Subtotal'}
+              </dt>
               <dd className="text-lg font-bold tabular-nums text-gray-900">
-                {formatPrice(subtotal)}
+                {formatPrice(total)}
               </dd>
             </div>
           </dl>
+
+          <DiscountCodeInput />
 
           <p className="text-xs text-gray-500">
             Pick delivery or pickup, choose how you'd like to pay, and we'll confirm

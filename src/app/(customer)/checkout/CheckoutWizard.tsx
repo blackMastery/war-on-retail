@@ -6,9 +6,16 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { ChevronLeftIcon, ChevronRightIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { selectSubtotal, useCartHydrated, useCartStore } from '@/lib/cart/store';
+import {
+  selectDiscountAmount,
+  selectSubtotal,
+  selectTotal,
+  useCartHydrated,
+  useCartStore,
+} from '@/lib/cart/store';
 import { formatPrice } from '@/lib/utils';
 import type { CartItem } from '@/lib/cart/types';
+import type { AppliedDiscount } from '@/types/discount';
 import { placeOrderAction } from './actions';
 
 type Method = {
@@ -61,6 +68,9 @@ export default function CheckoutWizard({
   const hydrated = useCartHydrated();
   const items = useCartStore((s) => s.items);
   const subtotal = useCartStore(selectSubtotal);
+  const discountAmount = useCartStore(selectDiscountAmount);
+  const total = useCartStore(selectTotal);
+  const appliedDiscount = useCartStore((s) => s.appliedDiscount);
 
   const [step, setStep] = useState<StepIdx>(0);
   const [draft, setDraft] = useState<WizardDraft>({
@@ -148,6 +158,7 @@ export default function CheckoutWizard({
         fulfillment: draft.fulfillment as WizardDraft['fulfillment'] & { type: 'delivery' | 'pickup' },
         paymentMethodId: draft.paymentMethodId,
         items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
+        discountCode: appliedDiscount?.code,
       });
       if (result?.error) {
         setSubmitError(result.error);
@@ -246,7 +257,13 @@ export default function CheckoutWizard({
         </div>
       </div>
 
-      <OrderSummary items={items} subtotal={subtotal} />
+      <OrderSummary
+        items={items}
+        subtotal={subtotal}
+        discount={appliedDiscount}
+        discountAmount={discountAmount}
+        total={total}
+      />
     </div>
   );
 }
@@ -590,7 +607,19 @@ function StepPayment({
 
 // ---------- Order summary ----------
 
-function OrderSummary({ items, subtotal }: { items: CartItem[]; subtotal: number }) {
+function OrderSummary({
+  items,
+  subtotal,
+  discount,
+  discountAmount,
+  total,
+}: {
+  items: CartItem[];
+  subtotal: number;
+  discount: AppliedDiscount | null;
+  discountAmount: number;
+  total: number;
+}) {
   const totalUnits = items.reduce((sum, i) => sum + i.quantity, 0);
   const hasPreOrder = items.some((i) => i.isPreOrder);
   return (
@@ -647,9 +676,17 @@ function OrderSummary({ items, subtotal }: { items: CartItem[]; subtotal: number
             <dt className="text-gray-600">Items ({totalUnits})</dt>
             <dd className="tabular-nums">{formatPrice(subtotal)}</dd>
           </div>
+          {discount && (
+            <div className="flex justify-between text-green-700">
+              <dt>
+                Discount <span className="font-mono text-xs uppercase">({discount.code})</span>
+              </dt>
+              <dd className="tabular-nums">−{formatPrice(discountAmount)}</dd>
+            </div>
+          )}
           <div className="flex justify-between">
-            <dt className="font-semibold text-gray-900">Subtotal</dt>
-            <dd className="text-lg font-bold tabular-nums text-gray-900">{formatPrice(subtotal)}</dd>
+            <dt className="font-semibold text-gray-900">{discount ? 'Total' : 'Subtotal'}</dt>
+            <dd className="text-lg font-bold tabular-nums text-gray-900">{formatPrice(total)}</dd>
           </div>
         </dl>
         <p className="text-xs text-gray-500">

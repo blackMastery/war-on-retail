@@ -33,6 +33,9 @@ const PlaceOrderInput = z.object({
       }),
     )
     .min(1, 'Cart is empty'),
+  // Optional discount code. The RPC re-validates it authoritatively against
+  // DB-locked prices — this is just the code the customer applied in the cart.
+  discountCode: z.string().trim().max(64).optional(),
 });
 
 export type PlaceOrderInputT = z.infer<typeof PlaceOrderInput>;
@@ -60,7 +63,7 @@ export async function placeOrderAction(input: PlaceOrderInputT): Promise<PlaceOr
     };
   }
 
-  const { customer, fulfillment, paymentMethodId, items } = parsed.data;
+  const { customer, fulfillment, paymentMethodId, items, discountCode } = parsed.data;
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc('place_order', {
@@ -68,6 +71,7 @@ export async function placeOrderAction(input: PlaceOrderInputT): Promise<PlaceOr
     p_fulfillment: fulfillment,
     p_payment_method_id: paymentMethodId,
     p_items: items,
+    p_discount_code: discountCode && discountCode.length > 0 ? discountCode : null,
   });
 
   if (error) {
@@ -85,6 +89,26 @@ export async function placeOrderAction(input: PlaceOrderInputT): Promise<PlaceOr
       return {
         error:
           "An item in your cart is no longer available. Please remove it and try again.",
+      };
+    }
+    // Discount-specific failures (the RPC re-validates the code). All map to a
+    // single ask: remove/replace the code and retry — the cart's discount UI is
+    // the place to fix it.
+    if (msg.startsWith('DISCOUNT_')) {
+      if (msg.startsWith('DISCOUNT_MIN_PURCHASE')) {
+        return { error: 'Your order no longer meets the minimum for that discount code. Please review your cart.' };
+      }
+      if (msg.startsWith('DISCOUNT_USAGE_LIMIT')) {
+        return { error: 'That discount code has reached its usage limit.' };
+      }
+      if (msg.startsWith('DISCOUNT_PER_CUSTOMER_LIMIT')) {
+        return { error: 'You’ve already used that discount code.' };
+      }
+      if (msg.startsWith('DISCOUNT_EXPIRED') || msg.startsWith('DISCOUNT_NOT_STARTED')) {
+        return { error: 'That discount code isn’t valid right now. Please remove it and try again.' };
+      }
+      return {
+        error: 'That discount code is no longer valid — please remove it and try again.',
       };
     }
     return { error: msg || 'Could not place the order. Please try again.' };
