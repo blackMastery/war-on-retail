@@ -27,8 +27,8 @@ export default async function AdminBrandsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
+      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold">Brands</h1>
           <p className="mt-1 text-sm text-gray-600">
             The brand list shown on <Link href="/brands" className="text-primary-600 hover:underline">/brands</Link>.

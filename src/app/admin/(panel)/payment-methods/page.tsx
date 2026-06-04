@@ -29,8 +29,8 @@ export default async function AdminPaymentMethodsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
+      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
+        <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">Payment methods</h1>
           <p className="mt-1 text-sm text-gray-600">
             Shown to customers in Step 3 of <Link href="/checkout" className="text-primary-600 hover:underline">checkout</Link>.

@@ -92,8 +92,8 @@ export default async function AdminDiscountsPage({
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between gap-4">
-        <div>
+      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
+        <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">Discount codes</h1>
           <p className="mt-1 text-sm text-gray-600">
             Promo codes customers redeem at checkout. The order pipeline re-validates and

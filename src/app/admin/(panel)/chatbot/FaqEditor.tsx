@@ -32,7 +32,7 @@ export default function FaqEditor({
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <form action={action} className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <form action={action} className="min-w-0 space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
         <h2 className="font-bold">{editing ? 'Edit FAQ' : 'New FAQ'}</h2>
         {editing && <input type="hidden" name="id" value={editing.id} />}
 
@@ -120,7 +120,7 @@ export default function FaqEditor({
         </div>
       </form>
 
-      <div className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <div className="min-w-0 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
         <h2 className="font-bold">Existing FAQs ({faqs.length})</h2>
         <ul className="mt-3 divide-y divide-gray-100">
           {faqs.length === 0 && <li className="py-3 text-sm text-gray-500">No FAQs yet.</li>}

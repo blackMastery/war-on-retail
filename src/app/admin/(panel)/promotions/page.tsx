@@ -60,14 +60,14 @@ export default async function AdminPromotionsPage({
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between gap-4">
-        <div>
+      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
+        <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">Promotions</h1>
           <p className="mt-1 text-sm text-gray-600">
             Images shown on the homepage when at least one is live. Featured = takes the large slot.
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">
           <a
             href="https://github.com/kevoncadogan/war-on-retail/blob/main/docs/promotion-images.md"
             target="_blank"

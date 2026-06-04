@@ -33,8 +33,8 @@ export default async function AdminCategoriesPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
+      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
+        <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">Categories</h1>
           <p className="mt-1 text-sm text-gray-600">
             Hierarchy shown on{' '}
