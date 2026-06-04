@@ -53,7 +53,8 @@ export default function ProductCard({
   return (
     <article
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 transition-shadow hover:shadow-md',
+        'group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200',
+        'transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg hover:ring-gray-300 motion-reduce:transform-none',
         isStrip && 'h-full',
         className,
       )}

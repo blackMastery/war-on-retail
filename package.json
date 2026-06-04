@@ -25,6 +25,7 @@
     "@uiw/react-md-editor": "^4.1.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "framer-motion": "^12.40.0",
     "next": "^16.2.6",
     "openai": "^6.39.0",
     "papaparse": "^5.4.1",

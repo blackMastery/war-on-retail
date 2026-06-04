@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CheckIcon, ClockIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { useCartStore } from '@/lib/cart/store';
 import type { CartItem } from '@/lib/cart/types';
@@ -115,49 +116,64 @@ export default function AddToCartButton({
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {statusMessage}
       </div>
-      <button
+      <motion.button
         type="button"
         onClick={onClick}
         disabled={isUnavailable}
         aria-label={ariaLabel}
+        whileTap={isUnavailable ? undefined : { scale: 0.96 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         className={`${base} ${sizing} ${colours}`}
       >
-        {justAdded ? (
-          <>
-            <CheckIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
-            Added{variant === 'primary' ? ' to cart' : ''}
-          </>
-        ) : isUnavailable ? (
-          <>
-            <ShoppingBagIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
-            {variant === 'compact' ? (
+        {/* Swap the label/icon with a quick scale-fade so "Added!" pops in
+            rather than hard-cutting. mode="wait" keeps width stable. */}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={justAdded ? 'added' : isUnavailable ? 'unavailable' : isPreOrder ? 'preorder' : 'add'}
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="inline-flex items-center gap-2"
+          >
+            {justAdded ? (
               <>
-                <span className="sm:hidden">Unavailable</span>
-                <span className="hidden sm:inline">Out of stock</span>
+                <CheckIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                Added{variant === 'primary' ? ' to cart' : ''}
+              </>
+            ) : isUnavailable ? (
+              <>
+                <ShoppingBagIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                {variant === 'compact' ? (
+                  <>
+                    <span className="sm:hidden">Unavailable</span>
+                    <span className="hidden sm:inline">Out of stock</span>
+                  </>
+                ) : (
+                  'Out of stock'
+                )}
+              </>
+            ) : isPreOrder ? (
+              <>
+                <ClockIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                Pre-order
               </>
             ) : (
-              'Out of stock'
-            )}
-          </>
-        ) : isPreOrder ? (
-          <>
-            <ClockIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
-            Pre-order
-          </>
-        ) : (
-          <>
-            <ShoppingBagIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
-            {variant === 'compact' ? (
               <>
-                <span className="sm:hidden">Add</span>
-                <span className="hidden sm:inline">Add to cart</span>
+                <ShoppingBagIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                {variant === 'compact' ? (
+                  <>
+                    <span className="sm:hidden">Add</span>
+                    <span className="hidden sm:inline">Add to cart</span>
+                  </>
+                ) : (
+                  'Add to cart'
+                )}
               </>
-            ) : (
-              'Add to cart'
             )}
-          </>
-        )}
-      </button>
+          </motion.span>
+        </AnimatePresence>
+      </motion.button>
     </>
   );
 }

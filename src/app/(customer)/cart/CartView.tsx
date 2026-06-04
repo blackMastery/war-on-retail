@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { AnimatePresence, motion } from 'framer-motion';
 import { MinusIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import {
   selectDiscountAmount,
@@ -77,8 +78,17 @@ export default function CartView({
     <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem]">
       {/* Line items */}
       <ul role="list" className="divide-y divide-gray-200 rounded-lg bg-white ring-1 ring-gray-200">
+        {/* Removing a line slides it out and lets the rest settle up (layout).
+            initial={false} so the existing cart doesn't animate in on mount. */}
+        <AnimatePresence initial={false}>
         {items.map((item) => (
-          <li key={item.productId} className="flex gap-4 p-4">
+          <motion.li
+            key={item.productId}
+            layout
+            exit={{ opacity: 0, x: -24, transition: { duration: 0.2, ease: 'easeOut' } }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="flex gap-4 p-4"
+          >
             <Link
               href={`/products/${item.slug}`}
               className="relative block aspect-square w-24 shrink-0 overflow-hidden rounded-md bg-gray-100 ring-1 ring-gray-200"
@@ -145,8 +155,9 @@ export default function CartView({
                 </div>
               </div>
             </div>
-          </li>
+          </motion.li>
         ))}
+        </AnimatePresence>
       </ul>
 
       {/* Sticky summary */}

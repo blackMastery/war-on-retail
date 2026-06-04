@@ -7,10 +7,10 @@ export default function BrandCard({ brand }: { brand: Brand }) {
     <Link
       href={`/brands/${brand.slug}`}
       aria-label={brand.name}
-      className="flex h-20 items-center justify-center rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-200 transition hover:shadow-md"
+      className="group flex h-20 items-center justify-center rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-200 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none"
     >
       {brand.logo_url ? (
-        <div className="relative h-12 w-full">
+        <div className="relative h-12 w-full transition-transform duration-200 ease-out group-hover:scale-105 motion-reduce:transform-none">
           <Image src={brand.logo_url} alt={brand.name} fill className="object-contain" />
         </div>
       ) : (

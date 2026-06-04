@@ -15,7 +15,7 @@ export default function CategoryCard({ category }: { category: Category }) {
       className="group flex h-full flex-col items-center justify-center rounded-lg bg-white p-6 text-center shadow-sm ring-1 ring-gray-200 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none"
     >
       {category.image_url ? (
-        <div className="relative h-16 w-16">
+        <div className="relative h-16 w-16 transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transform-none">
           <Image
             src={category.image_url}
             alt={category.name}
@@ -25,7 +25,10 @@ export default function CategoryCard({ category }: { category: Category }) {
           />
         </div>
       ) : (
-        <span className="text-4xl" aria-hidden>
+        <span
+          className="text-4xl transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transform-none"
+          aria-hidden
+        >
           {icon}
         </span>
       )}

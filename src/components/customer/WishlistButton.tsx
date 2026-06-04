@@ -1,8 +1,37 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { useWishlistHydrated, useWishlistStore } from '@/lib/wishlist/store';
+
+/** A heart that pops when it becomes "saved". Keyed on state so toggling on
+ *  replays the bounce; toggling off just swaps the icon. */
+function Heart({
+  saved,
+  solidClassName = '',
+  outlineClassName = 'text-current',
+}: {
+  saved: boolean;
+  solidClassName?: string;
+  outlineClassName?: string;
+}) {
+  return (
+    <motion.span
+      key={saved ? 'on' : 'off'}
+      initial={saved ? { scale: 0.6 } : false}
+      animate={saved ? { scale: [0.6, 1.2, 1] } : { scale: 1 }}
+      transition={{ duration: 0.28, ease: 'easeOut', times: [0, 0.6, 1] }}
+      className="inline-flex"
+    >
+      {saved ? (
+        <HeartSolid className={`h-5 w-5 ${solidClassName}`} aria-hidden="true" />
+      ) : (
+        <HeartOutline className={`h-5 w-5 ${outlineClassName}`} aria-hidden="true" />
+      )}
+    </motion.span>
+  );
+}
 
 type Props = {
   slug: string;
@@ -39,7 +68,7 @@ export default function WishlistButton({ slug, productName, variant = 'button' }
 
   if (variant === 'icon') {
     return (
-      <button
+      <motion.button
         type="button"
         onClick={(e) => {
           e.preventDefault();
@@ -48,38 +77,34 @@ export default function WishlistButton({ slug, productName, variant = 'button' }
         }}
         aria-label={label}
         aria-pressed={displaySaved}
-        className={`flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow ring-1 ring-gray-200 transition hover:bg-white ${
+        whileTap={{ scale: 0.85 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+        className={`flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow ring-1 ring-gray-200 transition hover:bg-white hover:shadow-md ${
           displaySaved ? 'text-primary-600' : 'text-gray-600 hover:text-primary-600'
         }`}
       >
-        {displaySaved ? (
-          <HeartSolid className="h-5 w-5" aria-hidden="true" />
-        ) : (
-          <HeartOutline className="h-5 w-5" aria-hidden="true" />
-        )}
-      </button>
+        <Heart saved={displaySaved} />
+      </motion.button>
     );
   }
 
   // Default: text + icon button matching the detail-page action row.
   return (
-    <button
+    <motion.button
       type="button"
       onClick={() => toggle(slug)}
       aria-label={label}
       aria-pressed={displaySaved}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
       className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border-2 px-6 py-3 font-semibold transition-colors ${
         displaySaved
           ? 'border-primary-600 bg-primary-600 text-white hover:bg-primary-700'
           : 'border-accent-800 bg-accent-400 text-gray-900 hover:bg-accent-300'
       }`}
     >
-      {displaySaved ? (
-        <HeartSolid className="h-5 w-5" aria-hidden="true" />
-      ) : (
-        <HeartOutline className="h-5 w-5 text-primary-700" aria-hidden="true" />
-      )}
+      <Heart saved={displaySaved} outlineClassName="text-primary-700" />
       {displaySaved ? 'Saved' : 'Save'}
-    </button>
+    </motion.button>
   );
 }

@@ -82,19 +82,21 @@ export default function HorizontalScroller({ children, ariaLabel, gap = 3 }: Pro
         {children}
       </div>
 
-      {/* Edge fades — quietly hint that more content exists. */}
-      {canScrollLeft && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-accent-500 to-transparent"
-        />
-      )}
-      {canScrollRight && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-accent-500 to-transparent"
-        />
-      )}
+      {/* Edge fades — quietly hint that more content exists. Always mounted and
+          toggled via opacity so they cross-fade as you scroll rather than
+          popping in/out. */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-accent-500 to-transparent transition-opacity duration-200 ${
+          canScrollLeft ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-accent-500 to-transparent transition-opacity duration-200 ${
+          canScrollRight ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
 
       {/* Desktop nav buttons. Hidden on touch screens where swipe is natural. */}
       <button

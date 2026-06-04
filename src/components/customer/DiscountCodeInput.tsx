@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { useCartStore } from '@/lib/cart/store';
 import { formatPrice, getOrCreateSessionId } from '@/lib/utils';
@@ -66,72 +67,86 @@ export default function DiscountCodeInput() {
     [code, pending, subtotal, items, setDiscount],
   );
 
-  if (applied) {
-    return (
-      <div
-        className="flex items-start justify-between gap-3 rounded-md bg-green-50 p-3 ring-1 ring-green-200"
-        role="status"
-        aria-live="polite"
-      >
-        <div className="flex min-w-0 items-start gap-2">
-          <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-green-600" aria-hidden="true" />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-green-800">
-              Code <span className="font-mono uppercase">{applied.code}</span> applied
-            </p>
-            <p className="text-xs text-green-700">
-              You’re saving {formatPrice(applied.amountDiscounted)}
-              {applied.description ? ` · ${applied.description}` : ''}
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => clearDiscount()}
-          aria-label={`Remove discount code ${applied.code}`}
-          className="shrink-0 rounded-full p-1 text-green-700 hover:bg-green-100"
-        >
-          <XMarkIcon className="h-5 w-5" aria-hidden="true" />
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={apply} className="space-y-2" noValidate>
-      <label htmlFor="discount-code" className="block text-sm font-medium text-gray-700">
-        Discount code
-      </label>
-      <div className="flex gap-2">
-        <input
-          id="discount-code"
-          name="discount-code"
-          type="text"
-          autoCapitalize="characters"
-          autoComplete="off"
-          value={code}
-          onChange={(e) => {
-            setCode(e.target.value);
-            if (error) setError(null);
-          }}
-          placeholder="e.g. SUMMER20"
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? 'discount-code-error' : undefined}
-          className="block w-full rounded-md border-gray-300 text-sm uppercase shadow-sm focus:border-primary-500 focus:ring-primary-500"
-        />
-        <button
-          type="submit"
-          disabled={pending || !code.trim()}
-          className="shrink-0 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+    <AnimatePresence mode="wait" initial={false}>
+      {applied ? (
+        <motion.div
+          key="applied"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+          className="flex items-start justify-between gap-3 rounded-md bg-green-50 p-3 ring-1 ring-green-200"
+          role="status"
+          aria-live="polite"
         >
-          {pending ? 'Applying…' : 'Apply'}
-        </button>
-      </div>
-      {error && (
-        <p id="discount-code-error" className="text-xs text-red-600" role="alert">
-          {error}
-        </p>
+          <div className="flex min-w-0 items-start gap-2">
+            <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-green-600" aria-hidden="true" />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-green-800">
+                Code <span className="font-mono uppercase">{applied.code}</span> applied
+              </p>
+              <p className="text-xs text-green-700">
+                You’re saving {formatPrice(applied.amountDiscounted)}
+                {applied.description ? ` · ${applied.description}` : ''}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => clearDiscount()}
+            aria-label={`Remove discount code ${applied.code}`}
+            className="shrink-0 rounded-full p-1 text-green-700 hover:bg-green-100"
+          >
+            <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </motion.div>
+      ) : (
+        <motion.form
+          key="form"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+          onSubmit={apply}
+          className="space-y-2"
+          noValidate
+        >
+          <label htmlFor="discount-code" className="block text-sm font-medium text-gray-700">
+            Discount code
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="discount-code"
+              name="discount-code"
+              type="text"
+              autoCapitalize="characters"
+              autoComplete="off"
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value);
+                if (error) setError(null);
+              }}
+              placeholder="e.g. SUMMER20"
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? 'discount-code-error' : undefined}
+              className="block w-full rounded-md border-gray-300 text-sm uppercase shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            />
+            <button
+              type="submit"
+              disabled={pending || !code.trim()}
+              className="shrink-0 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+            >
+              {pending ? 'Applying…' : 'Apply'}
+            </button>
+          </div>
+          {error && (
+            <p id="discount-code-error" className="text-xs text-red-600" role="alert">
+              {error}
+            </p>
+          )}
+        </motion.form>
       )}
-    </form>
+    </AnimatePresence>
   );
 }

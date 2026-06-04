@@ -9,6 +9,7 @@ import ProductCard from '@/components/customer/ProductCard';
 import ProductGrid from '@/components/customer/ProductGrid';
 import PromotionMosaic from '@/components/customer/PromotionMosaic';
 import RecentlyViewedStrip from '@/components/customer/RecentlyViewedStrip';
+import { Reveal } from '@/components/customer/motion/primitives';
 import { NEW_ARRIVAL_WINDOW_DAYS, newArrivalCutoffIso } from '@/config/catalog';
 import { getPageSeo } from '@/lib/page-seo';
 
@@ -240,7 +241,7 @@ export default async function Homepage() {
       )}
 
       {/* Categories — horizontal scroller */}
-      <section className="container py-12">
+      <Reveal as="section" className="container py-12">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="text-2xl font-bold">Shop by Category</h2>
           <Link href="/categories" className="text-sm font-medium text-primary-600 hover:underline">
@@ -254,11 +255,11 @@ export default async function Homepage() {
             </div>
           ))}
         </HorizontalScroller>
-      </section>
+      </Reveal>
 
       {/* New Arrivals — only shown when something exists in the window. */}
       {newArrivals && newArrivals.length > 0 && (
-        <section className="container py-12">
+        <Reveal as="section" className="container py-12">
           <div className="mb-6 flex items-end justify-between gap-3">
             <div>
               <h2 className="text-2xl font-bold">
@@ -282,7 +283,7 @@ export default async function Homepage() {
               </div>
             ))}
           </HorizontalScroller>
-        </section>
+        </Reveal>
       )}
 
       {/* Recently viewed — pulls from localStorage; renders nothing for
@@ -291,7 +292,7 @@ export default async function Homepage() {
       <RecentlyViewedStrip title="Recently Viewed" minItems={2} />
 
       {/* Featured products */}
-      <section className="bg-accent-600">
+      <Reveal as="section" className="bg-accent-600">
         <div className="container py-12">
           <div className="mb-6 flex items-end justify-between">
             <h2 className="text-2xl font-bold">Featured Products</h2>
@@ -304,10 +305,10 @@ export default async function Homepage() {
           </div>
           <ProductGrid products={featured ?? []} />
         </div>
-      </section>
+      </Reveal>
 
       {/* Brands — horizontal scroller */}
-      <section className="container py-12">
+      <Reveal as="section" className="container py-12">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="text-2xl font-bold">Popular Brands</h2>
           <Link href="/brands" className="text-sm font-medium text-primary-600 hover:underline">
@@ -321,10 +322,10 @@ export default async function Homepage() {
             </div>
           ))}
         </HorizontalScroller>
-      </section>
+      </Reveal>
 
       {/* Value props */}
-      <section className="container py-12">
+      <Reveal as="section" className="container py-12">
         <div className="grid gap-6 md:grid-cols-3">
           {[
             { icon: '🚚', title: 'Fast Delivery', body: 'Same-day Georgetown, 2–5 days nationwide.' },
@@ -343,7 +344,7 @@ export default async function Homepage() {
             </div>
           ))}
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

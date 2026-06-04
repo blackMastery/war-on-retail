@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   Bars3Icon,
   FireIcon,
@@ -17,6 +18,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import type { HeaderSettings } from './header-types';
 import { categoryIconFor } from '@/lib/category-icons';
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
+import { useScrolled } from '@/lib/useScrolled';
 import CartIcon from './CartIcon';
 import SearchBar from './SearchBar';
 import NavDropdown, { type NavGroup, type NavItem } from './NavDropdown';
@@ -52,37 +54,10 @@ export default function Header({ categories, brands, settings }: Props) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
-  // Two-phase mount/show state so the open/close transitions can play:
-  //   - `mobileMenuMounted` controls DOM presence (kept true during the
-  //      closing animation so the slide-out is visible)
-  //   - `mobileMenuShown` controls the visibility classes (translate, opacity)
-  // Pattern: mount → next animation frame → flip shown. On close: flip shown
-  // → wait the transition duration → unmount.
-  const [mobileMenuMounted, setMobileMenuMounted] = useState(false);
-  const [mobileMenuShown, setMobileMenuShown] = useState(false);
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      setMobileMenuMounted(true);
-      // Two nested RAFs: the first lets the browser commit the just-mounted
-      // (closed) state to the DOM and paint it; the second flips to open so
-      // the transition has two distinct frames to interpolate between. Without
-      // the double-RAF, React can batch the mount + state flip into a single
-      // frame and the browser skips the animation entirely.
-      let raf2 = 0;
-      const raf1 = requestAnimationFrame(() => {
-        raf2 = requestAnimationFrame(() => setMobileMenuShown(true));
-      });
-      return () => {
-        cancelAnimationFrame(raf1);
-        if (raf2) cancelAnimationFrame(raf2);
-      };
-    }
-    setMobileMenuShown(false);
-    // Matches the overlay's `duration-300` transition — unmount after the
-    // slide-out completes so the user sees the panel leave the screen.
-    const t = setTimeout(() => setMobileMenuMounted(false), 300);
-    return () => clearTimeout(t);
-  }, [mobileMenuOpen]);
+  // Framer Motion's <AnimatePresence> handles the mount-during-close + enter/
+  // exit transitions natively, replacing the old hand-rolled double-RAF
+  // mount/shown state machine.
+  const scrolled = useScrolled();
 
   useBodyScrollLock(mobileMenuOpen);
 
@@ -134,7 +109,9 @@ export default function Header({ categories, brands, settings }: Props) {
   return (
     <>
     <header
-      className="sticky top-0 z-40 bg-white shadow-sm"
+      className={`sticky top-0 z-40 bg-white transition-shadow duration-200 ${
+        scrolled ? 'shadow-md' : 'shadow-sm'
+      }`}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Utility bar */}
@@ -275,29 +252,32 @@ export default function Header({ categories, brands, settings }: Props) {
              (Amazon, Best Buy, Target). No backdrop, no half-state — the menu
              owns the viewport while open and gets out of the way completely
              when closed. */}
-      {mobileMenuMounted && (
+      <AnimatePresence>
+        {mobileMenuOpen && (
         <>
           {/* Backdrop — fades in alongside the drawer's slide. Tap to close.
               This is what gives the menu its "app drawer" feel: the user can
               still see (dimmed) where they were on the page, and the menu
               feels layered over context rather than replacing it. */}
-          <div
+          <motion.div
             role="presentation"
             onClick={() => setMobileMenuOpen(false)}
-            className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ease-out md:hidden motion-reduce:transition-none ${
-              mobileMenuShown ? 'opacity-100' : 'pointer-events-none opacity-0'
-            }`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="fixed inset-0 z-40 bg-black/50 md:hidden"
           />
-        <div
-          // Side drawer: ~85% of viewport width capped at ~360 px, slides in
-          // from the left edge. Parked off-screen at -translate-x-full when
-          // closed, slides to translate-x-0 on open. ease-out keeps the
-          // motion feeling responsive (most velocity at the start) rather
-          // than the sluggish ease-in-out default. The right-edge shadow
-          // gives the drawer depth against the backdrop.
-          className={`fixed bottom-0 left-0 top-0 z-50 flex w-[85%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-300 ease-out will-change-transform md:hidden motion-reduce:transition-none ${
-            mobileMenuShown ? 'translate-x-0' : 'pointer-events-none -translate-x-full'
-          }`}
+        <motion.div
+          // Side drawer: ~85% of viewport width capped at ~360 px. Slides in
+          // from the left edge via Framer Motion; <AnimatePresence> keeps it
+          // mounted through the exit slide-out (replacing the old double-RAF
+          // dance). The right-edge shadow gives depth against the backdrop.
+          initial={{ x: '-100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '-100%' }}
+          transition={{ type: 'tween', duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed bottom-0 left-0 top-0 z-50 flex w-[85%] max-w-sm flex-col bg-white shadow-2xl will-change-transform md:hidden"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           {/* Self-contained top bar: matches the visible header bar so the
@@ -430,9 +410,10 @@ export default function Header({ categories, brands, settings }: Props) {
               Deals
             </MobileLink>
           </nav>
-        </div>
+        </motion.div>
         </>
-      )}
+        )}
+      </AnimatePresence>
     </>
   );
 }

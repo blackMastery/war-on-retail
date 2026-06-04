@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -152,15 +153,30 @@ export default function ProductGallery({
           className="group relative block aspect-square w-full cursor-zoom-in select-none overflow-hidden rounded-lg bg-gray-100 ring-1 ring-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
           style={{ touchAction: 'pan-y', WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
         >
-          <Image
-            src={current}
-            alt={altFor(current, safeActive)}
-            fill
-            sizes="(min-width: 768px) 50vw, 100vw"
-            priority={safeActive === 0}
-            className="pointer-events-none object-cover"
-            draggable={false}
-          />
+          {/* Crossfade the active image so switching thumbnails / swiping
+              dissolves rather than hard-cuts. Both layers overlap (absolute)
+              during the ~200ms fade; reduced-motion users get an instant swap
+              via MotionConfig. */}
+          <AnimatePresence initial={false} mode="popLayout">
+            <motion.div
+              key={safeActive}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={current}
+                alt={altFor(current, safeActive)}
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                priority={safeActive === 0}
+                className="pointer-events-none object-cover"
+                draggable={false}
+              />
+            </motion.div>
+          </AnimatePresence>
           {discount > 0 && (
             <span className="pointer-events-none absolute left-3 top-3 rounded bg-primary-600 px-2 py-0.5 text-sm font-bold text-white">
               -{discount}%

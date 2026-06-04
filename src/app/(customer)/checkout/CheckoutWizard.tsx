@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { ChevronLeftIcon, ChevronRightIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import {
@@ -182,6 +183,16 @@ export default function CheckoutWizard({
         <StepBar step={step} onStepClick={(s) => goTo(s)} />
 
         <div className="mt-6 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200 sm:p-6">
+          {/* Each step fades/slides as you advance; mode="wait" so the leaving
+              step finishes before the next enters. */}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
           {step === 0 && (
             <StepCustomer
               value={draft.customer}
@@ -211,6 +222,8 @@ export default function CheckoutWizard({
               onChange={(id) => setDraft((d) => ({ ...d, paymentMethodId: id }))}
             />
           )}
+            </motion.div>
+          </AnimatePresence>
 
           {(stepError || submitError) && (
             <div

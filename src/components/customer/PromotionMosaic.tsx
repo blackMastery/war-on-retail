@@ -75,7 +75,7 @@ function Tile({
   const inner = (
     <figure
       className={`relative h-full w-full overflow-hidden rounded-lg bg-gray-200 shadow-sm ring-1 ring-gray-200 transition-shadow ${
-        promotion.link_url ? 'group-hover:shadow-md group-focus-visible:shadow-md' : ''
+        promotion.link_url ? 'group-hover:shadow-lg group-focus-visible:shadow-lg' : ''
       } ${aspect}`}
     >
       <Image
@@ -86,7 +86,7 @@ function Tile({
         sizes="(min-width: 1024px) 66vw, 100vw"
         className={`object-cover ${
           promotion.link_url
-            ? 'transition-transform duration-300 motion-reduce:transform-none group-hover:scale-[1.02]'
+            ? 'transition-transform duration-500 ease-out motion-reduce:transform-none group-hover:scale-[1.04]'
             : ''
         }`}
       />
