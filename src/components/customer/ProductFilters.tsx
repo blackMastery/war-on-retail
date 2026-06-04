@@ -308,12 +308,13 @@ function Group({
           className="flex w-full items-center justify-between rounded-md py-1 text-left text-sm font-semibold text-gray-900 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
         >
           <span>{title}</span>
-          <ChevronDownIcon
-            className={`h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200 motion-reduce:transition-none ${
+          <span
+            className={`flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-yellow-300 transition-transform duration-200 motion-reduce:transition-none ${
               open ? 'rotate-180' : ''
             }`}
-            aria-hidden="true"
-          />
+          >
+            <ChevronDownIcon className="h-4 w-4" aria-hidden="true" />
+          </span>
         </button>
       </legend>
       <div
