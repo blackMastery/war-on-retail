@@ -26,7 +26,7 @@ export default function Footer({ settings }: { settings: ResolvedStoreSettings }
               className="h-12 w-auto"
             />
             <p className="mt-3 text-pretty text-sm">{description}</p>
-            <p className="mt-4 text-sm">
+            <address className="mt-4 text-sm not-italic">
               <a href={`tel:${phone}`} className="hover:text-white">
                 <span aria-hidden="true">📞 </span>
                 {phone}
@@ -38,7 +38,7 @@ export default function Footer({ settings }: { settings: ResolvedStoreSettings }
               </a>
               <br />
               {address}
-            </p>
+            </address>
           </div>
 
           <FooterColumn title="Shop" items={footerLinks.shop} />

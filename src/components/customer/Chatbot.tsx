@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChatBubbleLeftRightIcon, PaperAirplaneIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getOrCreateSessionId } from '@/lib/utils';
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
+import { useDialogA11y } from '@/lib/useDialogA11y';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
@@ -61,54 +62,17 @@ export default function Chatbot({ settings }: { settings: ChatbotSettings }) {
     scrollToBottom(scrollRef.current);
   }, [messages, open]);
 
-  // ESC closes the panel and returns focus to the toggle button.
-  useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setOpen(false);
-        toggleRef.current?.focus();
-      }
-    }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open]);
-
-  // Focus trap — keep Tab inside the open panel.
-  useEffect(() => {
-    if (!open) return;
-    const panel = panelRef.current;
-    if (!panel) return;
-
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== 'Tab') return;
-      const focusables = panel!.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), [href], select:not([disabled]), textarea:not([disabled])',
-      );
-      if (focusables.length === 0) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      if (e.shiftKey) {
-        if (document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else if (document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
-
-    panel.addEventListener('keydown', onKeyDown);
-    return () => panel.removeEventListener('keydown', onKeyDown);
-  }, [open]);
-
-  // Desktop only — avoid pulling keyboard over content on mobile.
-  useEffect(() => {
-    if (!open) return;
-    const prefersFinePointer = window.matchMedia('(pointer: fine)').matches;
-    if (prefersFinePointer) inputRef.current?.focus();
-  }, [open]);
+  // Escape-close, Tab focus-trap, and focus-restore-to-toggle. Initial focus
+  // goes to the input, but only on a fine pointer so we don't summon the soft
+  // keyboard over the conversation on touch devices.
+  useDialogA11y({
+    open,
+    onClose: () => setOpen(false),
+    panelRef,
+    triggerRef: toggleRef,
+    initialFocus: inputRef,
+    autoFocusFinePointerOnly: true,
+  });
 
   async function send() {
     const text = input.trim();

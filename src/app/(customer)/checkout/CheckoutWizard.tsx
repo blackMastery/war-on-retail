@@ -228,11 +228,14 @@ export default function CheckoutWizard({
           {(stepError || submitError) && (
             <div
               role="alert"
-              aria-live="polite"
+              aria-live="assertive"
               className="mt-4 flex items-start gap-2 rounded-md bg-red-50 p-3 text-sm text-red-700"
             >
               <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>{submitError ?? stepError}</span>
+              <span>
+                <span className="sr-only">Error: </span>
+                {submitError ?? stepError}
+              </span>
             </div>
           )}
 
@@ -401,16 +404,21 @@ function StepCustomer({
           We use this to confirm the order and arrange delivery or pickup. No
           account needed.
         </p>
+        <p className="mt-1 text-xs text-gray-500">
+          <span className="text-primary-600" aria-hidden="true">*</span> indicates a required field.
+        </p>
       </div>
       <div>
         <label htmlFor={`${uid}-phone`} className="block text-sm font-medium text-gray-700">
-          Phone number
+          Phone number <span className="text-primary-600" aria-hidden="true">*</span>
         </label>
         <div className="mt-1 flex gap-2">
           <input
             id={`${uid}-phone`}
             type="tel"
             required
+            aria-required="true"
+            aria-describedby={`${uid}-phone-hint`}
             autoComplete="tel"
             inputMode="tel"
             value={value.phone}
@@ -425,13 +433,19 @@ function StepCustomer({
             type="button"
             onClick={findMyInfo}
             disabled={looking}
+            aria-busy={looking}
             aria-label="Find my saved info by phone number"
             className="shrink-0 rounded-md border border-primary-600 px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50 disabled:opacity-50"
           >
             {looking ? 'Looking…' : 'Find my info'}
           </button>
         </div>
-        <p className="mt-1 text-xs text-gray-500" role="status" aria-live="polite">
+        <p
+          id={`${uid}-phone-hint`}
+          className="mt-1 text-xs text-gray-500"
+          role="status"
+          aria-live="polite"
+        >
           {hint ? (
             <span className={hint.tone === 'success' ? 'font-medium text-green-700' : 'text-gray-500'}>
               {hint.text}
@@ -443,12 +457,13 @@ function StepCustomer({
       </div>
       <div>
         <label htmlFor={`${uid}-name`} className="block text-sm font-medium text-gray-700">
-          Full name
+          Full name <span className="text-primary-600" aria-hidden="true">*</span>
         </label>
         <input
           id={`${uid}-name`}
           type="text"
           required
+          aria-required="true"
           autoComplete="name"
           value={value.name}
           onChange={(e) => onChange({ ...value, name: e.target.value })}
@@ -511,19 +526,21 @@ function StepFulfillment({
       </div>
 
       {value.type === 'delivery' && (
-        <div className="space-y-3 rounded-md bg-gray-50 p-4 ring-1 ring-gray-200">
+        <fieldset className="space-y-3 rounded-md bg-gray-50 p-4 ring-1 ring-gray-200">
+          <legend className="px-1 text-sm font-semibold text-gray-900">Delivery address</legend>
           <p className="text-sm text-gray-600">
             <span className="font-semibold text-gray-900">Same-day in Georgetown.</span>{' '}
             2–5 days nationwide. We confirm a delivery window when we call.
           </p>
           <div>
             <label htmlFor={`${uid}-city`} className="block text-sm font-medium text-gray-700">
-              City / town
+              City / town <span className="text-primary-600" aria-hidden="true">*</span>
             </label>
             <input
               id={`${uid}-city`}
               type="text"
               required
+              aria-required="true"
               autoComplete="address-level2"
               value={value.city}
               onChange={(e) => onChange({ ...value, city: e.target.value })}
@@ -533,11 +550,12 @@ function StepFulfillment({
           </div>
           <div>
             <label htmlFor={`${uid}-address`} className="block text-sm font-medium text-gray-700">
-              Street address
+              Street address <span className="text-primary-600" aria-hidden="true">*</span>
             </label>
             <textarea
               id={`${uid}-address`}
               required
+              aria-required="true"
               autoComplete="street-address"
               rows={3}
               value={value.address}
@@ -546,7 +564,7 @@ function StepFulfillment({
               className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
             />
           </div>
-        </div>
+        </fieldset>
       )}
 
       {value.type === 'pickup' && (

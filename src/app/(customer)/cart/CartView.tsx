@@ -89,8 +89,12 @@ export default function CartView({
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="flex gap-4 p-4"
           >
+            {/* Image duplicates the product-name link below; hide it from AT and
+                the tab order so the line item exposes a single named link. */}
             <Link
               href={`/products/${item.slug}`}
+              aria-hidden="true"
+              tabIndex={-1}
               className="relative block aspect-square w-24 shrink-0 overflow-hidden rounded-md bg-gray-100 ring-1 ring-gray-200"
             >
               {item.imageUrl ? (
@@ -123,7 +127,7 @@ export default function CartView({
                   type="button"
                   onClick={() => removeItem(item.productId)}
                   aria-label={`Remove ${item.name} from cart`}
-                  className="shrink-0 rounded-full p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                  className="shrink-0 rounded-full p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600"
                 >
                   <TrashIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
@@ -165,7 +169,7 @@ export default function CartView({
         <div className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
           <h2 className="text-lg font-bold">Inquiry summary</h2>
 
-          <dl className="space-y-2 text-sm">
+          <dl className="space-y-2 text-sm" aria-live="polite" aria-atomic="true">
             <div className="flex justify-between">
               <dt className="text-gray-600">
                 Items <span className="tabular-nums">({totalItems})</span>
@@ -233,7 +237,7 @@ export default function CartView({
             </button>
           </div>
 
-          <p className="text-center text-xs text-gray-400">
+          <p className="text-center text-xs text-gray-500">
             Or call us:{' '}
             <a href={`tel:${storeInfo.phone}`} className="font-medium hover:text-gray-700">
               {storeInfo.phone}
@@ -278,7 +282,7 @@ function QuantityStepper({
           const n = Number.parseInt(e.target.value, 10);
           if (Number.isFinite(n) && n >= 1) onChange(n);
         }}
-        aria-label="Quantity"
+        aria-label={label}
         className="h-9 w-12 border-0 bg-transparent text-center text-sm tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
       />
       <button

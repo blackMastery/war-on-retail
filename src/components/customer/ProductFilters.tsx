@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState, useTransition } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdjustmentsHorizontalIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
@@ -14,6 +14,7 @@ import {
   type SortKey,
 } from '@/lib/products/filters';
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
+import { useDialogA11y } from '@/lib/useDialogA11y';
 import type { Brand, Category } from '@/types/database';
 import PriceRangeSlider from './PriceRangeSlider';
 
@@ -39,9 +40,18 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
 
   const [draft, setDraft] = useState<ProductFilters>(urlFilters);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const filtersButtonRef = useRef<HTMLButtonElement | null>(null);
+  const sheetRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => setDraft(urlFilters), [urlFilters]);
 
   useBodyScrollLock(mobileOpen);
+  useDialogA11y({
+    open: mobileOpen,
+    onClose: () => setMobileOpen(false),
+    panelRef: sheetRef,
+    triggerRef: filtersButtonRef,
+    initialFocus: 'panel',
+  });
 
   const tree = useMemo(() => {
     const tops = categories.filter((c) => !c.parent_id);
@@ -184,10 +194,11 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
       {/* Mobile toolbar */}
       <div className="mb-4 flex flex-wrap items-center gap-2 lg:hidden">
         <button
+          ref={filtersButtonRef}
           type="button"
           onClick={() => setMobileOpen(true)}
           aria-expanded={mobileOpen}
-          aria-controls="product-filters"
+          aria-controls="product-filters-sheet"
           className="inline-flex min-h-11 items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-gray-50"
         >
           <AdjustmentsHorizontalIcon className="h-4 w-4" aria-hidden="true" />
@@ -235,10 +246,13 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
             onClick={() => setMobileOpen(false)}
           />
           <div
+            ref={sheetRef}
+            id="product-filters-sheet"
             role="dialog"
             aria-modal="true"
             aria-label="Product filters"
-            className="absolute inset-x-0 bottom-0 flex max-h-[min(85dvh,calc(100dvh-env(safe-area-inset-top)))] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl"
+            tabIndex={-1}
+            className="absolute inset-x-0 bottom-0 flex max-h-[min(85dvh,calc(100dvh-env(safe-area-inset-top)))] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl focus:outline-none"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >
             <div className="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3">

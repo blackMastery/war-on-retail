@@ -302,9 +302,10 @@ export default async function ProductDetailPage({
               {formatPrice(product.price)}
             </span>
             {product.compare_at_price && product.compare_at_price > product.price && (
-              <span className="text-lg text-gray-400 line-through">
+              <del className="text-lg text-gray-500 line-through">
+                <span className="sr-only">Original price: </span>
                 {formatPrice(product.compare_at_price)}
-              </span>
+              </del>
             )}
           </div>
 

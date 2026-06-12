@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 export type NavItem = { label: string; href: string };
@@ -103,6 +104,8 @@ export default function NavDropdown({
   // Cancel any pending close on unmount.
   useEffect(() => () => cancelClose(), []);
 
+  const pathname = usePathname();
+
   return (
     <div
       ref={containerRef}
@@ -139,9 +142,9 @@ export default function NavDropdown({
           className={`absolute left-0 top-full z-50 mt-1 ${widthClass[width]} max-h-[min(32rem,80vh)] overflow-y-auto rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-gray-200`}
         >
           {groups ? (
-            <Groups groups={groups} onSelect={close} />
+            <Groups groups={groups} onSelect={close} pathname={pathname} />
           ) : (
-            <Items items={items ?? []} onSelect={close} />
+            <Items items={items ?? []} onSelect={close} pathname={pathname} />
           )}
         </div>
       )}
@@ -149,7 +152,15 @@ export default function NavDropdown({
   );
 }
 
-function Items({ items, onSelect }: { items: NavItem[]; onSelect: () => void }) {
+function Items({
+  items,
+  onSelect,
+  pathname,
+}: {
+  items: NavItem[];
+  onSelect: () => void;
+  pathname: string;
+}) {
   if (!items.length) {
     return <p className="px-4 py-3 text-sm italic text-gray-500">Nothing here yet.</p>;
   }
@@ -160,8 +171,9 @@ function Items({ items, onSelect }: { items: NavItem[]; onSelect: () => void }) 
           <Link
             href={it.href}
             role="menuitem"
+            aria-current={pathname === it.href ? 'page' : undefined}
             onClick={onSelect}
-            className="block px-4 py-2 text-sm hover:bg-primary-50 hover:text-primary-700 focus-visible:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-600"
+            className="block px-4 py-2 text-sm hover:bg-primary-50 hover:text-primary-700 focus-visible:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-600 aria-[current=page]:font-semibold aria-[current=page]:text-primary-700"
           >
             {it.label}
           </Link>
@@ -171,7 +183,15 @@ function Items({ items, onSelect }: { items: NavItem[]; onSelect: () => void }) 
   );
 }
 
-function Groups({ groups, onSelect }: { groups: NavGroup[]; onSelect: () => void }) {
+function Groups({
+  groups,
+  onSelect,
+  pathname,
+}: {
+  groups: NavGroup[];
+  onSelect: () => void;
+  pathname: string;
+}) {
   return (
     <div className="grid grid-cols-1 gap-x-6 gap-y-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
       {groups.map((g, i) => (
@@ -182,12 +202,15 @@ function Groups({ groups, onSelect }: { groups: NavGroup[]; onSelect: () => void
                 href={g.href}
                 onClick={onSelect}
                 role="menuitem"
-                className="mb-2 block text-sm font-bold text-primary-700 hover:underline"
+                aria-current={pathname === g.href ? 'page' : undefined}
+                className="mb-2 block text-sm font-bold text-primary-700 hover:underline aria-[current=page]:underline"
               >
                 {g.label}
               </Link>
             ) : (
-              <p className="mb-2 text-sm font-bold text-gray-900">{g.label}</p>
+              <p role="heading" aria-level={3} className="mb-2 text-sm font-bold text-gray-900">
+                {g.label}
+              </p>
             ))}
           <ul role="none" className="space-y-1">
             {g.items.map((it) => (
@@ -195,8 +218,9 @@ function Groups({ groups, onSelect }: { groups: NavGroup[]; onSelect: () => void
                 <Link
                   href={it.href}
                   role="menuitem"
+                  aria-current={pathname === it.href ? 'page' : undefined}
                   onClick={onSelect}
-                  className="block py-0.5 text-sm text-gray-700 hover:text-primary-600 focus-visible:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+                  className="block py-0.5 text-sm text-gray-700 hover:text-primary-600 focus-visible:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 aria-[current=page]:font-semibold aria-[current=page]:text-primary-700"
                 >
                   {it.label}
                 </Link>

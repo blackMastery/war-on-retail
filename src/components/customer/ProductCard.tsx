@@ -152,9 +152,10 @@ export default function ProductCard({
             {formatPrice(product.price)}
           </span>
           {product.compare_at_price && product.compare_at_price > product.price && (
-            <span className="text-xs text-gray-400 line-through sm:text-sm">
+            <del className="text-xs text-gray-500 line-through sm:text-sm">
+              <span className="sr-only">Original price: </span>
               {formatPrice(product.compare_at_price)}
-            </span>
+            </del>
           )}
         </div>
         {!isStrip && product.track_inventory && !isOutOfStock && (

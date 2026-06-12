@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Bars3Icon,
@@ -18,6 +18,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import type { HeaderSettings } from './header-types';
 import { categoryIconFor } from '@/lib/category-icons';
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock';
+import { useDialogA11y } from '@/lib/useDialogA11y';
 import { useScrolled } from '@/lib/useScrolled';
 import CartIcon from './CartIcon';
 import SearchBar from './SearchBar';
@@ -53,6 +54,8 @@ export default function Header({ categories, brands, settings }: Props) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const drawerRef = useRef<HTMLDivElement | null>(null);
 
   // Framer Motion's <AnimatePresence> handles the mount-during-close + enter/
   // exit transitions natively, replacing the old hand-rolled double-RAF
@@ -60,6 +63,13 @@ export default function Header({ categories, brands, settings }: Props) {
   const scrolled = useScrolled();
 
   useBodyScrollLock(mobileMenuOpen);
+  useDialogA11y({
+    open: mobileMenuOpen,
+    onClose: () => setMobileMenuOpen(false),
+    panelRef: drawerRef,
+    triggerRef: menuButtonRef,
+    initialFocus: 'panel',
+  });
 
   // Close drawers on navigation.
   useEffect(() => {
@@ -176,10 +186,12 @@ export default function Header({ categories, brands, settings }: Props) {
           <WishlistIcon />
           <CartIcon />
           <button
+            ref={menuButtonRef}
             type="button"
             onClick={openMenu}
             aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav-drawer"
             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 md:hidden"
           >
             {mobileMenuOpen ? (
@@ -200,7 +212,11 @@ export default function Header({ categories, brands, settings }: Props) {
       {/* Primary nav — desktop only */}
       <nav aria-label="Primary" className="hidden bg-primary-600 text-white md:block">
         <div className="container flex items-center gap-6 py-3 text-sm font-medium">
-          <Link href="/products" className="hover:text-accent-400">
+          <Link
+            href="/products"
+            aria-current={pathname === '/products' ? 'page' : undefined}
+            className="hover:text-accent-400"
+          >
             All Products
           </Link>
 
@@ -215,6 +231,7 @@ export default function Header({ categories, brands, settings }: Props) {
                 <Link
                   key={c.id}
                   href={`/categories/${c.slug}`}
+                  aria-current={pathname === `/categories/${c.slug}` ? 'page' : undefined}
                   className="hover:text-accent-400"
                 >
                   {c.name}
@@ -233,7 +250,11 @@ export default function Header({ categories, brands, settings }: Props) {
             );
           })}
 
-          <Link href="/deals" className="font-bold hover:text-accent-400">
+          <Link
+            href="/deals"
+            aria-current={pathname === '/deals' ? 'page' : undefined}
+            className="font-bold hover:text-accent-400"
+          >
             <span aria-hidden="true">🔥 </span>Deals
           </Link>
         </div>
@@ -269,6 +290,12 @@ export default function Header({ categories, brands, settings }: Props) {
             className="fixed inset-0 z-40 bg-black/50 md:hidden"
           />
         <motion.div
+          ref={drawerRef}
+          id="mobile-nav-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+          tabIndex={-1}
           // Side drawer: ~85% of viewport width capped at ~360 px. Slides in
           // from the left edge via Framer Motion; <AnimatePresence> keeps it
           // mounted through the exit slide-out (replacing the old double-RAF
@@ -277,7 +304,7 @@ export default function Header({ categories, brands, settings }: Props) {
           animate={{ x: 0 }}
           exit={{ x: '-100%' }}
           transition={{ type: 'tween', duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-0 left-0 top-0 z-50 flex w-[85%] max-w-sm flex-col bg-white shadow-2xl will-change-transform md:hidden"
+          className="fixed bottom-0 left-0 top-0 z-50 flex w-[85%] max-w-sm flex-col bg-white shadow-2xl will-change-transform focus:outline-none md:hidden"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           {/* Self-contained top bar: matches the visible header bar so the
