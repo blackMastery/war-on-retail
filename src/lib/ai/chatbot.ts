@@ -12,6 +12,20 @@ async function getOpenAI() {
 }
 
 const FAQ_CONFIDENCE_THRESHOLD = 0.55;
+const GUYANA_TZ = 'America/Guyana';
+
+/** Matches schedule questions — not "are you open right now?" (those go to the LLM). */
+const SCHEDULE_QUESTION_RE =
+  /\b(hours?|opening|close[sd]?|closing|business hours?|store hours?|when do you open|what time)\b/i;
+const OPEN_NOW_QUESTION_RE =
+  /\b(open now|right now|currently open|still open)\b/i;
+
+type ChatStoreInfo = {
+  name: string;
+  whatsapp: string;
+  phone: string;
+  hours: { weekdays: string; saturday: string; sunday: string };
+};
 
 export type ChatReply = {
   reply: string;
@@ -58,14 +72,43 @@ async function searchProducts(message: string, limit = 5): Promise<Product[]> {
 }
 
 /** Brand-aware fallback line — uses the live store-settings phone + WhatsApp. */
-function fallbackReply(info: { whatsapp: string; phone: string }): string {
+function fallbackReply(info: Pick<ChatStoreInfo, 'whatsapp' | 'phone'>): string {
   return `I'm not sure off the top of my head — but our team is fast. WhatsApp us at https://wa.me/${info.whatsapp} or call ${info.phone} and we'll sort you out.`;
+}
+
+function formatGuyanaNow(date = new Date()): string {
+  return date.toLocaleString('en-GY', {
+    timeZone: GUYANA_TZ,
+    weekday: 'long',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
+function formatHoursBlock(hours: ChatStoreInfo['hours']): string {
+  return `- Weekdays: ${hours.weekdays}\n- Saturday: ${hours.saturday}\n- Sunday: ${hours.sunday}`;
+}
+
+function isOpenNowQuestion(message: string): boolean {
+  return OPEN_NOW_QUESTION_RE.test(message);
+}
+
+function isScheduleQuestion(message: string): boolean {
+  return SCHEDULE_QUESTION_RE.test(message) && !isOpenNowQuestion(message);
+}
+
+/** Deterministic reply for "what are your hours?" — always uses live admin settings. */
+function buildScheduleReply(hours: ChatStoreInfo['hours']): string {
+  return `Our store hours: ${hours.weekdays}. ${hours.saturday}. ${hours.sunday}.`;
 }
 
 function buildSystemPrompt(
   faqs: FAQ[],
   products: Product[],
-  info: { name: string; whatsapp: string; phone: string },
+  info: ChatStoreInfo,
 ): string {
   const faqContext = faqs
     .slice(0, 20)
@@ -79,11 +122,20 @@ function buildSystemPrompt(
     )
     .join('\n');
 
+  const nowGuyana = formatGuyanaNow();
+
   return `You are the customer-service assistant for ${info.name}, an electronics and home-appliance retailer in Guyana.
+
+Current date/time (Guyana, ${GUYANA_TZ}): ${nowGuyana}
+
+Store hours (Guyana local time):
+${formatHoursBlock(info.hours)}
 
 Rules:
 - Be concise — 1–3 short sentences. Friendly, factual.
 - Prices are in Guyanese dollars (GYD).
+- All times are Guyana local time. Use the store hours above for schedule questions.
+- For "are you open now?" compare the current date/time to today's hours line; say open or closed with a brief reason.
 - If the answer is in the FAQs below, quote or lightly rephrase it.
 - If you recommend products, list 1–3 from the catalogue below with names and links (relative paths like /products/slug).
 - If you don't know, say so and direct the user to WhatsApp ${info.whatsapp} or phone ${info.phone}.
@@ -100,7 +152,7 @@ async function askAnthropic(opts: {
   message: string;
   faqs: FAQ[];
   products: Product[];
-  storeInfo: { name: string; whatsapp: string; phone: string };
+  storeInfo: ChatStoreInfo;
 }): Promise<string | null> {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return null;
@@ -131,7 +183,7 @@ async function askOpenAI(opts: {
   message: string;
   faqs: FAQ[];
   products: Product[];
-  storeInfo: { name: string; whatsapp: string; phone: string };
+  storeInfo: ChatStoreInfo;
 }): Promise<string | null> {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return null;
@@ -162,11 +214,22 @@ export async function answerMessage(message: string): Promise<ChatReply> {
     getStoreSettings(),
   ]);
   const allFaqs = (faqs ?? []) as FAQ[];
-  const storeInfo = {
+  const storeInfo: ChatStoreInfo = {
     name: settings.name,
     whatsapp: settings.whatsapp,
     phone: settings.phone,
+    hours: settings.hours,
   };
+
+  // 0) Schedule questions — answer from live store settings (no stale FAQ text).
+  if (isScheduleQuestion(message)) {
+    return {
+      reply: buildScheduleReply(storeInfo.hours),
+      matchedFaqId: null,
+      confidence: 1,
+      source: 'faq',
+    };
+  }
 
   // 1) Try direct FAQ retrieval first — fastest, cheapest, deterministic.
   const { faq, score } = bestFaq(message, allFaqs);
