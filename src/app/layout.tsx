@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { getStoreSettings } from '@/lib/store-settings';
 import './globals.css';
-
+import { Analytics } from "@vercel/analytics/next"
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 /**
@@ -53,6 +53,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={inter.variable}>
+      <Analytics />
       <body className="font-sans">
         {/* Keyboard skip-link — invisible until focused, then jumps past the header. */}
         <a
