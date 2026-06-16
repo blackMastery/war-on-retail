@@ -376,6 +376,9 @@ function StepCustomer({
   const uid = useId();
   const [looking, setLooking] = useState(false);
   const [hint, setHint] = useState<{ tone: 'success' | 'muted'; text: string } | null>(null);
+  // Masked email the lookup found on file (e.g. "j••@gmail.com"). Display only —
+  // we never receive or prefill the real address.
+  const [emailOnFile, setEmailOnFile] = useState<string | null>(null);
 
   async function findMyInfo() {
     setHint(null);
@@ -390,11 +393,14 @@ function StepCustomer({
       const result = await lookupCustomerAction(phone);
       if (result.found) {
         onApplyLookup({ name: result.name, delivery: result.delivery });
+        setEmailOnFile(result.emailMasked);
         setHint({ tone: 'success', text: 'Welcome back — we filled in your details.' });
       } else {
+        setEmailOnFile(null);
         setHint({ tone: 'muted', text: 'No saved info found — just fill in below.' });
       }
     } catch {
+      setEmailOnFile(null);
       setHint({ tone: 'muted', text: 'Couldn’t check right now — just fill in below.' });
     } finally {
       setLooking(false);
@@ -492,8 +498,17 @@ function StepCustomer({
           className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
         />
         <p id={`${uid}-email-hint`} className="mt-1 text-xs text-gray-500">
-          Add your email and we’ll send an order confirmation. We’ll still call or
-          WhatsApp to finalise.
+          {emailOnFile && value.email.trim() === '' ? (
+            <span className="font-medium text-green-700">
+              We have {emailOnFile} on file — leave blank to keep it, or enter a
+              new address.
+            </span>
+          ) : (
+            <>
+              Add your email and we’ll send an order confirmation. We’ll still
+              call or WhatsApp to finalise.
+            </>
+          )}
         </p>
       </div>
     </div>

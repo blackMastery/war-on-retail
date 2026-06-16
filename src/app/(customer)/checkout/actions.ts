@@ -9,7 +9,14 @@ import { sendOrderEmail } from '@/lib/email/send';
  * customer" and any lookup error — the UI treats them identically (quiet hint).
  */
 export type CustomerLookupResult =
-  | { found: true; name: string; delivery: { city: string; address: string } | null }
+  | {
+      found: true;
+      name: string;
+      // Masked email on file (e.g. "j••@gmail.com"), or null if none. Display
+      // only — the real address is never returned over this anon endpoint.
+      emailMasked: string | null;
+      delivery: { city: string; address: string } | null;
+    }
   | { found: false };
 
 /**
@@ -36,7 +43,12 @@ export async function lookupCustomerAction(phone: string): Promise<CustomerLooku
   const delivery = row.last_delivery_address
     ? { city: row.last_delivery_city ?? '', address: row.last_delivery_address }
     : null;
-  return { found: true, name: row.name, delivery };
+  return {
+    found: true,
+    name: row.name,
+    emailMasked: row.email_masked ?? null,
+    delivery,
+  };
 }
 
 /**

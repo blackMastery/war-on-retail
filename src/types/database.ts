@@ -821,6 +821,7 @@ export type Database = {
         Args: { p_phone: string };
         Returns: Array<{
           name: string;
+          email_masked: string | null;
           last_delivery_city: string | null;
           last_delivery_address: string | null;
         }>;
