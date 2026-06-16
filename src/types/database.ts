@@ -310,6 +310,8 @@ export type CustomerRow = {
   name: string;
   /** Normalised: leading `+` if present, otherwise digits-only. See `normalise_phone()` in SQL. */
   phone: string;
+  /** Optional — checkout never asks for it; admins add it for email receipts. */
+  email: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -317,6 +319,7 @@ type CustomerInsert = {
   id?: string;
   name: string;
   phone: string;
+  email?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -605,6 +608,67 @@ type PageSeoInsert = {
 };
 type PageSeoUpdate = Partial<PageSeoInsert>;
 
+// ---------- Email templates ----------
+// Admin-editable subject + HTML body keyed by a stable `slug`. Bodies use the
+// same {{placeholder}} convention as page bodies (see src/lib/email/render.ts).
+export type EmailTemplateRow = {
+  id: string;
+  slug: string;
+  name: string;
+  subject: string;
+  body_html: string;
+  is_active: boolean;
+  /** System templates back the automatic order emails — editable, never deletable. */
+  is_system: boolean;
+  created_by: string | null;
+  modified_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+type EmailTemplateInsert = {
+  id?: string;
+  slug: string;
+  name: string;
+  subject: string;
+  body_html?: string;
+  is_active?: boolean;
+  is_system?: boolean;
+  created_by?: string | null;
+  modified_by?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+type EmailTemplateUpdate = Partial<EmailTemplateInsert>;
+
+// ---------- Email log ----------
+export type EmailLogStatus = 'sent' | 'failed' | 'logged';
+export type EmailLogRow = {
+  id: string;
+  template_slug: string | null;
+  to_email: string;
+  subject: string;
+  status: EmailLogStatus;
+  /** Resend message id when status === 'sent'. */
+  provider_id: string | null;
+  error: string | null;
+  order_id: string | null;
+  created_by: string | null;
+  created_at: string;
+};
+type EmailLogInsert = {
+  id?: string;
+  template_slug?: string | null;
+  to_email: string;
+  subject: string;
+  status: EmailLogStatus;
+  provider_id?: string | null;
+  error?: string | null;
+  order_id?: string | null;
+  created_by?: string | null;
+  created_at?: string;
+};
+type EmailLogUpdate = Partial<EmailLogInsert>;
+
 // ---------- Database root ----------
 // Each Table needs `Relationships: []` — @supabase/postgrest-js >=2.x requires
 // it to satisfy the `GenericTable` constraint, otherwise typed selects collapse
@@ -714,6 +778,18 @@ export type Database = {
         Row: PageSeoRow;
         Insert: PageSeoInsert;
         Update: PageSeoUpdate;
+        Relationships: Empty;
+      };
+      email_templates: {
+        Row: EmailTemplateRow;
+        Insert: EmailTemplateInsert;
+        Update: EmailTemplateUpdate;
+        Relationships: Empty;
+      };
+      email_log: {
+        Row: EmailLogRow;
+        Insert: EmailLogInsert;
+        Update: EmailLogUpdate;
         Relationships: Empty;
       };
     };

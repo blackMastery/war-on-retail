@@ -7,6 +7,7 @@ import { siteConfig } from '@/config/site';
 import type { OrderStatus } from '@/types/database';
 import OrderStatusActions from './OrderStatusActions';
 import OrderNotesForm from './OrderNotesForm';
+import OrderEmailPanel from './OrderEmailPanel';
 
 export const metadata = { title: 'Admin · Order' };
 export const dynamic = 'force-dynamic';
@@ -29,7 +30,7 @@ export default async function AdminOrderDetailPage({
   const { data: order } = await supabase
     .from('orders')
     .select(
-      'id, order_number, status, fulfillment_type, delivery_city, delivery_address, subtotal, discount_code, discount_amount, admin_notes, placed_at, status_updated_by, status_updated_at, customer_id, payment_method_id, customer:customers(id, name, phone), payment_method:payment_methods(name, description)',
+      'id, order_number, status, fulfillment_type, delivery_city, delivery_address, subtotal, discount_code, discount_amount, admin_notes, placed_at, status_updated_by, status_updated_at, customer_id, payment_method_id, customer:customers(id, name, phone, email), payment_method:payment_methods(name, description)',
     )
     .eq('id', id)
     .maybeSingle();
@@ -46,7 +47,7 @@ export default async function AdminOrderDetailPage({
   // so PostgREST embed inference would otherwise complain. The shape comes
   // straight from the select string above.
   const customer = order.customer as unknown as
-    | { id: string; name: string; phone: string }
+    | { id: string; name: string; phone: string; email: string | null }
     | null;
   const paymentMethod = order.payment_method as unknown as
     | { name: string; description: string | null }
@@ -123,6 +124,14 @@ export default async function AdminOrderDetailPage({
             </div>
           ) : (
             <p className="mt-3 text-sm text-gray-500">Customer record was removed.</p>
+          )}
+
+          {customer && (
+            <OrderEmailPanel
+              customerId={customer.id}
+              orderId={order.id}
+              currentEmail={customer.email}
+            />
           )}
 
           <h2 className="mt-6 font-semibold">Fulfilment</h2>

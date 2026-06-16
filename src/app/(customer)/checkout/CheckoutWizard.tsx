@@ -35,7 +35,7 @@ type StoreInfo = {
 };
 
 type WizardDraft = {
-  customer: { name: string; phone: string };
+  customer: { name: string; phone: string; email: string };
   fulfillment:
     | { type: 'delivery'; city: string; address: string }
     | { type: 'pickup' }
@@ -75,7 +75,7 @@ export default function CheckoutWizard({
 
   const [step, setStep] = useState<StepIdx>(0);
   const [draft, setDraft] = useState<WizardDraft>({
-    customer: { name: '', phone: '' },
+    customer: { name: '', phone: '', email: '' },
     fulfillment: { type: '' },
     paymentMethodId: '',
   });
@@ -112,6 +112,11 @@ export default function CheckoutWizard({
     const phone = draft.customer.phone.trim();
     if (!/^[0-9+()\-\s]{7,20}$/.test(phone)) {
       return 'Please enter a valid phone number (digits, spaces, + and ( ) allowed).';
+    }
+    // Email is optional, but if provided it must look like an email.
+    const email = draft.customer.email.trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return 'Please enter a valid email address, or leave it blank.';
     }
     return null;
   }
@@ -364,8 +369,8 @@ function StepCustomer({
   onChange,
   onApplyLookup,
 }: {
-  value: { name: string; phone: string };
-  onChange: (v: { name: string; phone: string }) => void;
+  value: { name: string; phone: string; email: string };
+  onChange: (v: { name: string; phone: string; email: string }) => void;
   onApplyLookup: (r: { name: string; delivery: { city: string; address: string } | null }) => void;
 }) {
   const uid = useId();
@@ -470,6 +475,26 @@ function StepCustomer({
           placeholder="Jane Doe"
           className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
         />
+      </div>
+      <div>
+        <label htmlFor={`${uid}-email`} className="block text-sm font-medium text-gray-700">
+          Email <span className="text-gray-400">(optional)</span>
+        </label>
+        <input
+          id={`${uid}-email`}
+          type="email"
+          autoComplete="email"
+          inputMode="email"
+          aria-describedby={`${uid}-email-hint`}
+          value={value.email}
+          onChange={(e) => onChange({ ...value, email: e.target.value })}
+          placeholder="jane@example.com"
+          className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+        />
+        <p id={`${uid}-email-hint`} className="mt-1 text-xs text-gray-500">
+          Add your email and we’ll send an order confirmation. We’ll still call or
+          WhatsApp to finalise.
+        </p>
       </div>
     </div>
   );

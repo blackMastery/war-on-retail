@@ -35,6 +35,7 @@ export const ADMIN_PAGES: AdminPage[] = [
   { key: 'brands', label: 'Brands', href: '/admin/brands', icon: '🏷' },
   { key: 'payment-methods', label: 'Payment methods', href: '/admin/payment-methods', icon: '💳' },
   { key: 'chatbot', label: 'Chatbot FAQs', href: '/admin/chatbot', icon: '🤖' },
+  { key: 'email-templates', label: 'Email templates', href: '/admin/email-templates', icon: '✉️' },
   { key: 'settings', label: 'Store settings', href: '/admin/settings', icon: '⚙️' },
   { key: 'team', label: 'Team', href: '/admin/team', icon: '🔐', superAdminOnly: true },
 ];

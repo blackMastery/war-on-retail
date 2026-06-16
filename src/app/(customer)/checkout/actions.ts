@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { sendOrderEmail } from '@/lib/email/send';
 
 /**
  * Result of the returning-customer lookup. `found:false` covers both "no such
@@ -50,6 +51,11 @@ const PlaceOrderInput = z.object({
       .string()
       .trim()
       .regex(/^[0-9+()\-\s]{7,20}$/, 'Phone must be 7–20 characters of digits / + ( ) - spaces'),
+    // Optional — the store is phone/WhatsApp-centric. When provided it powers
+    // the order-confirmation email; an empty string is treated as "not given".
+    email: z
+      .union([z.string().trim().email('Please enter a valid email address'), z.literal('')])
+      .optional(),
   }),
   fulfillment: z.discriminatedUnion('type', [
     z.object({
@@ -151,9 +157,22 @@ export async function placeOrderAction(input: PlaceOrderInputT): Promise<PlaceOr
 
   // The RPC returns `setof record` — Supabase represents this as an array of rows.
   const first = Array.isArray(data) ? data[0] : data;
-  const orderNumber = (first as { order_number?: string } | null)?.order_number;
+  const row = first as { order_id?: string; order_number?: string } | null;
+  const orderNumber = row?.order_number;
   if (!orderNumber) {
     return { error: 'Order was created but no order number returned. Please contact us.' };
   }
+
+  // Best-effort confirmation email. Fires when the customer supplied an email
+  // at checkout (or already has one on file from an admin). No-ops otherwise.
+  // Never let an email hiccup affect the placed-order result.
+  if (row?.order_id) {
+    try {
+      await sendOrderEmail({ orderId: row.order_id, slug: 'order_confirmation' });
+    } catch (err) {
+      console.error('[checkout] confirmation email failed', err);
+    }
+  }
+
   return { orderNumber };
 }
