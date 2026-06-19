@@ -4,19 +4,19 @@
 
 :root {
   --card: #ffffff;
-  --ring: #fcdf3e;
+  --ring: #ffd400;
   --input: #e5e7eb;
   --muted: #f9fafb;
   --accent: #fffbeb;
   --border: #e5e7eb;
   --radius: 0.375rem;
-  --chart-1: #DFBF0A;
+  --chart-1: #ffd400;
   --chart-2: #d97706;
   --chart-3: #b45309;
   --chart-4: #92400e;
   --chart-5: #78350f;
   --popover: #ffffff;
-  --primary: #fcdf3e;
+  --primary: #ffd400;
   --header: #000000;
   --header-foreground: #ffffff;
   --sidebar: #f9fafb;
@@ -27,12 +27,12 @@
   --background: #ffffff;
   --font-serif: Source Serif 4, serif;
   --foreground: #262626;
-  --link: #fcdf3e;
+  --link: #ffd400;
   --link-on-light: #7a6200;
   --destructive: #ef4444;
   --shadow-blur: 8px;
   --shadow-color: hsl(0 0% 0%);
-  --sidebar-ring: #fcdf3e;
+  --sidebar-ring: #ffd400;
   --shadow-spread: -1px;
   --letter-spacing: 0em;
   --shadow-opacity: 0.1;
@@ -41,7 +41,7 @@
   --card-foreground: #262626;
   --shadow-offset-x: 0px;
   --shadow-offset-y: 4px;
-  --sidebar-primary: #fcdf3e;
+  --sidebar-primary: #ffd400;
   --muted-foreground: #6b7280;
   --accent-foreground: #92400e;
   --popover-foreground: #262626;
@@ -55,32 +55,32 @@
 
 .dark {
   --card: #ffffff;
-  --ring: #fcdf3e;
+  --ring: #ffd400;
   --input: #404040;
   --muted: #262626;
   --accent: #fef9c3;
   --border: #333333;
-  --chart-1: #fcdf3e;
-  --chart-2: #e6c700;
+  --chart-1: #ffd400;
+  --chart-2: #e6bf00;
   --chart-3: #b89700;
   --chart-4: #8a7300;
   --chart-5: #5c4d00;
   --popover: #262626;
-  --primary: #fcdf3e;
+  --primary: #ffd400;
   --header: #000000;
   --header-foreground: #ffffff;
   --sidebar: #000000;
   --secondary: #1a1a1a;
   --background: #171717;
   --foreground: #f5f5f5;
-  --link: #fcdf3e;
+  --link: #ffd400;
   --link-on-light: #7a6200;
   --destructive: #ef4444;
-  --sidebar-ring: #fcdf3e;
+  --sidebar-ring: #ffd400;
   --sidebar-accent: #fef9c3;
   --sidebar-border: #333333;
   --card-foreground: #262626;
-  --sidebar-primary: #fcdf3e;
+  --sidebar-primary: #ffd400;
   --muted-foreground: #b8b8b8;
   --accent-foreground: #422006;
   --popover-foreground: #e5e5e5;

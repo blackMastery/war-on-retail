@@ -24,7 +24,7 @@ export type EmailVars = Record<string, string>;
 const RAW_HTML_VARS = new Set(['order_items']);
 
 /** Brand amber — kept in sync with tailwind `primary`. */
-const BRAND_PRIMARY = '#DFBF0A';
+const BRAND_PRIMARY = '#FFD400';
 
 /**
  * Catalogue of supported variables, surfaced in the editor as an insert palette
