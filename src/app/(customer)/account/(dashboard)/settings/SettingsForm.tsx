@@ -14,16 +14,21 @@ const inputClass =
 
 type Feedback = { kind: 'ok' | 'error'; msg: string } | null;
 
+const PHONE_RE = /^[0-9+()\-\s]{7,20}$/;
+
 export default function SettingsForm({
   email,
   initialName,
+  initialPhone,
 }: {
   email: string;
   initialName: string;
+  initialPhone: string;
 }) {
   const router = useRouter();
 
   const [name, setName] = useState(initialName);
+  const [phone, setPhone] = useState(initialPhone);
   const [nameStatus, setNameStatus] = useState<'idle' | 'pending'>('idle');
   const [nameFeedback, setNameFeedback] = useState<Feedback>(null);
 
@@ -32,31 +37,58 @@ export default function SettingsForm({
   const [pwStatus, setPwStatus] = useState<'idle' | 'pending'>('idle');
   const [pwFeedback, setPwFeedback] = useState<Feedback>(null);
 
-  async function onSaveName(e: React.FormEvent) {
+  async function onSaveProfile(e: React.FormEvent) {
     e.preventDefault();
     setNameFeedback(null);
-    const trimmed = name.trim();
-    if (!trimmed) {
+    const trimmedName = name.trim();
+    const trimmedPhone = phone.trim();
+    if (!trimmedName) {
       setNameFeedback({ kind: 'error', msg: 'Name is required.' });
+      return;
+    }
+    if (trimmedPhone && !PHONE_RE.test(trimmedPhone)) {
+      setNameFeedback({
+        kind: 'error',
+        msg: 'Enter a valid phone number (digits, spaces, + and ( ) allowed), or leave it blank.',
+      });
       return;
     }
     setNameStatus('pending');
     const supabase = createClient();
+
+    // Phone first — it may claim/rename/create the customer row that the name
+    // update below then writes to. Skipped when left blank (phone can't be
+    // cleared — it's the dedup key).
+    if (trimmedPhone && trimmedPhone !== initialPhone) {
+      const { error: phoneError } = await supabase.rpc('set_my_phone', { p_phone: trimmedPhone });
+      if (phoneError) {
+        setNameStatus('idle');
+        const taken = phoneError.message?.includes('PHONE_TAKEN');
+        setNameFeedback({
+          kind: 'error',
+          msg: taken
+            ? 'That phone number is already linked to another account.'
+            : phoneError.message,
+        });
+        return;
+      }
+    }
+
     // Auth metadata is the profile source of truth; the RPC keeps any linked
     // customer rows (what admins + receipts see) in step.
-    const { error } = await supabase.auth.updateUser({ data: { full_name: trimmed } });
+    const { error } = await supabase.auth.updateUser({ data: { full_name: trimmedName } });
     if (error) {
       setNameStatus('idle');
       setNameFeedback({ kind: 'error', msg: error.message });
       return;
     }
-    const { error: rpcError } = await supabase.rpc('update_my_profile', { p_name: trimmed });
+    const { error: rpcError } = await supabase.rpc('update_my_profile', { p_name: trimmedName });
     if (rpcError) {
       // Non-fatal: the auth name updated; surface but don't lose the success.
       console.error('[settings] update_my_profile failed', rpcError);
     }
     setNameStatus('idle');
-    setNameFeedback({ kind: 'ok', msg: 'Name updated.' });
+    setNameFeedback({ kind: 'ok', msg: 'Profile updated.' });
     router.refresh();
   }
 
@@ -89,7 +121,7 @@ export default function SettingsForm({
     <div className="space-y-6">
       <section className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="text-lg font-semibold">Profile</h2>
-        <form onSubmit={onSaveName} className="mt-4 space-y-4">
+        <form onSubmit={onSaveProfile} className="mt-4 space-y-4">
           <div>
             <label className="block text-sm font-medium text-secondary-foreground">Email</label>
             <input
@@ -113,6 +145,24 @@ export default function SettingsForm({
               onChange={(e) => setName(e.target.value)}
               className={inputClass}
             />
+          </div>
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-secondary-foreground">
+              Phone number
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              autoComplete="tel"
+              inputMode="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+592 600 0000"
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              We use this to confirm orders and prefill checkout.
+            </p>
           </div>
           <Feedback feedback={nameFeedback} />
           <button

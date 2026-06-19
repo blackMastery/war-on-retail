@@ -866,6 +866,11 @@ export type Database = {
         Args: { p_name: string };
         Returns: number;
       };
+      /** Sets the caller's phone (claims/renames/creates a customer row). Returns the normalised phone. */
+      set_my_phone: {
+        Args: { p_phone: string };
+        Returns: string;
+      };
       /** Bulk-merges localStorage wishlist slugs into the caller's account. Returns inserted count. */
       merge_wishlist: {
         Args: { p_slugs: string[] };

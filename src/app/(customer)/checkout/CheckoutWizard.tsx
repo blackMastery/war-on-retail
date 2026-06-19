@@ -43,6 +43,14 @@ type WizardDraft = {
   paymentMethodId: string;
 };
 
+/** Prefill for a signed-in shopper, resolved server-side from their account. */
+export type CheckoutPrefill = {
+  name: string;
+  phone: string;
+  email: string;
+  delivery: { city: string; address: string } | null;
+} | null;
+
 const STEPS = ['Customer', 'Checkout', 'Payment'] as const;
 type StepIdx = 0 | 1 | 2;
 
@@ -61,9 +69,11 @@ type StepIdx = 0 | 1 | 2;
 export default function CheckoutWizard({
   methods,
   storeInfo,
+  prefill = null,
 }: {
   methods: Method[];
   storeInfo: StoreInfo;
+  prefill?: CheckoutPrefill;
 }) {
   const router = useRouter();
   const hydrated = useCartHydrated();
@@ -74,11 +84,17 @@ export default function CheckoutWizard({
   const appliedDiscount = useCartStore((s) => s.appliedDiscount);
 
   const [step, setStep] = useState<StepIdx>(0);
-  const [draft, setDraft] = useState<WizardDraft>({
-    customer: { name: '', phone: '', email: '' },
-    fulfillment: { type: '' },
+  const [draft, setDraft] = useState<WizardDraft>(() => ({
+    customer: {
+      name: prefill?.name ?? '',
+      phone: prefill?.phone ?? '',
+      email: prefill?.email ?? '',
+    },
+    fulfillment: prefill?.delivery
+      ? { type: 'delivery', city: prefill.delivery.city, address: prefill.delivery.address }
+      : { type: '' },
     paymentMethodId: '',
-  });
+  }));
   const [stepError, setStepError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);

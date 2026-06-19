@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { getStoreSettings } from '@/lib/store-settings';
+import { getCustomerContext } from '@/lib/customer/auth';
 import { pageMetadata } from '@/lib/page-seo';
-import CheckoutWizard from './CheckoutWizard';
+import CheckoutWizard, { type CheckoutPrefill } from './CheckoutWizard';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +46,46 @@ export default async function CheckoutPage() {
     mapsEmbedUrl: settings.mapsEmbedUrl,
   };
 
+  // Signed-in shoppers skip the "Find my info" dance — prefill from their linked
+  // customer record (most recent) plus their last delivery address. RLS scopes
+  // both reads to this user. Guests get a null prefill and the manual flow.
+  const ctx = await getCustomerContext();
+  let prefill: CheckoutPrefill = null;
+  if (ctx) {
+    const customer = ctx.customers[0];
+    let delivery: { city: string; address: string } | null = null;
+    if (ctx.customers.length > 0) {
+      const { data: lastDelivery } = await supabase
+        .from('orders')
+        .select('delivery_city, delivery_address')
+        .in(
+          'customer_id',
+          ctx.customers.map((c) => c.id),
+        )
+        .eq('fulfillment_type', 'delivery')
+        .not('delivery_address', 'is', null)
+        .order('placed_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (lastDelivery?.delivery_address) {
+        delivery = {
+          city: lastDelivery.delivery_city ?? '',
+          address: lastDelivery.delivery_address,
+        };
+      }
+    }
+    const metaName =
+      typeof ctx.user.user_metadata?.full_name === 'string'
+        ? ctx.user.user_metadata.full_name.trim()
+        : '';
+    prefill = {
+      name: customer?.name ?? metaName,
+      phone: customer?.phone ?? '',
+      email: customer?.email ?? ctx.user.email ?? '',
+      delivery,
+    };
+  }
+
   return (
     <div className="container py-8">
       <h1 className="text-2xl font-bold sm:text-3xl">Checkout</h1>
@@ -53,7 +94,7 @@ export default async function CheckoutPage() {
         before payment.
       </p>
       <div className="mt-6">
-        <CheckoutWizard methods={paymentMethods ?? []} storeInfo={storeInfo} />
+        <CheckoutWizard methods={paymentMethods ?? []} storeInfo={storeInfo} prefill={prefill} />
       </div>
     </div>
   );
