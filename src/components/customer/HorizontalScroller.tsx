@@ -87,13 +87,13 @@ export default function HorizontalScroller({ children, ariaLabel, gap = 3 }: Pro
           popping in/out. */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-accent-500 to-transparent transition-opacity duration-200 ${
+        className={`pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-background to-transparent transition-opacity duration-200 ${
           canScrollLeft ? 'opacity-100' : 'opacity-0'
         }`}
       />
       <div
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-accent-500 to-transparent transition-opacity duration-200 ${
+        className={`pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background to-transparent transition-opacity duration-200 ${
           canScrollRight ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -104,7 +104,7 @@ export default function HorizontalScroller({ children, ariaLabel, gap = 3 }: Pro
         onClick={() => scroll(-1)}
         disabled={!canScrollLeft}
         aria-label={`Scroll ${ariaLabel} left`}
-        className={`absolute left-1 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-700 shadow-md ring-1 ring-gray-200 transition hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-0 md:flex`}
+        className={`absolute left-1 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-card text-secondary-foreground shadow-md ring-1 ring-border transition hover:bg-muted disabled:pointer-events-none disabled:opacity-0 md:flex`}
       >
         <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
       </button>
@@ -113,7 +113,7 @@ export default function HorizontalScroller({ children, ariaLabel, gap = 3 }: Pro
         onClick={() => scroll(1)}
         disabled={!canScrollRight}
         aria-label={`Scroll ${ariaLabel} right`}
-        className={`absolute right-1 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-700 shadow-md ring-1 ring-gray-200 transition hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-0 md:flex`}
+        className={`absolute right-1 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-card text-secondary-foreground shadow-md ring-1 ring-border transition hover:bg-muted disabled:pointer-events-none disabled:opacity-0 md:flex`}
       >
         <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
       </button>

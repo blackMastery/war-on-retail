@@ -114,7 +114,7 @@ export default function Chatbot({ settings }: { settings: ChatbotSettings }) {
         aria-label={open ? 'Close chat' : 'Open chat'}
         aria-expanded={open}
         aria-controls="wor-chat-panel"
-        className="fixed z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg transition-shadow hover:bg-primary-700 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+        className="fixed z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-shadow hover:opacity-90 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         style={{
           bottom: FAB_OFFSET,
           right: 'max(1.25rem, env(safe-area-inset-right, 0px))',
@@ -135,13 +135,13 @@ export default function Chatbot({ settings }: { settings: ChatbotSettings }) {
           role="dialog"
           aria-modal="true"
           aria-label="War on Retail assistant"
-          className="fixed z-50 flex w-auto flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-gray-200 focus:outline-none inset-x-4 sm:inset-x-auto sm:right-5 sm:w-[22rem] sm:max-w-[calc(100vw-2.5rem)]"
+          className="fixed z-50 flex w-auto flex-col overflow-hidden rounded-2xl bg-card shadow-2xl ring-1 ring-border focus:outline-none inset-x-4 sm:inset-x-auto sm:right-5 sm:w-[22rem] sm:max-w-[calc(100vw-2.5rem)]"
           style={{
             bottom: PANEL_OFFSET,
             height: 'min(32rem, calc(100dvh - var(--cookie-banner-height, 0px) - 7rem))',
           }}
         >
-          <header className="bg-primary-600 px-4 py-3 text-white">
+          <header className="bg-primary text-primary-foreground px-4 py-3">
             <h2 className="font-semibold">War on Retail Assistant</h2>
             <p className="text-xs opacity-90">Usually replies in seconds</p>
           </header>
@@ -151,15 +151,15 @@ export default function Chatbot({ settings }: { settings: ChatbotSettings }) {
             role="log"
             aria-live="polite"
             aria-atomic="false"
-            className="flex-1 space-y-3 overflow-y-auto overscroll-contain bg-white px-3 py-3"
+            className="flex-1 space-y-3 overflow-y-auto overscroll-contain bg-card px-3 py-3"
           >
             {messages.map((m, i) => (
               <div
                 key={i}
                 className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
                   m.role === 'user'
-                    ? 'ml-auto bg-primary-600 text-white'
-                    : 'mr-auto bg-white text-gray-900 ring-1 ring-gray-200'
+                    ? 'ml-auto bg-primary text-primary-foreground'
+                    : 'mr-auto bg-card text-foreground ring-1 ring-border'
                 }`}
               >
                 {m.content}
@@ -168,7 +168,7 @@ export default function Chatbot({ settings }: { settings: ChatbotSettings }) {
             {sending && (
               <div
                 aria-label="Assistant is typing"
-                className="mr-auto rounded-2xl bg-white px-3 py-2 text-sm text-gray-500 ring-1 ring-gray-200"
+                className="mr-auto rounded-2xl bg-card px-3 py-2 text-sm text-muted-foreground ring-1 ring-border"
               >
                 <span aria-hidden="true">…</span>
                 <span className="sr-only">Assistant is typing…</span>
@@ -181,7 +181,7 @@ export default function Chatbot({ settings }: { settings: ChatbotSettings }) {
               e.preventDefault();
               send();
             }}
-            className="flex items-center gap-2 border-t border-gray-200 bg-white p-2"
+            className="flex items-center gap-2 border-t border-border bg-card p-2"
           >
             <label htmlFor="wor-chat-input" className="sr-only">
               Message
@@ -196,13 +196,13 @@ export default function Chatbot({ settings }: { settings: ChatbotSettings }) {
               placeholder="Type your message…"
               autoComplete="off"
               enterKeyHint="send"
-              className="flex-1 rounded-full border border-gray-300 px-3 py-2.5 text-base focus:border-primary-500 focus:ring-primary-500 sm:py-2 sm:text-sm"
+              className="flex-1 rounded-full border border-border px-3 py-2.5 text-base focus:border-ring focus:ring-ring sm:py-2 sm:text-sm"
               disabled={sending}
             />
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="flex min-h-11 min-w-11 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-full bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50"
               aria-label="Send message"
             >
               <PaperAirplaneIcon className="h-4 w-4" aria-hidden="true" />

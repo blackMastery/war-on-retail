@@ -8,7 +8,7 @@ import type { EmailTemplateRow } from '@/types/database';
 
 const initial: TemplateFormState = {};
 const INPUT =
-  'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm';
+  'mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm';
 
 export default function EmailTemplateForm({
   template,
@@ -30,11 +30,11 @@ export default function EmailTemplateForm({
         <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{state.error}</div>
       )}
 
-      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Basics</h2>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">Name</span>
+          <span className="font-medium text-secondary-foreground">Name</span>
           <input
             name="name"
             required
@@ -46,9 +46,9 @@ export default function EmailTemplateForm({
         </label>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">
+          <span className="font-medium text-secondary-foreground">
             Slug{' '}
-            <span className="font-normal text-gray-500">
+            <span className="font-normal text-muted-foreground">
               {template ? '(fixed)' : '(optional)'}
             </span>
           </span>
@@ -56,7 +56,7 @@ export default function EmailTemplateForm({
             <input
               value={template.slug}
               readOnly
-              className={`${INPUT} bg-gray-50 font-mono text-gray-500`}
+              className={`${INPUT} bg-muted font-mono text-muted-foreground`}
             />
           ) : (
             <input
@@ -65,7 +65,7 @@ export default function EmailTemplateForm({
               className={INPUT}
             />
           )}
-          <span className="mt-1 block text-xs text-gray-500">
+          <span className="mt-1 block text-xs text-muted-foreground">
             {isSystem
               ? 'System template — used to send the automatic order email of the same name. Editable, but cannot be renamed or deleted.'
               : 'Stable key used to reference this template in code/sends. Cannot be changed after creation.'}
@@ -74,7 +74,7 @@ export default function EmailTemplateForm({
         </label>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">Subject</span>
+          <span className="font-medium text-secondary-foreground">Subject</span>
           <input
             name="subject"
             required
@@ -83,7 +83,7 @@ export default function EmailTemplateForm({
             placeholder="We received your order {{order_number}}"
             className={INPUT}
           />
-          <span className="mt-1 block text-xs text-gray-500">
+          <span className="mt-1 block text-xs text-muted-foreground">
             You can use variables here too, e.g. <code>{'{{order_number}}'}</code>.
           </span>
           {err('subject') && (
@@ -96,13 +96,13 @@ export default function EmailTemplateForm({
             type="checkbox"
             name="is_active"
             defaultChecked={template?.is_active ?? true}
-            className="rounded text-primary-600"
+            className="rounded text-primary"
           />
           Active (system templates only auto-send when active)
         </label>
       </section>
 
-      <section className="space-y-3 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-3 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Email body</h2>
         <EmailHtmlEditor
           name="body_html"
@@ -112,11 +112,11 @@ export default function EmailTemplateForm({
         />
       </section>
 
-      <div className="flex items-center justify-end gap-2 border-t border-gray-200 pt-4">
+      <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-primary-600 px-5 py-2 font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+          className="rounded-md bg-primary text-primary-foreground px-5 py-2 font-semibold hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Saving…' : template ? 'Save changes' : 'Create template'}
         </button>

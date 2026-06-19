@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { ADMIN_ALERT_ON_CARD } from '@/lib/admin/tokens';
 
 const MIN_LEN = 8;
 
@@ -42,7 +43,7 @@ export default function ResetPasswordForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="new-password" className="block text-sm font-medium text-secondary-foreground">
           New password
         </label>
         <input
@@ -53,12 +54,12 @@ export default function ResetPasswordForm() {
           minLength={MIN_LEN}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          className="mt-1 w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
         />
-        <p className="mt-1 text-xs text-gray-500">At least {MIN_LEN} characters.</p>
+        <p className="mt-1 text-xs text-muted-foreground">At least {MIN_LEN} characters.</p>
       </div>
       <div>
-        <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="confirm-password" className="block text-sm font-medium text-secondary-foreground">
           Confirm new password
         </label>
         <input
@@ -69,16 +70,16 @@ export default function ResetPasswordForm() {
           minLength={MIN_LEN}
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          className="mt-1 w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
         />
       </div>
       {status === 'error' && (
-        <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{errorMsg}</p>
+        <p className={ADMIN_ALERT_ON_CARD.error}>{errorMsg}</p>
       )}
       <button
         type="submit"
         disabled={status === 'pending'}
-        className="w-full rounded-md bg-primary-600 px-4 py-2 font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
+        className="w-full rounded-md bg-primary text-primary-foreground px-4 py-2 font-semibold shadow-sm hover:opacity-90 disabled:opacity-60"
       >
         {status === 'pending' ? 'Saving…' : 'Save and continue'}
       </button>

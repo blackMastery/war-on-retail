@@ -83,21 +83,21 @@ export default function CookieNotice() {
       role="dialog"
       aria-labelledby="cookie-notice-title"
       aria-describedby="cookie-notice-body"
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card shadow-lg"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="container flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="flex-1">
-          <p id="cookie-notice-title" className="text-sm font-semibold text-gray-900">
+          <p id="cookie-notice-title" className="text-sm font-semibold text-foreground">
             Cookies &amp; privacy
           </p>
-          <p id="cookie-notice-body" className="mt-1 text-xs text-gray-600">
+          <p id="cookie-notice-body" className="mt-1 text-xs text-muted-foreground">
             We use browser storage to remember your cart, wishlist, and recently viewed items.
             Our chat assistant logs conversations so we can improve replies. We don't use
             third-party tracking cookies.{' '}
             <Link
               href="/policies/privacy"
-              className="font-medium text-primary-600 hover:underline"
+              className="font-medium text-link-on-light hover:underline"
             >
               Read our privacy policy →
             </Link>
@@ -107,7 +107,7 @@ export default function CookieNotice() {
           type="button"
           onClick={dismiss}
           aria-label="Dismiss privacy notice"
-          className="inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-md bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700 sm:w-auto sm:shrink-0"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-md bg-primary text-primary-foreground px-5 py-2 text-sm font-semibold hover:opacity-90 sm:w-auto sm:shrink-0"
         >
           <span className="sm:hidden">Got it</span>
           <span className="hidden sm:inline">Dismiss Privacy Notice</span>

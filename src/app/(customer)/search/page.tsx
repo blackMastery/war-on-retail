@@ -49,10 +49,10 @@ export default async function SearchPage({
   return (
     <div className="container py-10">
       <h1 className="text-2xl font-bold">Search results</h1>
-      <p className="mt-1 text-sm text-gray-600 tabular-nums">
+      <p className="mt-1 text-sm text-muted-foreground tabular-nums">
         {q ? (
           <>
-            Showing matches for <span className="font-medium text-gray-900">“{q}”</span>
+            Showing matches for <span className="font-medium text-foreground">“{q}”</span>
             {pag.count > 0 && pag.count <= PAGE_SIZE && ` — ${pag.count} found`}
             {pag.count > PAGE_SIZE && ` — ${pag.firstIdx}–${pag.lastIdx} of ${pag.count}`}
           </>

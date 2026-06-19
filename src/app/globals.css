@@ -3,27 +3,171 @@
 @tailwind utilities;
 
 :root {
-  --background: 255 215 0;
-  --foreground: 17 24 39;
-  color-scheme: light;
+  --card: #ffffff;
+  --ring: #fcdf3e;
+  --input: #e5e7eb;
+  --muted: #f9fafb;
+  --accent: #fffbeb;
+  --border: #e5e7eb;
+  --radius: 0.375rem;
+  --chart-1: #DFBF0A;
+  --chart-2: #d97706;
+  --chart-3: #b45309;
+  --chart-4: #92400e;
+  --chart-5: #78350f;
+  --popover: #ffffff;
+  --primary: #fcdf3e;
+  --header: #000000;
+  --header-foreground: #ffffff;
+  --sidebar: #f9fafb;
+  --spacing: 0.25rem;
+  --font-mono: JetBrains Mono, monospace;
+  --font-sans: Inter, sans-serif;
+  --secondary: #f3f4f6;
+  --background: #ffffff;
+  --font-serif: Source Serif 4, serif;
+  --foreground: #262626;
+  --link: #fcdf3e;
+  --link-on-light: #7a6200;
+  --destructive: #ef4444;
+  --shadow-blur: 8px;
+  --shadow-color: hsl(0 0% 0%);
+  --sidebar-ring: #fcdf3e;
+  --shadow-spread: -1px;
+  --letter-spacing: 0em;
+  --shadow-opacity: 0.1;
+  --sidebar-accent: #fffbeb;
+  --sidebar-border: #e5e7eb;
+  --card-foreground: #262626;
+  --shadow-offset-x: 0px;
+  --shadow-offset-y: 4px;
+  --sidebar-primary: #fcdf3e;
+  --muted-foreground: #6b7280;
+  --accent-foreground: #92400e;
+  --popover-foreground: #262626;
+  --primary-foreground: #000000;
+  --sidebar-foreground: #262626;
+  --secondary-foreground: #4b5563;
+  --destructive-foreground: #ffffff;
+  --sidebar-accent-foreground: #92400e;
+  --sidebar-primary-foreground: #ffffff;
+}
+
+.dark {
+  --card: #ffffff;
+  --ring: #fcdf3e;
+  --input: #404040;
+  --muted: #262626;
+  --accent: #fef9c3;
+  --border: #333333;
+  --chart-1: #fcdf3e;
+  --chart-2: #e6c700;
+  --chart-3: #b89700;
+  --chart-4: #8a7300;
+  --chart-5: #5c4d00;
+  --popover: #262626;
+  --primary: #fcdf3e;
+  --header: #000000;
+  --header-foreground: #ffffff;
+  --sidebar: #000000;
+  --secondary: #1a1a1a;
+  --background: #171717;
+  --foreground: #f5f5f5;
+  --link: #fcdf3e;
+  --link-on-light: #7a6200;
+  --destructive: #ef4444;
+  --sidebar-ring: #fcdf3e;
+  --sidebar-accent: #fef9c3;
+  --sidebar-border: #333333;
+  --card-foreground: #262626;
+  --sidebar-primary: #fcdf3e;
+  --muted-foreground: #b8b8b8;
+  --accent-foreground: #422006;
+  --popover-foreground: #e5e5e5;
+  --primary-foreground: #000000;
+  --sidebar-foreground: #e5e5e5;
+  --secondary-foreground: #e8e8e8;
+  --destructive-foreground: #ffffff;
+  --sidebar-accent-foreground: #422006;
+  --sidebar-primary-foreground: #000000;
 }
 
 @layer base {
   html {
     @apply antialiased;
     overflow-x: clip;
+    color-scheme: dark;
     /* Kills the 300ms tap delay on iOS for every link/button. */
     touch-action: manipulation;
   }
   body {
-    @apply bg-accent-500 text-gray-900;
+    @apply bg-background text-foreground;
     overflow-x: clip;
     /* Bottom inset for home indicator; top handled by sticky Header. */
     padding-bottom: env(safe-area-inset-bottom);
   }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--muted-foreground);
+    opacity: 1;
+  }
+  .dark input:not([type='checkbox']):not([type='radio']):not([type='submit']):not([type='button']):not([type='file']),
+  .dark textarea,
+  .dark select {
+    background-color: var(--card);
+    color: var(--card-foreground);
+  }
   /* Honest focus rings for keyboard users. */
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-primary-600;
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+  /* White card surfaces stay readable on the dark page background. */
+  .dark .bg-card,
+  .dark [class*='bg-card/'] {
+    --border: #e5e7eb;
+    --input: #e5e7eb;
+    --muted-foreground: #525252;
+    --secondary-foreground: #404040;
+    --foreground: #262626;
+    color: var(--card-foreground);
+  }
+  .dark .bg-card .text-foreground,
+  .dark [class*='bg-card/'] .text-foreground {
+    color: var(--card-foreground);
+  }
+  /* Black header/footer chrome — brighter supporting text. */
+  .dark .bg-header {
+    --muted-foreground: #c8c8c8;
+    --secondary-foreground: #e8e8e8;
+    color: var(--header-foreground);
+  }
+  /* Elevated dark bands (featured products, etc.). */
+  .dark .bg-secondary {
+    --muted-foreground: #c4c4c4;
+    --secondary-foreground: #e8e8e8;
+  }
+  /* Muted wells on the dark page (image placeholders, skeletons). */
+  .dark .bg-muted {
+    --muted-foreground: #d4d4d4;
+  }
+  /* Light wells inside white cards (table headers, chat snippets, etc.). */
+  .dark .bg-card .bg-muted,
+  .dark [class*='bg-card/'] .bg-muted {
+    background-color: #f3f4f6;
+    --foreground: #262626;
+    --muted-foreground: #525252;
+    --secondary-foreground: #404040;
+    color: var(--card-foreground);
+  }
+  /* Admin sidebar chrome — dark rail with readable supporting text. */
+  .dark .bg-sidebar {
+    --muted-foreground: #a3a3a3;
+    --secondary-foreground: #d4d4d4;
+    color: var(--sidebar-foreground);
+  }
+  ::selection {
+    background-color: color-mix(in srgb, var(--primary) 35%, transparent);
+    color: var(--foreground);
   }
 }
 
@@ -52,6 +196,35 @@
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome/Safari */
+  }
+}
+
+/* Markdown / long-form content on the dark storefront background. */
+@layer components {
+  .prose-theme {
+    @apply prose max-w-none;
+    --tw-prose-body: var(--secondary-foreground);
+    --tw-prose-headings: var(--foreground);
+    --tw-prose-lead: var(--secondary-foreground);
+    --tw-prose-links: var(--link);
+    --tw-prose-bold: var(--foreground);
+    --tw-prose-counters: var(--muted-foreground);
+    --tw-prose-bullets: var(--muted-foreground);
+    --tw-prose-hr: var(--border);
+    --tw-prose-quotes: var(--secondary-foreground);
+    --tw-prose-quote-borders: var(--border);
+    --tw-prose-captions: var(--muted-foreground);
+    --tw-prose-code: var(--foreground);
+    --tw-prose-pre-code: var(--foreground);
+    --tw-prose-pre-bg: var(--muted);
+    --tw-prose-th-borders: var(--border);
+    --tw-prose-td-borders: var(--border);
+  }
+  .prose-theme :where(a):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+  }
+  .prose-theme :where(a:hover):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    color: var(--link);
   }
 }
 

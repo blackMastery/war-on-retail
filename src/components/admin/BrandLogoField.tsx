@@ -44,7 +44,7 @@ export default function BrandLogoField({ initialUrl }: Props) {
       {url ? (
         <div className="space-y-2">
           <div
-            className="relative aspect-[3/2] overflow-hidden rounded-md ring-1 ring-gray-200"
+            className="relative aspect-[3/2] overflow-hidden rounded-md ring-1 ring-border"
             style={{
               backgroundImage:
                 'linear-gradient(45deg, #f3f4f6 25%, transparent 25%), linear-gradient(-45deg, #f3f4f6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f3f4f6 75%), linear-gradient(-45deg, transparent 75%, #f3f4f6 75%)',
@@ -58,7 +58,7 @@ export default function BrandLogoField({ initialUrl }: Props) {
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="rounded-md border border-gray-300 px-3 py-1.5 font-medium hover:bg-gray-50"
+              className="rounded-md border border-border px-3 py-1.5 font-medium hover:bg-muted"
             >
               Replace
             </button>
@@ -74,11 +74,11 @@ export default function BrandLogoField({ initialUrl }: Props) {
       ) : (
         <label
           htmlFor="brand-logo-input"
-          className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-600 transition hover:border-primary-400 hover:bg-primary-50"
+          className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted px-4 py-8 text-center text-sm text-muted-foreground transition hover:border-primary hover:bg-accent"
         >
           <div>
-            <p className="font-medium text-gray-700">Click to upload brand logo</p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="font-medium text-secondary-foreground">Click to upload brand logo</p>
+            <p className="mt-1 text-xs text-muted-foreground">
               PNG with transparency preferred. Up to 5&nbsp;MB.
             </p>
           </div>
@@ -96,7 +96,7 @@ export default function BrandLogoField({ initialUrl }: Props) {
 
       {error && <p className="rounded-md bg-red-50 p-2 text-xs text-red-700">{error}</p>}
       {pending && (
-        <p className="text-xs text-gray-500" aria-live="polite">
+        <p className="text-xs text-muted-foreground" aria-live="polite">
           Uploading…
         </p>
       )}

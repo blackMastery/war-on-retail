@@ -81,9 +81,9 @@ export default function SpecificationsField({ initial }: Props) {
       <input type="hidden" name="specifications_json" value={serialised} />
 
       {rows.length === 0 ? (
-        <p className="rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-4 text-sm text-gray-500">
+        <p className="rounded-md border border-dashed border-border bg-muted px-3 py-4 text-sm text-muted-foreground">
           No specs yet. Add the technical details that matter — they’ll appear in the{' '}
-          <strong className="font-semibold text-gray-700">Specifications</strong> table on the
+          <strong className="font-semibold text-secondary-foreground">Specifications</strong> table on the
           product page.
         </p>
       ) : (
@@ -92,7 +92,7 @@ export default function SpecificationsField({ initial }: Props) {
             const isDupe = row.key.trim() !== '' && dupes.has(row.key.trim().toLowerCase());
             return (
               <li key={row.id} className="flex items-center gap-2">
-                <span className="w-6 shrink-0 text-right text-xs tabular-nums text-gray-400">
+                <span className="w-6 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
                   {idx + 1}.
                 </span>
                 <input
@@ -101,10 +101,10 @@ export default function SpecificationsField({ initial }: Props) {
                   onChange={(e) => updateRow(row.id, { key: e.target.value })}
                   placeholder="e.g. Screen size"
                   aria-label={`Specification ${idx + 1} name`}
-                  className={`w-2/5 rounded-md text-sm shadow-sm focus:ring-primary-500 ${
+                  className={`w-2/5 rounded-md text-sm shadow-sm focus:ring-ring ${
                     isDupe
                       ? 'border-orange-400 focus:border-orange-500 focus:ring-orange-500'
-                      : 'border-gray-300 focus:border-primary-500'
+                      : 'border-border focus:border-ring'
                   }`}
                 />
                 <input
@@ -113,7 +113,7 @@ export default function SpecificationsField({ initial }: Props) {
                   onChange={(e) => updateRow(row.id, { value: e.target.value })}
                   placeholder="e.g. 55 inches"
                   aria-label={`Specification ${idx + 1} value`}
-                  className="min-w-0 flex-1 rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  className="min-w-0 flex-1 rounded-md border-border text-sm shadow-sm focus:border-ring focus:ring-ring"
                 />
                 <div className="flex shrink-0 items-center">
                   <IconButton
@@ -154,11 +154,11 @@ export default function SpecificationsField({ initial }: Props) {
         <button
           type="button"
           onClick={() => addRow()}
-          className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+          className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-muted"
         >
           + Add specification
         </button>
-        <span className="text-xs text-gray-500" aria-hidden="true">
+        <span className="text-xs text-muted-foreground" aria-hidden="true">
           or quick-add:
         </span>
         {QUICK_ADD_KEYS.map((k) => (
@@ -166,7 +166,7 @@ export default function SpecificationsField({ initial }: Props) {
             key={k}
             type="button"
             onClick={() => addRow(k)}
-            className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-700 hover:bg-primary-50 hover:text-primary-700"
+            className="rounded-full bg-muted px-2.5 py-1 text-xs text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
           >
             + {k}
           </button>
@@ -238,9 +238,9 @@ function IconButton({
       title={label}
       className={`rounded-full p-1.5 ${
         danger
-          ? 'text-gray-400 hover:bg-red-50 hover:text-red-600'
-          : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'
-      } disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400`}
+          ? 'text-muted-foreground hover:bg-red-50 hover:text-red-600'
+          : 'text-muted-foreground hover:bg-muted hover:text-secondary-foreground'
+      } disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted-foreground`}
     >
       {children}
     </button>

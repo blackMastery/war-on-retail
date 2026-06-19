@@ -94,8 +94,8 @@ export default function CheckoutWizard({
   if (!hydrated) {
     return (
       <div className="animate-pulse space-y-4">
-        <div className="h-12 rounded-md bg-gray-100" />
-        <div className="h-48 rounded-md bg-gray-100" />
+        <div className="h-12 rounded-md bg-muted" />
+        <div className="h-48 rounded-md bg-muted" />
       </div>
     );
   }
@@ -187,7 +187,7 @@ export default function CheckoutWizard({
       <div>
         <StepBar step={step} onStepClick={(s) => goTo(s)} />
 
-        <div className="mt-6 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200 sm:p-6">
+        <div className="mt-6 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border sm:p-6">
           {/* Each step fades/slides as you advance; mode="wait" so the leaving
               step finishes before the next enters. */}
           <AnimatePresence mode="wait" initial={false}>
@@ -249,7 +249,7 @@ export default function CheckoutWizard({
               <button
                 type="button"
                 onClick={() => goTo((step - 1) as StepIdx)}
-                className="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900"
+                className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
                 Back
@@ -257,7 +257,7 @@ export default function CheckoutWizard({
             ) : (
               <Link
                 href="/cart"
-                className="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900"
+                className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
                 Back to cart
@@ -268,7 +268,7 @@ export default function CheckoutWizard({
               <button
                 type="button"
                 onClick={handleNext}
-                className="inline-flex items-center gap-1 rounded-md bg-primary-600 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-primary-700"
+                className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-5 py-2.5 font-semibold shadow-sm hover:opacity-90"
               >
                 Continue
                 <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
@@ -278,7 +278,7 @@ export default function CheckoutWizard({
                 type="button"
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="inline-flex items-center gap-2 rounded-md bg-primary-600 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-5 py-2.5 font-semibold shadow-sm hover:opacity-90 disabled:opacity-60"
               >
                 {submitting ? 'Placing order…' : 'Place order'}
               </button>
@@ -310,7 +310,7 @@ function StepBar({
   return (
     <ol
       aria-label="Checkout progress"
-      className="flex flex-col gap-2 rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-200 sm:flex-row sm:items-stretch sm:gap-0"
+      className="flex flex-col gap-2 rounded-lg bg-card p-3 shadow-sm ring-1 ring-border sm:flex-row sm:items-stretch sm:gap-0"
     >
       {STEPS.map((label, i) => {
         const isCurrent = i === step;
@@ -328,29 +328,29 @@ function StepBar({
               disabled={!reachable}
               className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition ${
                 isCurrent
-                  ? 'bg-primary-50'
+                  ? 'bg-accent'
                   : reachable
-                    ? 'hover:bg-gray-50'
+                    ? 'hover:bg-muted'
                     : 'cursor-not-allowed opacity-60'
               }`}
             >
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                   isDone
-                    ? 'bg-primary-600 text-white'
+                    ? 'bg-primary text-primary-foreground'
                     : isCurrent
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-gray-200 text-gray-700'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-secondary-foreground'
                 }`}
                 aria-hidden="true"
               >
                 {isDone ? <CheckCircleIcon className="h-5 w-5" /> : i + 1}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-xs uppercase tracking-wide text-gray-500">
+                <span className="block text-xs uppercase tracking-wide text-muted-foreground">
                   Step {i + 1}
                 </span>
-                <span className="block text-sm font-semibold text-gray-900">
+                <span className="block text-sm font-semibold text-foreground">
                   {label}
                 </span>
               </span>
@@ -410,18 +410,18 @@ function StepCustomer({
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-bold text-gray-900">Tell us who you are</h2>
-        <p className="mt-1 text-sm text-gray-600">
+        <h2 className="text-lg font-bold text-foreground">Tell us who you are</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           We use this to confirm the order and arrange delivery or pickup. No
           account needed.
         </p>
-        <p className="mt-1 text-xs text-gray-500">
-          <span className="text-primary-600" aria-hidden="true">*</span> indicates a required field.
+        <p className="mt-1 text-xs text-muted-foreground">
+          <span className="text-destructive" aria-hidden="true">*</span> indicates a required field.
         </p>
       </div>
       <div>
-        <label htmlFor={`${uid}-phone`} className="block text-sm font-medium text-gray-700">
-          Phone number <span className="text-primary-600" aria-hidden="true">*</span>
+        <label htmlFor={`${uid}-phone`} className="block text-sm font-medium text-secondary-foreground">
+          Phone number <span className="text-destructive" aria-hidden="true">*</span>
         </label>
         <div className="mt-1 flex gap-2">
           <input
@@ -438,7 +438,7 @@ function StepCustomer({
               if (hint) setHint(null);
             }}
             placeholder="+592 600 0000"
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            className="w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
           />
           <button
             type="button"
@@ -446,19 +446,19 @@ function StepCustomer({
             disabled={looking}
             aria-busy={looking}
             aria-label="Find my saved info by phone number"
-            className="shrink-0 rounded-md border border-primary-600 px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50 disabled:opacity-50"
+            className="shrink-0 rounded-md border border-primary px-3 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent disabled:opacity-50"
           >
             {looking ? 'Looking…' : 'Find my info'}
           </button>
         </div>
         <p
           id={`${uid}-phone-hint`}
-          className="mt-1 text-xs text-gray-500"
+          className="mt-1 text-xs text-muted-foreground"
           role="status"
           aria-live="polite"
         >
           {hint ? (
-            <span className={hint.tone === 'success' ? 'font-medium text-green-700' : 'text-gray-500'}>
+            <span className={hint.tone === 'success' ? 'font-medium text-green-700' : 'text-muted-foreground'}>
               {hint.text}
             </span>
           ) : (
@@ -467,8 +467,8 @@ function StepCustomer({
         </p>
       </div>
       <div>
-        <label htmlFor={`${uid}-name`} className="block text-sm font-medium text-gray-700">
-          Full name <span className="text-primary-600" aria-hidden="true">*</span>
+        <label htmlFor={`${uid}-name`} className="block text-sm font-medium text-secondary-foreground">
+          Full name <span className="text-destructive" aria-hidden="true">*</span>
         </label>
         <input
           id={`${uid}-name`}
@@ -479,12 +479,12 @@ function StepCustomer({
           value={value.name}
           onChange={(e) => onChange({ ...value, name: e.target.value })}
           placeholder="Jane Doe"
-          className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          className="mt-1 w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
         />
       </div>
       <div>
-        <label htmlFor={`${uid}-email`} className="block text-sm font-medium text-gray-700">
-          Email <span className="text-gray-400">(optional)</span>
+        <label htmlFor={`${uid}-email`} className="block text-sm font-medium text-secondary-foreground">
+          Email <span className="text-muted-foreground">(optional)</span>
         </label>
         <input
           id={`${uid}-email`}
@@ -495,9 +495,9 @@ function StepCustomer({
           value={value.email}
           onChange={(e) => onChange({ ...value, email: e.target.value })}
           placeholder="jane@example.com"
-          className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          className="mt-1 w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
         />
-        <p id={`${uid}-email-hint`} className="mt-1 text-xs text-gray-500">
+        <p id={`${uid}-email-hint`} className="mt-1 text-xs text-muted-foreground">
           {emailOnFile && value.email.trim() === '' ? (
             <span className="font-medium text-green-700">
               We have {emailOnFile} on file — leave blank to keep it, or enter a
@@ -530,8 +530,8 @@ function StepFulfillment({
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-bold text-gray-900">How would you like to receive it?</h2>
-        <p className="mt-1 text-sm text-gray-600">
+        <h2 className="text-lg font-bold text-foreground">How would you like to receive it?</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Delivery to your door, or pick it up in person — your choice.
         </p>
       </div>
@@ -566,15 +566,15 @@ function StepFulfillment({
       </div>
 
       {value.type === 'delivery' && (
-        <fieldset className="space-y-3 rounded-md bg-gray-50 p-4 ring-1 ring-gray-200">
-          <legend className="px-1 text-sm font-semibold text-gray-900">Delivery address</legend>
-          <p className="text-sm text-gray-600">
-            <span className="font-semibold text-gray-900">Same-day in Georgetown.</span>{' '}
+        <fieldset className="space-y-3 rounded-md bg-muted p-4 ring-1 ring-border">
+          <legend className="px-1 text-sm font-semibold text-foreground">Delivery address</legend>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">Same-day in Georgetown.</span>{' '}
             2–5 days nationwide. We confirm a delivery window when we call.
           </p>
           <div>
-            <label htmlFor={`${uid}-city`} className="block text-sm font-medium text-gray-700">
-              City / town <span className="text-primary-600" aria-hidden="true">*</span>
+            <label htmlFor={`${uid}-city`} className="block text-sm font-medium text-secondary-foreground">
+              City / town <span className="text-destructive" aria-hidden="true">*</span>
             </label>
             <input
               id={`${uid}-city`}
@@ -585,12 +585,12 @@ function StepFulfillment({
               value={value.city}
               onChange={(e) => onChange({ ...value, city: e.target.value })}
               placeholder="Georgetown"
-              className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+              className="mt-1 w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
             />
           </div>
           <div>
-            <label htmlFor={`${uid}-address`} className="block text-sm font-medium text-gray-700">
-              Street address <span className="text-primary-600" aria-hidden="true">*</span>
+            <label htmlFor={`${uid}-address`} className="block text-sm font-medium text-secondary-foreground">
+              Street address <span className="text-destructive" aria-hidden="true">*</span>
             </label>
             <textarea
               id={`${uid}-address`}
@@ -601,7 +601,7 @@ function StepFulfillment({
               value={value.address}
               onChange={(e) => onChange({ ...value, address: e.target.value })}
               placeholder="House number, street, ward, landmarks…"
-              className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+              className="mt-1 w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
             />
           </div>
         </fieldset>
@@ -616,12 +616,12 @@ function StepFulfillment({
 
 function PickupCard({ storeInfo }: { storeInfo: StoreInfo }) {
   return (
-    <div className="space-y-3 rounded-md bg-gray-50 p-4 ring-1 ring-gray-200">
-      <p className="text-sm text-gray-600">
-        <span className="font-semibold text-gray-900">Skip the delivery fee.</span>{' '}
+    <div className="space-y-3 rounded-md bg-muted p-4 ring-1 ring-border">
+      <p className="text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">Skip the delivery fee.</span>{' '}
         Come grab it during opening hours.
       </p>
-      <div className="overflow-hidden rounded-md ring-1 ring-gray-200">
+      <div className="overflow-hidden rounded-md ring-1 ring-border">
         <iframe
           src={storeInfo.mapsEmbedUrl}
           width="100%"
@@ -634,12 +634,12 @@ function PickupCard({ storeInfo }: { storeInfo: StoreInfo }) {
       </div>
       <dl className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
         <div>
-          <dt className="font-semibold text-gray-900">Address</dt>
-          <dd className="text-gray-700">{storeInfo.address}</dd>
+          <dt className="font-semibold text-foreground">Address</dt>
+          <dd className="text-secondary-foreground">{storeInfo.address}</dd>
         </div>
         <div>
-          <dt className="font-semibold text-gray-900">Hours</dt>
-          <dd className="text-gray-700">
+          <dt className="font-semibold text-foreground">Hours</dt>
+          <dd className="text-secondary-foreground">
             {storeInfo.hours.weekdays}
             <br />
             {storeInfo.hours.saturday}
@@ -648,17 +648,17 @@ function PickupCard({ storeInfo }: { storeInfo: StoreInfo }) {
           </dd>
         </div>
         <div>
-          <dt className="font-semibold text-gray-900">Call</dt>
+          <dt className="font-semibold text-foreground">Call</dt>
           <dd>
-            <a href={`tel:${storeInfo.phone}`} className="text-primary-600 hover:underline">
+            <a href={`tel:${storeInfo.phone}`} className="text-primary hover:underline">
               {storeInfo.phone}
             </a>
           </dd>
         </div>
         <div>
-          <dt className="font-semibold text-gray-900">Email</dt>
+          <dt className="font-semibold text-foreground">Email</dt>
           <dd>
-            <a href={`mailto:${storeInfo.email}`} className="text-primary-600 hover:underline">
+            <a href={`mailto:${storeInfo.email}`} className="text-primary hover:underline">
               {storeInfo.email}
             </a>
           </dd>
@@ -691,8 +691,8 @@ function StepPayment({
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-bold text-gray-900">How would you like to pay?</h2>
-        <p className="mt-1 text-sm text-gray-600">
+        <h2 className="text-lg font-bold text-foreground">How would you like to pay?</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           We don't charge anything online. Our team will share the relevant
           details (MMG number, bank account, etc.) when we confirm the order.
         </p>
@@ -709,7 +709,7 @@ function StepPayment({
             key={m.id}
             htmlFor={`${uid}-${m.id}`}
             className={`flex cursor-pointer items-start gap-3 rounded-md border p-4 ${
-              value === m.id ? 'border-primary-600 bg-primary-50' : 'border-gray-300 hover:bg-gray-50'
+              value === m.id ? 'border-primary bg-accent' : 'border-border hover:bg-muted'
             }`}
           >
             <input
@@ -719,12 +719,12 @@ function StepPayment({
               value={m.id}
               checked={value === m.id}
               onChange={() => onChange(m.id)}
-              className="mt-1 h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500"
+              className="mt-1 h-4 w-4 border-border text-primary focus:ring-ring"
             />
             <span className="min-w-0 flex-1">
-              <span className="block font-semibold text-gray-900">{m.name}</span>
+              <span className="block font-semibold text-foreground">{m.name}</span>
               {m.description && (
-                <span className="mt-0.5 block text-sm text-gray-600">{m.description}</span>
+                <span className="mt-0.5 block text-sm text-muted-foreground">{m.description}</span>
               )}
             </span>
           </label>
@@ -753,12 +753,12 @@ function OrderSummary({
   const hasPreOrder = items.some((i) => i.isPreOrder);
   return (
     <aside className="lg:sticky lg:top-32 lg:self-start">
-      <div className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <div className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="text-lg font-bold">Order summary</h2>
-        <ul role="list" className="divide-y divide-gray-200">
+        <ul role="list" className="divide-y divide-border">
           {items.map((item) => (
             <li key={item.productId} className="flex gap-3 py-3">
-              <span className="relative block h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100 ring-1 ring-gray-200">
+              <span className="relative block h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border">
                 {item.imageUrl ? (
                   <Image
                     src={item.imageUrl}
@@ -770,15 +770,15 @@ function OrderSummary({
                 ) : (
                   <span
                     aria-hidden="true"
-                    className="flex h-full w-full items-center justify-center text-xl text-gray-300"
+                    className="flex h-full w-full items-center justify-center text-xl text-muted-foreground"
                   >
                     📦
                   </span>
                 )}
               </span>
               <span className="min-w-0 flex-1 text-sm">
-                <span className="line-clamp-2 font-medium text-gray-900">{item.name}</span>
-                <span className="block text-xs text-gray-500 tabular-nums">
+                <span className="line-clamp-2 font-medium text-foreground">{item.name}</span>
+                <span className="block text-xs text-muted-foreground tabular-nums">
                   Qty {item.quantity} · {formatPrice(item.price)}
                 </span>
                 {item.isPreOrder && (
@@ -787,7 +787,7 @@ function OrderSummary({
                   </span>
                 )}
               </span>
-              <span className="shrink-0 self-start text-sm font-semibold tabular-nums text-gray-900">
+              <span className="shrink-0 self-start text-sm font-semibold tabular-nums text-foreground">
                 {formatPrice(item.price * item.quantity)}
               </span>
             </li>
@@ -800,9 +800,9 @@ function OrderSummary({
             after we confirm.
           </p>
         )}
-        <dl className="space-y-2 border-t border-gray-200 pt-3 text-sm">
+        <dl className="space-y-2 border-t border-border pt-3 text-sm">
           <div className="flex justify-between">
-            <dt className="text-gray-600">Items ({totalUnits})</dt>
+            <dt className="text-muted-foreground">Items ({totalUnits})</dt>
             <dd className="tabular-nums">{formatPrice(subtotal)}</dd>
           </div>
           {discount && (
@@ -814,11 +814,11 @@ function OrderSummary({
             </div>
           )}
           <div className="flex justify-between">
-            <dt className="font-semibold text-gray-900">{discount ? 'Total' : 'Subtotal'}</dt>
-            <dd className="text-lg font-bold tabular-nums text-gray-900">{formatPrice(total)}</dd>
+            <dt className="font-semibold text-foreground">{discount ? 'Total' : 'Subtotal'}</dt>
+            <dd className="text-lg font-bold tabular-nums text-foreground">{formatPrice(total)}</dd>
           </div>
         </dl>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           The final total may differ — delivery fees (if any) and item
           availability are confirmed by our team before payment.
         </p>
@@ -850,7 +850,7 @@ function RadioCard({
     <label
       htmlFor={id}
       className={`flex cursor-pointer items-center gap-3 rounded-md border p-4 ${
-        checked ? 'border-primary-600 bg-primary-50' : 'border-gray-300 hover:bg-gray-50'
+        checked ? 'border-primary bg-accent' : 'border-border hover:bg-muted'
       }`}
     >
       <input
@@ -859,12 +859,12 @@ function RadioCard({
         name={name}
         checked={checked}
         onChange={onChange}
-        className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500"
+        className="h-4 w-4 border-border text-primary focus:ring-ring"
       />
       <span aria-hidden="true" className="text-2xl">{icon}</span>
       <span className="min-w-0">
-        <span className="block font-semibold text-gray-900">{title}</span>
-        <span className="block text-xs text-gray-600">{subtitle}</span>
+        <span className="block font-semibold text-foreground">{title}</span>
+        <span className="block text-xs text-muted-foreground">{subtitle}</span>
       </span>
     </label>
   );

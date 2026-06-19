@@ -4,6 +4,7 @@ import Pagination from '@/components/customer/Pagination';
 import { paginate, parsePage } from '@/lib/pagination';
 import { buildIlikeOrClause } from '@/lib/products/search';
 import { formatPrice } from '@/lib/utils';
+import { ORDER_STATUS_BADGE } from '@/lib/admin/tokens';
 import type { OrderStatus } from '@/types/database';
 
 export const metadata = { title: 'Admin · Orders' };
@@ -18,13 +19,6 @@ function parseStatus(raw: string | undefined): StatusFilter {
     ? (raw as StatusFilter)
     : 'pending';
 }
-
-const STATUS_TONE: Record<OrderStatus, string> = {
-  pending: 'bg-amber-100 text-amber-800',
-  approved: 'bg-blue-100 text-blue-800',
-  fulfilled: 'bg-green-100 text-green-800',
-  cancelled: 'bg-gray-100 text-gray-600',
-};
 
 export default async function AdminOrdersPage({
   searchParams,
@@ -93,7 +87,7 @@ export default async function AdminOrdersPage({
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Orders</h1>
-          <p className="mt-1 text-sm text-gray-600 tabular-nums">
+          <p className="mt-1 text-sm text-muted-foreground tabular-nums">
             {pag.count === 0
               ? 'No orders match these filters.'
               : pag.count <= ORDER_PAGE_SIZE
@@ -104,7 +98,7 @@ export default async function AdminOrdersPage({
       </header>
 
       {/* Status tabs + search */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-200">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg bg-card p-3 shadow-sm ring-1 ring-border">
         <nav className="flex flex-wrap gap-1" aria-label="Filter by status">
           {STATUS_FILTERS.map((s) => {
             const params = new URLSearchParams();
@@ -118,8 +112,8 @@ export default async function AdminOrdersPage({
                 href={href}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium capitalize ${
                   isActive
-                    ? 'bg-primary-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-secondary-foreground hover:bg-muted'
                 }`}
               >
                 {s}
@@ -138,24 +132,24 @@ export default async function AdminOrdersPage({
             name="q"
             defaultValue={q}
             placeholder="Search by order #, name, or phone…"
-            className="w-72 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+            className="w-72 rounded-md border-border shadow-sm focus:border-ring focus:ring-ring sm:text-sm"
           />
         </form>
       </div>
 
       {(!orders || orders.length === 0) && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-lg font-semibold text-gray-900">No orders to show</p>
-          <p className="mt-1 text-sm text-gray-600">
+        <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
+          <p className="text-lg font-semibold text-foreground">No orders to show</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             When customers complete checkout, their orders appear here.
           </p>
         </div>
       )}
 
       {orders && orders.length > 0 && (
-        <div className="overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+        <div className="overflow-x-auto rounded-lg bg-card shadow-sm ring-1 ring-border">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Order #</th>
                 <th className="px-4 py-3">Placed</th>
@@ -167,7 +161,7 @@ export default async function AdminOrdersPage({
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {orders.map((o) => {
                 // PostgREST embedded selects come back as an object (or null).
                 // Cast through `unknown` because the typed Database has empty
@@ -181,21 +175,21 @@ export default async function AdminOrdersPage({
                 const discountAmount = Number(o.discount_amount ?? 0);
                 const orderTotal = Math.max(0, Number(o.subtotal) - discountAmount);
                 return (
-                  <tr key={o.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-mono text-xs font-medium text-gray-900">
+                  <tr key={o.id} className="hover:bg-muted">
+                    <td className="px-4 py-3 font-mono text-xs font-medium text-foreground">
                       {o.order_number}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-500">
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
                       {new Date(o.placed_at).toLocaleString('en-GY', {
                         dateStyle: 'medium',
                         timeStyle: 'short',
                       })}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900">
+                      <div className="font-medium text-foreground">
                         {customer?.name ?? '—'}
                       </div>
-                      <div className="text-xs text-gray-500">{customer?.phone ?? ''}</div>
+                      <div className="text-xs text-muted-foreground">{customer?.phone ?? ''}</div>
                     </td>
                     <td className="px-4 py-3">
                       <span
@@ -208,7 +202,7 @@ export default async function AdminOrdersPage({
                         {o.fulfillment_type}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-700">{paymentMethod?.name ?? '—'}</td>
+                    <td className="px-4 py-3 text-secondary-foreground">{paymentMethod?.name ?? '—'}</td>
                     <td className="px-4 py-3 text-right font-medium tabular-nums">
                       {formatPrice(orderTotal)}
                       {discountAmount > 0 && (
@@ -221,7 +215,7 @@ export default async function AdminOrdersPage({
                     <td className="px-4 py-3">
                       <span
                         className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
-                          STATUS_TONE[o.status as OrderStatus]
+                          ORDER_STATUS_BADGE[o.status as OrderStatus]
                         }`}
                       >
                         {o.status}
@@ -230,7 +224,7 @@ export default async function AdminOrdersPage({
                     <td className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/orders/${o.id}`}
-                        className="text-xs font-medium text-primary-600 hover:underline"
+                        className="text-xs font-medium text-link-on-light hover:underline"
                       >
                         View →
                       </Link>

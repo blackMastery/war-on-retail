@@ -29,9 +29,9 @@ export default async function EditEmailTemplatePage({
 
       <EmailTemplateForm template={template} brand={brand} />
 
-      <section className="space-y-2 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-2 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Send a test</h2>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           Sends this template with sample data. Save your changes first — the test uses the saved
           version.
         </p>

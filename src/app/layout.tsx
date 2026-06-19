@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono, Source_Serif_4 } from 'next/font/google';
 import { getStoreSettings } from '@/lib/store-settings';
 import './globals.css';
 import { Analytics } from "@vercel/analytics/next"
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
+const sourceSerif = Source_Serif_4({ subsets: ['latin'], variable: '--font-serif' });
 
 /**
  * Root SEO metadata is now driven by the admin-edited store settings, with
@@ -44,21 +47,18 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FFD700' },
-    { media: '(prefers-color-scheme: dark)', color: '#0A0A0A' },
-  ],
+  themeColor: '#171717',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`dark ${inter.variable} ${jetbrainsMono.variable} ${sourceSerif.variable}`}>
       <Analytics />
       <body className="font-sans">
         {/* Keyboard skip-link — invisible until focused, then jumps past the header. */}
         <a
           href="#main"
-          className="skip-link rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-md"
+          className="skip-link rounded-md bg-primary text-primary-foreground px-3 py-2 text-sm font-semibold text-primary-foreground shadow-md"
         >
           Skip to main content
         </a>

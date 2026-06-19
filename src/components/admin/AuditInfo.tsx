@@ -27,17 +27,17 @@ export default async function AuditInfo({
 
   return (
     <dl
-      className={`grid gap-x-6 gap-y-1 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-xs text-gray-600 sm:grid-cols-2 ${className}`}
+      className={`grid gap-x-6 gap-y-1 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-muted-foreground sm:grid-cols-2 ${className}`}
     >
       <div className="flex gap-1">
-        <dt className="font-medium text-gray-500">Created by</dt>
-        <dd className="text-gray-700">
+        <dt className="font-medium text-muted-foreground">Created by</dt>
+        <dd className="text-secondary-foreground">
           {labelFor(createdBy, names)} · {formatAuditDate(createdAt)}
         </dd>
       </div>
       <div className="flex gap-1">
-        <dt className="font-medium text-gray-500">Last modified by</dt>
-        <dd className="text-gray-700">
+        <dt className="font-medium text-muted-foreground">Last modified by</dt>
+        <dd className="text-secondary-foreground">
           {labelFor(modifiedBy, names)} · {formatAuditDate(updatedAt)}
         </dd>
       </div>

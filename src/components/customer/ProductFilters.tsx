@@ -172,7 +172,7 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
       </Group>
 
       {pending && (
-        <p className="text-xs text-gray-500" aria-live="polite">
+        <p className="text-xs text-muted-foreground" aria-live="polite">
           Updating results…
         </p>
       )}
@@ -183,7 +183,7 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
     <button
       type="button"
       onClick={clearAll}
-      className="min-h-11 px-2 text-xs font-medium text-primary-600 hover:underline"
+      className="min-h-11 px-2 text-xs font-medium text-link hover:underline"
     >
       Clear all
     </button>
@@ -199,12 +199,12 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
           onClick={() => setMobileOpen(true)}
           aria-expanded={mobileOpen}
           aria-controls="product-filters-sheet"
-          className="inline-flex min-h-11 items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-gray-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium shadow-sm hover:bg-muted"
         >
           <AdjustmentsHorizontalIcon className="h-4 w-4" aria-hidden="true" />
           Filters
           {hasActiveFilters(draft) && (
-            <span className="rounded-full bg-primary-600 px-1.5 text-xs font-bold text-white">
+            <span className="rounded-full bg-primary text-primary-foreground px-1.5 text-xs font-bold">
               {[
                 ...draft.categorySlugs,
                 ...draft.brandSlugs,
@@ -227,7 +227,7 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
         aria-label="Product filters"
         className="hidden lg:sticky lg:top-32 lg:block lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto"
       >
-        <div className="space-y-6 rounded-lg bg-white p-5 ring-1 ring-gray-200">
+        <div className="space-y-6 rounded-lg bg-card p-5 ring-1 ring-border">
           <header className="flex items-center justify-between">
             <h2 className="text-base font-bold">Filters</h2>
             {filterHeader}
@@ -252,10 +252,10 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
             aria-modal="true"
             aria-label="Product filters"
             tabIndex={-1}
-            className="absolute inset-x-0 bottom-0 flex max-h-[min(85dvh,calc(100dvh-env(safe-area-inset-top)))] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl focus:outline-none"
+            className="absolute inset-x-0 bottom-0 flex max-h-[min(85dvh,calc(100dvh-env(safe-area-inset-top)))] flex-col overflow-hidden rounded-t-2xl bg-card shadow-2xl focus:outline-none"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >
-            <div className="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3">
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
               <h2 className="text-base font-bold">Filters</h2>
               <div className="flex items-center gap-1">
                 {filterHeader}
@@ -263,7 +263,7 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
                 type="button"
                 onClick={() => setMobileOpen(false)}
                 aria-label="Close filters"
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-muted"
               >
                 <XMarkIcon className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -272,11 +272,11 @@ export default function ProductFilters({ categories, brands, priceBounds }: Prop
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">
               {filterFields}
             </div>
-            <div className="shrink-0 border-t border-gray-200 p-4">
+            <div className="shrink-0 border-t border-border p-4">
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="flex min-h-11 w-full items-center justify-center rounded-md bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
+                className="flex min-h-11 w-full items-center justify-center rounded-md bg-primary text-primary-foreground px-4 text-sm font-semibold hover:opacity-90"
               >
                 Show results
               </button>
@@ -319,7 +319,7 @@ function Group({
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-controls={bodyId}
-          className="flex w-full items-center justify-between rounded-md py-1 text-left text-sm font-semibold text-gray-900 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          className="flex w-full items-center justify-between rounded-md py-1 text-left text-sm font-semibold text-foreground hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span>{title}</span>
           <span
@@ -359,14 +359,14 @@ function CheckboxRow({
   return (
     <label
       className={`flex min-h-11 cursor-pointer items-center gap-3 ${
-        size === 'sm' ? 'text-xs text-gray-700' : 'text-sm text-gray-800'
+        size === 'sm' ? 'text-xs text-secondary-foreground' : 'text-sm text-foreground'
       }`}
     >
       <input
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+        className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
       />
       <span className="min-w-0 flex-1">{label}</span>
     </label>
@@ -381,7 +381,7 @@ function SortSelect({ value, onChange }: { value: SortKey; onChange: (v: SortKey
         name={PARAM.sort}
         value={value}
         onChange={(e) => onChange(e.target.value as SortKey)}
-        className="min-h-11 w-full max-w-full rounded-md border-gray-300 bg-white text-base shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+        className="min-h-11 w-full max-w-full rounded-md border-border bg-card text-base shadow-sm focus:border-ring focus:ring-ring sm:text-sm"
       >
         {SORT_OPTIONS.map((o) => (
           <option key={o.value} value={o.value}>

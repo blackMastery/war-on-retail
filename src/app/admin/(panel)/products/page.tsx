@@ -45,7 +45,7 @@ export default async function AdminProductsPage({
         <h1 className="text-2xl font-bold">Products</h1>
         <Link
           href="/admin/products/new"
-          className="rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90"
         >
           + New product
         </Link>
@@ -56,27 +56,27 @@ export default async function AdminProductsPage({
           name="q"
           defaultValue={q}
           placeholder="Search by name…"
-          className="w-full max-w-md rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          className="w-full max-w-md rounded-md border-border text-sm shadow-sm focus:border-ring focus:ring-ring"
         />
         <button
           type="submit"
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50"
+          className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-muted"
         >
           Search
         </button>
         {q && (
           <Link
             href="/admin/products"
-            className="rounded-md px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700"
+            className="rounded-md px-4 py-2 text-sm font-medium text-muted-foreground hover:text-secondary-foreground"
           >
             Clear
           </Link>
         )}
       </form>
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+      <div className="overflow-x-auto rounded-lg bg-card shadow-sm ring-1 ring-border">
+        <table className="min-w-full divide-y divide-border text-sm">
+          <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">SKU</th>
@@ -88,26 +88,26 @@ export default async function AdminProductsPage({
               <th className="px-4 py-3" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {(products ?? []).length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-gray-500">
+                <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
                   No products found.
                 </td>
               </tr>
             )}
             {products?.map((p) => (
-              <tr key={p.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">
+              <tr key={p.id} className="hover:bg-muted">
+                <td className="px-4 py-3 font-medium text-foreground">
                   <Link href={`/admin/products/${p.id}/edit`} className="hover:underline">
                     {p.name}
                   </Link>
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-gray-500">{p.sku ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-700">
+                <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{p.sku ?? '—'}</td>
+                <td className="px-4 py-3 text-secondary-foreground">
                   {p.category_id ? catName.get(p.category_id) ?? '—' : '—'}
                 </td>
-                <td className="px-4 py-3 text-gray-700">
+                <td className="px-4 py-3 text-secondary-foreground">
                   {p.brand_id ? brandName.get(p.brand_id) ?? '—' : '—'}
                 </td>
                 <td className="px-4 py-3 text-right">{formatPrice(p.price)}</td>
@@ -119,7 +119,7 @@ export default async function AdminProductsPage({
                     className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                       p.is_active
                         ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-600'
+                        : 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {p.is_active ? 'Active' : 'Hidden'}
@@ -144,7 +144,7 @@ export default async function AdminProductsPage({
                 key={n}
                 href={`/admin/products?${new URLSearchParams({ q, page: String(n) }).toString()}`}
                 className={`rounded-md px-3 py-1.5 ${
-                  active ? 'bg-primary-600 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-200'
+                  active ? 'bg-primary text-primary-foreground' : 'bg-card text-secondary-foreground ring-1 ring-border'
                 }`}
               >
                 {n}

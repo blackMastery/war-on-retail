@@ -67,7 +67,7 @@ export default function WishlistView() {
     return (
       <div className="mt-6 grid animate-pulse grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="aspect-[3/4] rounded-lg bg-gray-100" />
+          <div key={i} className="aspect-[3/4] rounded-lg bg-muted" />
         ))}
       </div>
     );
@@ -75,14 +75,14 @@ export default function WishlistView() {
 
   if (products.length === 0) {
     return (
-      <div className="mt-6 rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-        <p className="text-lg font-semibold text-gray-900">Nothing saved yet</p>
-        <p className="mt-1 text-sm text-gray-600">
+      <div className="mt-6 rounded-lg border border-dashed border-border bg-card p-12 text-center">
+        <p className="text-lg font-semibold text-foreground">Nothing saved yet</p>
+        <p className="mt-1 text-sm text-muted-foreground">
           Tap the heart on any product to add it to your wishlist.
         </p>
         <Link
           href="/products"
-          className="mt-6 inline-block rounded-md bg-primary-600 px-5 py-2 font-semibold text-white hover:bg-primary-700"
+          className="mt-6 inline-block rounded-md bg-primary text-primary-foreground px-5 py-2 font-semibold hover:opacity-90"
         >
           Browse products
         </Link>
@@ -92,7 +92,7 @@ export default function WishlistView() {
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="flex items-center justify-between text-sm text-gray-600">
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
         <p className="tabular-nums">
           {products.length} {products.length === 1 ? 'item' : 'items'}
         </p>
@@ -101,7 +101,7 @@ export default function WishlistView() {
           onClick={() => {
             if (confirm('Remove all items from your wishlist?')) clear();
           }}
-          className="font-medium text-gray-500 hover:text-red-600 hover:underline"
+          className="font-medium text-muted-foreground hover:text-red-600 hover:underline"
         >
           Clear wishlist
         </button>

@@ -19,7 +19,7 @@ export type TeamMember = {
 
 const initial: TeamFormState = {};
 const INPUT =
-  'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm';
+  'mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm';
 
 export default function TeamManager({ members }: { members: TeamMember[] }) {
   return (
@@ -29,7 +29,7 @@ export default function TeamManager({ members }: { members: TeamMember[] }) {
       <section className="space-y-4">
         <h2 className="font-semibold">Admins ({members.length})</h2>
         {members.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
+          <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
             No admins yet. Add the first one above.
           </div>
         ) : (
@@ -51,10 +51,10 @@ function AddAdminForm() {
   const err = (k: string) => state.fieldErrors?.[k];
 
   return (
-    <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
       <div>
         <h2 className="font-semibold">Add an admin</h2>
-        <p className="mt-0.5 text-xs text-gray-500">
+        <p className="mt-0.5 text-xs text-muted-foreground">
           Creates a new login with the password you set so they can sign in
           right away. If a login already exists for the email, it&apos;s promoted
           instead and the password is left unchanged.
@@ -72,19 +72,19 @@ function AddAdminForm() {
 
       <form action={action} className="grid gap-4 sm:grid-cols-2 sm:items-start">
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">Email</span>
+          <span className="font-medium text-secondary-foreground">Email</span>
           <input name="email" type="email" placeholder="staff@waronretail.com" className={INPUT} />
           {err('email') && <span className="mt-1 block text-xs text-red-600">{err('email')}</span>}
         </label>
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">Full name</span>
+          <span className="font-medium text-secondary-foreground">Full name</span>
           <input name="full_name" type="text" placeholder="Jane Doe" className={INPUT} />
           {err('full_name') && (
             <span className="mt-1 block text-xs text-red-600">{err('full_name')}</span>
           )}
         </label>
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">Temporary password</span>
+          <span className="font-medium text-secondary-foreground">Temporary password</span>
           <input
             name="password"
             type="password"
@@ -95,13 +95,13 @@ function AddAdminForm() {
           {err('password') ? (
             <span className="mt-1 block text-xs text-red-600">{err('password')}</span>
           ) : (
-            <span className="mt-1 block text-xs text-gray-500">
+            <span className="mt-1 block text-xs text-muted-foreground">
               Share it with them; they can change it later via “Forgot password”.
             </span>
           )}
         </label>
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">Role</span>
+          <span className="font-medium text-secondary-foreground">Role</span>
           <select name="role" defaultValue="admin" className={INPUT}>
             <option value="admin">Admin</option>
             <option value="super_admin">Super admin</option>
@@ -111,7 +111,7 @@ function AddAdminForm() {
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
+            className="rounded-md bg-primary text-primary-foreground px-5 py-2 text-sm font-semibold shadow-sm hover:opacity-90 disabled:opacity-60"
           >
             {pending ? 'Adding…' : 'Add admin'}
           </button>
@@ -129,23 +129,23 @@ function MemberRow({ member }: { member: TeamMember }) {
   const isSuper = role === 'super_admin';
 
   return (
-    <li className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <li className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
       <form action={action} className="space-y-4">
         <input type="hidden" name="admin_user_id" value={member.id} />
 
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="font-semibold text-gray-900">{member.full_name}</p>
-            <p className="text-sm text-gray-500">{member.email}</p>
+            <p className="font-semibold text-foreground">{member.full_name}</p>
+            <p className="text-sm text-muted-foreground">{member.email}</p>
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <label className="text-sm">
-              <span className="mr-2 font-medium text-gray-700">Role</span>
+              <span className="mr-2 font-medium text-secondary-foreground">Role</span>
               <select
                 name="role"
                 value={role}
                 onChange={(e) => setRole(e.target.value as TeamMember['role'])}
-                className="rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="rounded-md border-border text-sm shadow-sm focus:border-ring focus:ring-ring"
               >
                 <option value="admin">Admin</option>
                 <option value="super_admin">Super admin</option>
@@ -156,9 +156,9 @@ function MemberRow({ member }: { member: TeamMember }) {
                 type="checkbox"
                 name="is_active"
                 defaultChecked={member.is_active}
-                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                className="rounded border-border text-primary focus:ring-ring"
               />
-              <span className="font-medium text-gray-700">Active</span>
+              <span className="font-medium text-secondary-foreground">Active</span>
             </label>
           </div>
         </div>
@@ -169,8 +169,8 @@ function MemberRow({ member }: { member: TeamMember }) {
           </p>
         ) : (
           <fieldset className="space-y-2">
-            <legend className="text-sm font-medium text-gray-700">Section access</legend>
-            <p className="text-xs text-gray-500">
+            <legend className="text-sm font-medium text-secondary-foreground">Section access</legend>
+            <p className="text-xs text-muted-foreground">
               The dashboard is always available. Tick the other sections this
               admin may use.
             </p>
@@ -182,10 +182,10 @@ function MemberRow({ member }: { member: TeamMember }) {
                     name="pages"
                     value={p.key}
                     defaultChecked={member.pages.includes(p.key)}
-                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    className="rounded border-border text-primary focus:ring-ring"
                   />
                   <span aria-hidden>{p.icon}</span>
-                  <span className="text-gray-700">{p.label}</span>
+                  <span className="text-secondary-foreground">{p.label}</span>
                 </label>
               ))}
             </div>
@@ -196,7 +196,7 @@ function MemberRow({ member }: { member: TeamMember }) {
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-primary-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
+            className="rounded-md bg-primary text-primary-foreground px-4 py-1.5 text-sm font-semibold shadow-sm hover:opacity-90 disabled:opacity-60"
           >
             {pending ? 'Saving…' : 'Save'}
           </button>

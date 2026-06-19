@@ -15,7 +15,7 @@ const MDEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[500px] items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-500">
+      <div className="flex h-[500px] items-center justify-center rounded-md border border-dashed border-border bg-muted text-sm text-muted-foreground">
         Loading editor…
       </div>
     ),

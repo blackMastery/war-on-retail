@@ -168,7 +168,7 @@ export default function SearchBar({
     >
       <form
         onSubmit={onSubmit}
-        className="flex w-full items-center rounded-full border border-gray-300 bg-white p-1 shadow-sm focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500"
+        className="flex w-full items-center rounded-full border border-border bg-card p-1 shadow-sm focus-within:border-ring focus-within:ring-1 focus-within:ring-ring"
         role="search"
       >
         <label htmlFor={inputId} className="sr-only">
@@ -194,11 +194,11 @@ export default function SearchBar({
           aria-activedescendant={
             highlight >= 0 && results[highlight] ? optionId(highlight) : undefined
           }
-          className="min-w-0 flex-1 rounded-full border-0 bg-transparent py-2 pl-3 text-base focus:border-transparent focus:outline-none focus:ring-0 md:py-1.5 md:pl-4 md:text-sm"
+          className="min-w-0 flex-1 rounded-full border-0 bg-transparent py-2 pl-3 text-base text-card-foreground placeholder:text-muted-foreground focus:border-transparent focus:outline-none focus:ring-0 md:py-1.5 md:pl-4 md:text-sm"
         />
         <button
           type="submit"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 md:h-9 md:w-9"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground hover:opacity-90 md:h-9 md:w-9"
           aria-label="Search"
         >
           <MagnifyingGlassIcon className="h-4 w-4" aria-hidden="true" />
@@ -209,7 +209,7 @@ export default function SearchBar({
           page content immediately below the bar without being clipped. */}
       {showPanel && (
         <div
-          className="absolute left-0 right-0 top-full z-[60] mt-2 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl"
+          className="absolute left-0 right-0 top-full z-[60] mt-2 overflow-hidden rounded-lg border border-border bg-card shadow-xl"
         >
           {hasResults ? (
             <ul
@@ -237,10 +237,10 @@ export default function SearchBar({
                         navigateTo(`/products/${p.slug}`);
                       }}
                       className={`flex items-center gap-3 px-3 py-2 ${
-                        isActive ? 'bg-primary-50' : 'hover:bg-gray-50'
+                        isActive ? 'bg-accent' : 'hover:bg-muted'
                       }`}
                     >
-                      <span className="relative block h-10 w-10 shrink-0 overflow-hidden rounded bg-gray-100 ring-1 ring-gray-200">
+                      <span className="relative block h-10 w-10 shrink-0 overflow-hidden rounded bg-muted ring-1 ring-border">
                         {p.featured_image_url ? (
                           <Image
                             src={p.featured_image_url}
@@ -252,16 +252,16 @@ export default function SearchBar({
                         ) : (
                           <span
                             aria-hidden="true"
-                            className="flex h-full w-full items-center justify-center text-xl text-gray-300"
+                            className="flex h-full w-full items-center justify-center text-xl text-muted-foreground"
                           >
                             📦
                           </span>
                         )}
                       </span>
-                      <span className="min-w-0 flex-1 truncate text-sm text-gray-900">
+                      <span className="min-w-0 flex-1 truncate text-sm text-foreground">
                         {p.name}
                       </span>
-                      <span className="shrink-0 text-sm font-semibold tabular-nums text-gray-900">
+                      <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
                         {formatPrice(p.price)}
                       </span>
                     </Link>
@@ -280,8 +280,8 @@ export default function SearchBar({
               e.preventDefault();
               navigateTo(`/search?q=${encodeURIComponent(q.trim())}`);
             }}
-            className={`flex items-center justify-between gap-2 px-3 py-2.5 text-sm font-medium text-primary-700 hover:bg-primary-50 ${
-              hasResults ? 'border-t border-gray-200' : ''
+            className={`flex items-center justify-between gap-2 px-3 py-2.5 text-sm font-medium text-link-on-light hover:bg-accent ${
+              hasResults ? 'border-t border-border' : ''
             }`}
           >
             <span className="truncate">

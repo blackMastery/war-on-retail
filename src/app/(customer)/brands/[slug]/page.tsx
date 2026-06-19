@@ -67,7 +67,7 @@ export default async function BrandPage({
           {brand.name}
         </h1>
         {brand.description && (
-          <p className="mt-2 max-w-2xl text-gray-600">{brand.description}</p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">{brand.description}</p>
         )}
         <ResultCount state={pag} emptyMessage={`No ${brand.name} products yet.`} />
       </header>

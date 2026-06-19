@@ -27,13 +27,13 @@ export default function SeoMetaFields({
   fallback?: { title?: string; description?: string };
 }) {
   const INPUT =
-    'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm';
+    'mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm';
   const err = (k: string) => fieldErrors?.[k];
   return (
     <div className="space-y-4">
       <label className="block text-sm">
-        <span className="font-medium text-gray-700">
-          Meta title <span className="font-normal text-gray-500">(optional)</span>
+        <span className="font-medium text-secondary-foreground">
+          Meta title <span className="font-normal text-muted-foreground">(optional)</span>
         </span>
         <input
           name="meta_title"
@@ -41,7 +41,7 @@ export default function SeoMetaFields({
           placeholder={fallback?.title ?? 'Leave blank to use the default'}
           className={INPUT}
         />
-        <span className="mt-1 block text-xs text-gray-500">
+        <span className="mt-1 block text-xs text-muted-foreground">
           Replaces the {`<title>`} tag and the social-preview title.
         </span>
         {err('meta_title') && (
@@ -50,8 +50,8 @@ export default function SeoMetaFields({
       </label>
 
       <label className="block text-sm">
-        <span className="font-medium text-gray-700">
-          Meta description <span className="font-normal text-gray-500">(optional)</span>
+        <span className="font-medium text-secondary-foreground">
+          Meta description <span className="font-normal text-muted-foreground">(optional)</span>
         </span>
         <textarea
           name="meta_description"
@@ -62,15 +62,15 @@ export default function SeoMetaFields({
           }
           className={INPUT}
         />
-        <span className="mt-1 block text-xs text-gray-500">
+        <span className="mt-1 block text-xs text-muted-foreground">
           Aim for 150–160 characters.
         </span>
       </label>
 
       <label className="block text-sm">
-        <span className="font-medium text-gray-700">
+        <span className="font-medium text-secondary-foreground">
           Meta keywords{' '}
-          <span className="font-normal text-gray-500">(optional, comma-separated)</span>
+          <span className="font-normal text-muted-foreground">(optional, comma-separated)</span>
         </span>
         <input
           name="meta_keywords"
@@ -78,7 +78,7 @@ export default function SeoMetaFields({
           placeholder="e.g. samsung tv, 55 inch, 4k, guyana"
           className={INPUT}
         />
-        <span className="mt-1 block text-xs text-gray-500">
+        <span className="mt-1 block text-xs text-muted-foreground">
           Bing still uses these; Google ignores them but doesn&apos;t penalise.
         </span>
       </label>

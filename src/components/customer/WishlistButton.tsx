@@ -79,11 +79,15 @@ export default function WishlistButton({ slug, productName, variant = 'button' }
         aria-pressed={displaySaved}
         whileTap={{ scale: 0.85 }}
         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-        className={`flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow ring-1 ring-gray-200 transition hover:bg-white hover:shadow-md ${
-          displaySaved ? 'text-primary-600' : 'text-gray-600 hover:text-primary-600'
+        className={`flex h-11 w-11 items-center justify-center rounded-full bg-card/95 shadow-md ring-1 ring-neutral-300/80 transition hover:bg-card hover:shadow-lg ${
+          displaySaved ? 'text-red-600' : 'text-neutral-700 hover:text-red-500'
         }`}
       >
-        <Heart saved={displaySaved} />
+        <Heart
+          saved={displaySaved}
+          solidClassName="text-red-600"
+          outlineClassName="stroke-2 text-neutral-700"
+        />
       </motion.button>
     );
   }
@@ -99,11 +103,15 @@ export default function WishlistButton({ slug, productName, variant = 'button' }
       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
       className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border-2 px-6 py-3 font-semibold transition-colors ${
         displaySaved
-          ? 'border-primary-600 bg-primary-600 text-white hover:bg-primary-700'
-          : 'border-accent-800 bg-accent-400 text-gray-900 hover:bg-accent-300'
+          ? 'border-red-600 bg-red-50 text-red-700 hover:bg-red-100'
+          : 'border-chart-4 bg-chart-1 text-primary-foreground hover:bg-chart-2'
       }`}
     >
-      <Heart saved={displaySaved} outlineClassName="text-primary-700" />
+      <Heart
+        saved={displaySaved}
+        solidClassName="text-red-600"
+        outlineClassName="text-accent-foreground"
+      />
       {displaySaved ? 'Saved' : 'Save'}
     </motion.button>
   );

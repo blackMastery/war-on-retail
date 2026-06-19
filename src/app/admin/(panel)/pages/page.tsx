@@ -15,16 +15,16 @@ export default async function AdminPagesPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold">Pages</h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-muted-foreground">
           Per-page SEO overrides for the static customer routes — title,
           description, keywords, and whether search engines may index the page.
         </p>
       </header>
 
       {(!pages || pages.length === 0) && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-lg font-semibold text-gray-900">No pages seeded yet</p>
-          <p className="mt-1 text-sm text-gray-600">
+        <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
+          <p className="text-lg font-semibold text-foreground">No pages seeded yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Apply migration <code>20260101001200_seo_metadata.sql</code> to seed the
             page table.
           </p>
@@ -32,9 +32,9 @@ export default async function AdminPagesPage() {
       )}
 
       {pages && pages.length > 0 && (
-        <div className="overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+        <div className="overflow-x-auto rounded-lg bg-card shadow-sm ring-1 ring-border">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Label</th>
                 <th className="px-4 py-3">Path</th>
@@ -44,26 +44,26 @@ export default async function AdminPagesPage() {
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {pages.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">{p.label}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-gray-500">{p.path}</td>
-                  <td className="max-w-xs truncate px-4 py-3 text-xs text-gray-600">
-                    {p.meta_title ?? <span className="text-gray-400">— default —</span>}
+                <tr key={p.id} className="hover:bg-muted">
+                  <td className="px-4 py-3 font-medium text-foreground">{p.label}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{p.path}</td>
+                  <td className="max-w-xs truncate px-4 py-3 text-xs text-muted-foreground">
+                    {p.meta_title ?? <span className="text-muted-foreground">— default —</span>}
                   </td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                         p.robots_index
                           ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-200 text-gray-700'
+                          : 'bg-muted text-secondary-foreground'
                       }`}
                     >
                       {p.robots_index ? 'Indexed' : 'Hidden'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-xs text-gray-500">
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
                     {new Date(p.updated_at).toLocaleDateString('en-GY', {
                       dateStyle: 'medium',
                     })}
@@ -71,7 +71,7 @@ export default async function AdminPagesPage() {
                   <td className="px-4 py-3 text-right">
                     <Link
                       href={`/admin/pages/${p.id}/edit`}
-                      className="text-xs font-medium text-primary-600 hover:underline"
+                      className="text-xs font-medium text-primary hover:underline"
                     >
                       Edit →
                     </Link>

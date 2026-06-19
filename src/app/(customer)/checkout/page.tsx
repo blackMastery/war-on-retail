@@ -48,7 +48,7 @@ export default async function CheckoutPage() {
   return (
     <div className="container py-8">
       <h1 className="text-2xl font-bold sm:text-3xl">Checkout</h1>
-      <p className="mt-1 text-sm text-gray-600">
+      <p className="mt-1 text-sm text-muted-foreground">
         Three quick steps. Nothing is charged here — our team confirms the order
         before payment.
       </p>

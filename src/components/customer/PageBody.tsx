@@ -41,7 +41,7 @@ export default async function PageBody({ pageId }: { pageId: string }) {
       >
         {data.markdown}
       </ReactMarkdown>
-      <p className="mt-8 text-xs text-gray-500">
+      <p className="mt-8 text-xs text-muted-foreground">
         <em>
           Last updated:{' '}
           {new Date(data.updatedAt).toLocaleDateString('en-GY', {

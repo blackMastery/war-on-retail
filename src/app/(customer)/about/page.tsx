@@ -8,7 +8,7 @@ export async function generateMetadata() {
 export default function AboutPage() {
   return (
     <div className="container py-10">
-      <div className="prose prose-gray max-w-3xl">
+      <div className="prose-theme max-w-3xl">
         <PageBody pageId="about" />
       </div>
     </div>

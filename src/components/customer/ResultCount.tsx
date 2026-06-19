@@ -19,20 +19,20 @@ export default function ResultCount({
 }: Props) {
   if (state.count === 0) {
     return (
-      <p className="mt-1 text-sm text-gray-600">
+      <p className="mt-1 text-sm text-muted-foreground">
         {emptyMessage ?? `No ${noun.plural} to show.`}
       </p>
     );
   }
   if (state.count <= state.pageSize) {
     return (
-      <p className="mt-1 text-sm text-gray-600 tabular-nums">
+      <p className="mt-1 text-sm text-muted-foreground tabular-nums">
         {state.count} {state.count === 1 ? noun.singular : noun.plural}
       </p>
     );
   }
   return (
-    <p className="mt-1 text-sm text-gray-600 tabular-nums">
+    <p className="mt-1 text-sm text-muted-foreground tabular-nums">
       Showing {state.firstIdx}–{state.lastIdx} of {state.count} {noun.plural}
     </p>
   );

@@ -25,7 +25,7 @@ function valueLabel(d: DiscountCode): string {
 type Tone = 'green' | 'gray' | 'orange' | 'red';
 const toneClass: Record<Tone, string> = {
   green: 'bg-green-100 text-green-800',
-  gray: 'bg-gray-100 text-gray-600',
+  gray: 'bg-muted text-muted-foreground',
   orange: 'bg-orange-100 text-orange-800',
   red: 'bg-red-100 text-red-700',
 };
@@ -47,9 +47,9 @@ function statusLabel(d: DiscountCode): { label: string; tone: Tone } {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</dt>
-      <dd className="mt-1 text-2xl font-bold tabular-nums text-gray-900">{value}</dd>
+    <div className="rounded-lg bg-card p-4 shadow-sm ring-1 ring-border">
+      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</dt>
+      <dd className="mt-1 text-2xl font-bold tabular-nums text-foreground">{value}</dd>
     </div>
   );
 }
@@ -95,14 +95,14 @@ export default async function AdminDiscountsPage({
       <header className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">Discount codes</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Promo codes customers redeem at checkout. The order pipeline re-validates and
             records every redemption.
           </p>
         </div>
         <Link
           href="/admin/discounts/new"
-          className="shrink-0 rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="shrink-0 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90"
         >
           + New code
         </Link>
@@ -122,18 +122,18 @@ export default async function AdminDiscountsPage({
           defaultValue={query}
           placeholder="Search by code…"
           aria-label="Search discount codes"
-          className="block w-full max-w-xs rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          className="block w-full max-w-xs rounded-md border-border text-sm shadow-sm focus:border-ring focus:ring-ring"
         />
         <button
           type="submit"
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-muted"
         >
           Search
         </button>
         {query && (
           <Link
             href="/admin/discounts"
-            className="rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700"
+            className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-secondary-foreground"
           >
             Clear
           </Link>
@@ -141,20 +141,20 @@ export default async function AdminDiscountsPage({
       </form>
 
       {(!codes || codes.length === 0) && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-lg font-semibold text-gray-900">
+        <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
+          <p className="text-lg font-semibold text-foreground">
             {query ? 'No codes match your search' : 'No discount codes yet'}
           </p>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             {query ? 'Try a different term.' : 'Create one to offer a promo at checkout.'}
           </p>
         </div>
       )}
 
       {codes && codes.length > 0 && (
-        <div className="overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <div className="overflow-x-auto rounded-lg bg-card shadow-sm ring-1 ring-border">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th scope="col" className="px-4 py-3">Code</th>
                 <th scope="col" className="px-4 py-3">Type</th>
@@ -165,24 +165,24 @@ export default async function AdminDiscountsPage({
                 <th scope="col" className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {codes.map((d) => {
                 const s = statusLabel(d);
                 return (
-                  <tr key={d.id} className="hover:bg-gray-50">
+                  <tr key={d.id} className="hover:bg-muted">
                     <td className="px-4 py-3">
-                      <div className="font-mono font-semibold uppercase text-gray-900">{d.code}</div>
+                      <div className="font-mono font-semibold uppercase text-foreground">{d.code}</div>
                       {d.description && (
-                        <div className="text-xs text-gray-500">{d.description}</div>
+                        <div className="text-xs text-muted-foreground">{d.description}</div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-700">{TYPE_LABEL[d.discount_type]}</td>
-                    <td className="px-4 py-3 tabular-nums text-gray-700">{valueLabel(d)}</td>
-                    <td className="px-4 py-3 tabular-nums text-gray-700">
+                    <td className="px-4 py-3 text-secondary-foreground">{TYPE_LABEL[d.discount_type]}</td>
+                    <td className="px-4 py-3 tabular-nums text-secondary-foreground">{valueLabel(d)}</td>
+                    <td className="px-4 py-3 tabular-nums text-secondary-foreground">
                       {d.usage_count}
                       {d.usage_limit != null ? ` / ${d.usage_limit}` : ''}
                     </td>
-                    <td className="px-4 py-3 tabular-nums text-gray-700">
+                    <td className="px-4 py-3 tabular-nums text-secondary-foreground">
                       {formatPrice(Number(d.total_discount_given))}
                     </td>
                     <td className="px-4 py-3">
@@ -196,7 +196,7 @@ export default async function AdminDiscountsPage({
                       <div className="flex items-center justify-end gap-3">
                         <Link
                           href={`/admin/discounts/${d.id}/edit`}
-                          className="font-medium text-primary-600 hover:underline"
+                          className="font-medium text-primary hover:underline"
                         >
                           Edit
                         </Link>

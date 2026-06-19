@@ -21,12 +21,12 @@ export default function TestSendForm({ slug }: { slug: string }) {
           type="email"
           required
           placeholder="you@example.com"
-          className="flex-1 rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          className="flex-1 rounded-md border-border text-sm shadow-sm focus:border-ring focus:ring-ring"
         />
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+          className="rounded-md border border-border bg-card px-4 py-2 text-sm font-semibold text-secondary-foreground hover:bg-muted disabled:opacity-60"
         >
           {pending ? 'Sending…' : 'Send test'}
         </button>

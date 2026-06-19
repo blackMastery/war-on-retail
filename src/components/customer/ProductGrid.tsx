@@ -7,7 +7,7 @@ export default function ProductGrid({ products }: { products: Product[] }) {
     return (
       <section
         aria-label="Products"
-        className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center text-gray-500"
+        className="rounded-lg border border-dashed border-border bg-card p-12 text-center text-muted-foreground"
       >
         No products to show yet.
       </section>

@@ -119,32 +119,32 @@ export default function Header({ categories, brands, settings }: Props) {
   return (
     <>
     <header
-      className={`sticky top-0 z-40 bg-white transition-shadow duration-200 ${
+      className={`sticky top-0 z-40 transition-shadow duration-200 ${
         scrolled ? 'shadow-md' : 'shadow-sm'
       }`}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Utility bar */}
-      <div className="bg-surface-dark text-white">
+      <div className="bg-header text-header-foreground">
         <div className="container flex items-center justify-between gap-2 py-2 text-xs sm:text-sm">
           <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <a
               href={`tel:${settings.phone}`}
-              className="truncate hover:text-accent-400"
+              className="truncate transition-colors hover:text-primary"
             >
               <span aria-hidden="true">📞 </span>
               {settings.phone}
             </a>
-            <span aria-hidden="true" className="hidden opacity-50 md:inline">
+            <span aria-hidden="true" className="hidden text-header-foreground/50 md:inline">
               |
             </span>
-            <span className="hidden opacity-80 md:inline">{settings.hoursWeekdays}</span>
+            <span className="hidden text-header-foreground/90 md:inline">{settings.hoursWeekdays}</span>
           </div>
           <a
             href={`https://wa.me/${settings.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 hover:text-accent-400"
+            className="shrink-0 hover:text-primary"
           >
             WhatsApp
           </a>
@@ -152,7 +152,8 @@ export default function Header({ categories, brands, settings }: Props) {
       </div>
 
       {/* Main bar */}
-      <div className="container flex items-center gap-2 py-3 sm:gap-4 sm:py-4">
+      <div className="bg-header text-header-foreground">
+        <div className="container flex items-center gap-2 py-3 sm:gap-4 sm:py-4">
         <Link
           href="/"
           aria-label={`${settings.name} home`}
@@ -179,12 +180,12 @@ export default function Header({ categories, brands, settings }: Props) {
             onClick={() => (mobileSearchOpen ? setMobileSearchOpen(false) : openSearch())}
             aria-label={mobileSearchOpen ? 'Close search' : 'Open search'}
             aria-expanded={mobileSearchOpen}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 md:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header md:hidden"
           >
             <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
           </button>
-          <WishlistIcon />
-          <CartIcon />
+          <WishlistIcon tone="dark" />
+          <CartIcon tone="dark" />
           <button
             ref={menuButtonRef}
             type="button"
@@ -192,7 +193,7 @@ export default function Header({ categories, brands, settings }: Props) {
             aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-nav-drawer"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 md:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header md:hidden"
           >
             {mobileMenuOpen ? (
               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -201,28 +202,31 @@ export default function Header({ categories, brands, settings }: Props) {
             )}
           </button>
         </div>
+        </div>
       </div>
 
       {mobileSearchOpen && (
-        <div className="container border-t pb-3 pt-3 md:hidden">
+        <div className="border-t border-white/10 bg-header pb-3 pt-3 md:hidden">
+          <div className="container">
           <SearchBar />
+          </div>
         </div>
       )}
 
       {/* Primary nav — desktop only */}
-      <nav aria-label="Primary" className="hidden bg-primary-600 text-white md:block">
+      <nav aria-label="Primary" className="hidden bg-primary text-primary-foreground md:block">
         <div className="container flex items-center gap-6 py-3 text-sm font-medium">
           <Link
             href="/products"
             aria-current={pathname === '/products' ? 'page' : undefined}
-            className="hover:text-accent-400"
+            className="hover:opacity-75"
           >
             All Products
           </Link>
 
-          <NavDropdown label="All Categories" width="lg" groups={categoryGroups} />
+          <NavDropdown label="All Categories" width="lg" groups={categoryGroups} tone="onPrimary" />
 
-          <NavDropdown label="Brands" width="md" items={brandItems} />
+          <NavDropdown label="Brands" width="md" items={brandItems} tone="onPrimary" />
 
           {featured.map((c) => {
             const subs = childrenOf(c.id);
@@ -232,7 +236,7 @@ export default function Header({ categories, brands, settings }: Props) {
                   key={c.id}
                   href={`/categories/${c.slug}`}
                   aria-current={pathname === `/categories/${c.slug}` ? 'page' : undefined}
-                  className="hover:text-accent-400"
+                  className="hover:opacity-75"
                 >
                   {c.name}
                 </Link>
@@ -242,6 +246,7 @@ export default function Header({ categories, brands, settings }: Props) {
               <NavDropdown
                 key={c.id}
                 label={c.name}
+                tone="onPrimary"
                 items={[
                   { label: `All ${c.name}`, href: `/categories/${c.slug}` },
                   ...subs.map((s) => ({ label: s.name, href: `/categories/${s.slug}` })),
@@ -253,7 +258,7 @@ export default function Header({ categories, brands, settings }: Props) {
           <Link
             href="/deals"
             aria-current={pathname === '/deals' ? 'page' : undefined}
-            className="font-bold hover:text-accent-400"
+            className="font-bold hover:opacity-75"
           >
             <span aria-hidden="true">🔥 </span>Deals
           </Link>
@@ -304,13 +309,13 @@ export default function Header({ categories, brands, settings }: Props) {
           animate={{ x: 0 }}
           exit={{ x: '-100%' }}
           transition={{ type: 'tween', duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-0 left-0 top-0 z-50 flex w-[85%] max-w-sm flex-col bg-white shadow-2xl will-change-transform focus:outline-none md:hidden"
+          className="fixed bottom-0 left-0 top-0 z-50 flex w-[85%] max-w-sm flex-col bg-card shadow-2xl will-change-transform focus:outline-none md:hidden"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           {/* Self-contained top bar: matches the visible header bar so the
               user never feels the chrome "disappeared", and carries the X
               close button so dismissal is always one tap. */}
-          <div className="flex shrink-0 items-center justify-between border-b border-gray-200 px-3 py-3 sm:px-4 sm:py-4">
+          <div className="flex shrink-0 items-center justify-between border-b border-border px-3 py-3 sm:px-4 sm:py-4">
             <Link
               href="/"
               aria-label={`${settings.name} home`}
@@ -330,7 +335,7 @@ export default function Header({ categories, brands, settings }: Props) {
               type="button"
               onClick={() => setMobileMenuOpen(false)}
               aria-label="Close navigation"
-              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
             </button>
@@ -463,7 +468,7 @@ function MobileLink({
     <Link
       href={href}
       onClick={onSelect}
-      className={`flex min-h-11 items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100 active:bg-gray-100 ${className}`}
+      className={`flex min-h-11 items-center gap-3 rounded-md px-3 py-2 hover:bg-muted active:bg-muted ${className}`}
     >
       {thumbnail}
       <span className="min-w-0 flex-1 truncate">{children}</span>
@@ -492,12 +497,12 @@ function MobileSection({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2 text-left hover:bg-gray-100 active:bg-gray-100"
+        className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2 text-left hover:bg-muted active:bg-muted"
       >
         {thumbnail}
         <span className="min-w-0 flex-1 truncate">{label}</span>
         <ChevronDownIcon
-          className={`h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200 motion-reduce:transition-none ${
+          className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${
             open ? 'rotate-180' : ''
           }`}
           aria-hidden="true"
@@ -509,7 +514,7 @@ function MobileSection({
         }`}
       >
         <div className="overflow-hidden">
-          <div className="ml-3 mt-1 flex flex-col gap-0.5 border-l border-gray-200 pl-3">
+          <div className="ml-3 mt-1 flex flex-col gap-0.5 border-l border-border pl-3">
             {children}
           </div>
         </div>
@@ -537,7 +542,7 @@ function CategoryThumb({
 }) {
   if (imageUrl) {
     return (
-      <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded bg-gray-50 ring-1 ring-gray-200">
+      <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded bg-muted ring-1 ring-border">
         <Image src={imageUrl} alt="" fill sizes="32px" className="object-contain p-0.5" />
       </span>
     );
@@ -545,7 +550,7 @@ function CategoryThumb({
   return (
     <span
       aria-hidden="true"
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-gray-50 text-lg leading-none ring-1 ring-gray-200"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-muted text-lg leading-none ring-1 ring-border"
     >
       {categoryIconFor(slug)}
     </span>
@@ -573,9 +578,9 @@ function UtilityThumb({
   tone?: 'gray' | 'primary' | 'deal';
 }) {
   const tones = {
-    gray: 'bg-gray-50 text-gray-600 ring-gray-200',
-    primary: 'bg-primary-50 text-primary-700 ring-primary-100',
-    deal: 'bg-orange-50 text-orange-600 ring-orange-100',
+    gray: 'bg-muted text-muted-foreground ring-border',
+    primary: 'bg-accent text-accent-foreground ring-border',
+    deal: 'bg-chart-1/20 text-chart-3 ring-chart-2/30',
   } as const;
   return (
     <span
@@ -604,7 +609,7 @@ function BrandThumb({
 }) {
   if (logoUrl) {
     return (
-      <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded bg-gray-50 ring-1 ring-gray-200">
+      <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded bg-muted ring-1 ring-border">
         <Image src={logoUrl} alt="" fill sizes="32px" className="object-contain p-0.5" />
       </span>
     );
@@ -612,7 +617,7 @@ function BrandThumb({
   return (
     <span
       aria-hidden="true"
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-semibold text-primary-700 ring-1 ring-primary-100"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-semibold text-accent-foreground ring-1 ring-border"
     >
       {name.charAt(0).toUpperCase()}
     </span>

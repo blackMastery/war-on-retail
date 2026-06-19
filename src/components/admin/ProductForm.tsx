@@ -17,7 +17,7 @@ const initial: ProductFormState = {};
 
 // Shared input styling. (Can't use `@apply` at runtime — must be real Tailwind classes.)
 const INPUT =
-  'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm';
+  'mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm';
 
 export default function ProductForm({ product, categories, brands }: Props) {
   const [state, action, pending] = useActionState(upsertProduct, initial);
@@ -126,7 +126,7 @@ export default function ProductForm({ product, categories, brands }: Props) {
               type="checkbox"
               name="track_inventory"
               defaultChecked={product?.track_inventory ?? true}
-              className="rounded text-primary-600"
+              className="rounded text-primary"
             />
             Track inventory
           </label>
@@ -134,7 +134,7 @@ export default function ProductForm({ product, categories, brands }: Props) {
       </Section>
 
       <Section title="Pre-orders">
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-muted-foreground">
           When ticked, customers can still buy this product after stock runs
           out — the order line is flagged as a pre-order and admins
           reconcile inventory manually when shipping.
@@ -144,22 +144,22 @@ export default function ProductForm({ product, categories, brands }: Props) {
             type="checkbox"
             name="is_pre_order_enabled"
             defaultChecked={product?.is_pre_order_enabled ?? false}
-            className="rounded text-primary-600"
+            className="rounded text-primary"
           />
           Allow pre-orders when out of stock
         </label>
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">
-            Pre-order message <span className="font-normal text-gray-500">(optional)</span>
+          <span className="font-medium text-secondary-foreground">
+            Pre-order message <span className="font-normal text-muted-foreground">(optional)</span>
           </span>
           <textarea
             name="pre_order_message"
             rows={2}
             defaultValue={product?.pre_order_message ?? ''}
             placeholder="e.g. Ships within 3–4 weeks. Confirmed by our team."
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+            className="mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm"
           />
-          <span className="mt-1 block text-xs text-gray-500">
+          <span className="mt-1 block text-xs text-muted-foreground">
             Shown next to the customer&apos;s Pre-order CTA when the product is
             out of stock. Leave blank to use a generic line.
           </span>
@@ -196,7 +196,7 @@ export default function ProductForm({ product, categories, brands }: Props) {
       </Section>
 
       <Section title="Images">
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-muted-foreground">
           Upload as many images as you want. Pick one as the featured image — it’s the one that
           shows on product cards and as the hero on the product page. Files upload directly to the{' '}
           <code>product-images</code> Supabase Storage bucket.
@@ -210,7 +210,7 @@ export default function ProductForm({ product, categories, brands }: Props) {
       </Section>
 
       <Section title="Specifications">
-        <p className="mb-3 text-xs text-gray-600">
+        <p className="mb-3 text-xs text-muted-foreground">
           Technical details shown in the product page’s spec table. One row per attribute — the
           name on the left is the label customers see, the value on the right is what shows next
           to it.
@@ -221,7 +221,7 @@ export default function ProductForm({ product, categories, brands }: Props) {
       </Section>
 
       <Section title="SEO">
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-muted-foreground">
           Optional. When blank, the product page builds these automatically
           from brand + name and the short / long description.
         </p>
@@ -247,7 +247,7 @@ export default function ProductForm({ product, categories, brands }: Props) {
               type="checkbox"
               name="is_active"
               defaultChecked={product?.is_active ?? true}
-              className="rounded text-primary-600"
+              className="rounded text-primary"
             />
             Active (visible in storefront)
           </label>
@@ -256,18 +256,18 @@ export default function ProductForm({ product, categories, brands }: Props) {
               type="checkbox"
               name="is_featured"
               defaultChecked={product?.is_featured ?? false}
-              className="rounded text-primary-600"
+              className="rounded text-primary"
             />
             Featured (homepage)
           </label>
         </div>
       </Section>
 
-      <div className="flex items-center justify-end gap-2 border-t border-gray-200 pt-4">
+      <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-primary-600 px-5 py-2 font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+          className="rounded-md bg-primary text-primary-foreground px-5 py-2 font-semibold hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Saving…' : product ? 'Save changes' : 'Create product'}
         </button>
@@ -279,7 +279,7 @@ export default function ProductForm({ product, categories, brands }: Props) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <section className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
       <h2 className="mb-3 font-semibold">{title}</h2>
       <div className="space-y-4">{children}</div>
     </section>
@@ -299,9 +299,9 @@ function Field({
 }) {
   return (
     <label className="block text-sm">
-      <span className="font-medium text-gray-700">{label}</span>
+      <span className="font-medium text-secondary-foreground">{label}</span>
       {children}
-      {hint && !error && <span className="mt-1 block text-xs text-gray-500">{hint}</span>}
+      {hint && !error && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>}
       {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
     </label>
   );

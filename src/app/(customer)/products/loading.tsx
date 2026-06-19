@@ -13,13 +13,13 @@ export default function Loading() {
   return (
     <div className="container py-6 sm:py-8">
       <header className="mb-6 animate-pulse">
-        <div className="h-7 w-48 rounded bg-gray-200 sm:h-8" />
-        <div className="mt-2 h-4 w-64 rounded bg-gray-200" />
+        <div className="h-7 w-48 rounded bg-muted sm:h-8" />
+        <div className="mt-2 h-4 w-64 rounded bg-muted" />
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
         <div className="hidden lg:block">
-          <div className="h-[32rem] animate-pulse rounded-lg bg-gray-100" />
+          <div className="h-[32rem] animate-pulse rounded-lg bg-muted" />
         </div>
         <div className="min-w-0">
           <ProductGridSkeleton count={12} />

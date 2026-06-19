@@ -23,8 +23,8 @@ export type EmailVars = Record<string, string>;
 /** Variables whose values are already HTML and must NOT be escaped. */
 const RAW_HTML_VARS = new Set(['order_items']);
 
-/** Brand red — kept in sync with tailwind `primary-600`. */
-const BRAND_RED = '#C91919';
+/** Brand amber — kept in sync with tailwind `primary`. */
+const BRAND_PRIMARY = '#DFBF0A';
 
 /**
  * Catalogue of supported variables, surfaced in the editor as an insert palette
@@ -89,15 +89,15 @@ export function renderLayout(innerHtml: string, brand: EmailBrand): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:24px 0;">
 <tr><td align="center">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
-<tr><td style="background:${BRAND_RED};padding:20px 28px;">
-<span style="font-size:20px;font-weight:bold;color:#ffffff;letter-spacing:0.3px;">${escapeHtml(brand.name)}</span>
+<tr><td style="background:${BRAND_PRIMARY};padding:20px 28px;">
+<span style="font-size:20px;font-weight:bold;color:#000000;letter-spacing:0.3px;">${escapeHtml(brand.name)}</span>
 </td></tr>
 <tr><td style="padding:28px;font-size:15px;line-height:1.6;color:#1f2937;">
 ${innerHtml}
 </td></tr>
 <tr><td style="padding:20px 28px;background:#f9fafb;border-top:1px solid #e5e7eb;font-size:12px;line-height:1.6;color:#6b7280;">
 <p style="margin:0 0 6px 0;">${escapeHtml(brand.name)} — ${escapeHtml(brand.address)}</p>
-<p style="margin:0 0 6px 0;">Phone ${escapeHtml(brand.phone)} · <a href="mailto:${escapeHtml(brand.email)}" style="color:${BRAND_RED};text-decoration:none;">${escapeHtml(brand.email)}</a></p>
+<p style="margin:0 0 6px 0;">Phone ${escapeHtml(brand.phone)} · <a href="mailto:${escapeHtml(brand.email)}" style="color:${BRAND_PRIMARY};text-decoration:none;">${escapeHtml(brand.email)}</a></p>
 <p style="margin:0;color:#9ca3af;">You're receiving this because you placed an order or asked us to keep you posted. Reply to this email to unsubscribe.</p>
 </td></tr>
 </table>

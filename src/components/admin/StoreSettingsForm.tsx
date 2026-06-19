@@ -9,7 +9,7 @@ import type { StoreSettings } from '@/types/database';
 
 const initial: StoreSettingsFormState = {};
 const INPUT =
-  'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm';
+  'mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm';
 
 export default function StoreSettingsForm({ settings }: { settings: StoreSettings | null }) {
   const [state, action, pending] = useActionState(updateStoreSettings, initial);
@@ -194,11 +194,11 @@ export default function StoreSettingsForm({ settings }: { settings: StoreSetting
         />
       </Section>
 
-      <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-2 border-t border-gray-200 bg-white px-4 py-3 sm:mx-0 sm:rounded-md sm:px-0 sm:pb-0">
+      <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-2 border-t border-border bg-card px-4 py-3 sm:mx-0 sm:rounded-md sm:px-0 sm:pb-0">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-primary-600 px-5 py-2 font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
+          className="rounded-md bg-primary text-primary-foreground px-5 py-2 font-semibold shadow-sm hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Saving…' : 'Save settings'}
         </button>
@@ -211,7 +211,7 @@ export default function StoreSettingsForm({ settings }: { settings: StoreSetting
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
       <h2 className="font-semibold">{title}</h2>
       <div className="space-y-4">{children}</div>
     </section>
@@ -247,7 +247,7 @@ function Field({
 }: FieldProps) {
   return (
     <label className="block text-sm">
-      <span className="font-medium text-gray-700">{label}</span>
+      <span className="font-medium text-secondary-foreground">{label}</span>
       {textarea ? (
         <textarea
           name={name}
@@ -266,7 +266,7 @@ function Field({
           className={INPUT}
         />
       )}
-      {hint && <span className="mt-1 block text-xs text-gray-500">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>}
       {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
     </label>
   );

@@ -112,7 +112,7 @@ export default function DiscountCodeInput() {
           className="space-y-2"
           noValidate
         >
-          <label htmlFor="discount-code" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="discount-code" className="block text-sm font-medium text-secondary-foreground">
             Discount code
           </label>
           <div className="flex gap-2">
@@ -130,12 +130,12 @@ export default function DiscountCodeInput() {
               placeholder="e.g. SUMMER20"
               aria-invalid={error ? true : undefined}
               aria-describedby={error ? 'discount-code-error' : undefined}
-              className="block w-full rounded-md border-gray-300 text-sm uppercase shadow-sm focus:border-primary-500 focus:ring-primary-500"
+              className="block w-full rounded-md border-border text-sm uppercase shadow-sm focus:border-ring focus:ring-ring"
             />
             <button
               type="submit"
               disabled={pending || !code.trim()}
-              className="shrink-0 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+              className="shrink-0 rounded-md bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground hover:bg-muted disabled:opacity-50"
             >
               {pending ? 'Applying…' : 'Apply'}
             </button>

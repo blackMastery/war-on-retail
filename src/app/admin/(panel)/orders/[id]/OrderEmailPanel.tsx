@@ -17,7 +17,7 @@ const SEND_OPTIONS: { slug: string; label: string }[] = [
 ];
 
 const INPUT =
-  'mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500';
+  'mt-1 block w-full rounded-md border-border text-sm shadow-sm focus:border-ring focus:ring-ring';
 
 /**
  * Order-screen email controls. Two jobs:
@@ -39,14 +39,14 @@ export default function OrderEmailPanel({
   const [sendState, sendAction, sendPending] = useActionState(sendOrderEmailManual, initial);
 
   return (
-    <div className="mt-6 border-t border-gray-200 pt-4">
+    <div className="mt-6 border-t border-border pt-4">
       <h2 className="font-semibold">Email</h2>
 
       <form action={emailAction} className="mt-2">
         <input type="hidden" name="customer_id" value={customerId} />
         <input type="hidden" name="order_id" value={orderId} />
         <label className="block text-sm">
-          <span className="text-xs uppercase tracking-wide text-gray-500">Customer email</span>
+          <span className="text-xs uppercase tracking-wide text-muted-foreground">Customer email</span>
           <input
             name="email"
             type="email"
@@ -59,7 +59,7 @@ export default function OrderEmailPanel({
           <button
             type="submit"
             disabled={emailPending}
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+            className="rounded-md border border-border bg-card px-3 py-1.5 text-xs font-semibold text-secondary-foreground hover:bg-muted disabled:opacity-60"
           >
             {emailPending ? 'Saving…' : 'Save email'}
           </button>
@@ -70,7 +70,7 @@ export default function OrderEmailPanel({
 
       <form action={sendAction} className="mt-4 space-y-2">
         <input type="hidden" name="order_id" value={orderId} />
-        <span className="text-xs uppercase tracking-wide text-gray-500">Send an email</span>
+        <span className="text-xs uppercase tracking-wide text-muted-foreground">Send an email</span>
         {!currentEmail && (
           <p className="text-xs text-amber-700">Add an email above first to send.</p>
         )}
@@ -85,7 +85,7 @@ export default function OrderEmailPanel({
           <button
             type="submit"
             disabled={sendPending || !currentEmail}
-            className="rounded-md bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+            className="rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-xs font-semibold hover:opacity-90 disabled:opacity-60"
           >
             {sendPending ? 'Sending…' : 'Send'}
           </button>

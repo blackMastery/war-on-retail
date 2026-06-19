@@ -14,10 +14,10 @@ export const metadata = { title: 'Set a new password' };
  */
 export default function ResetPasswordPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md ring-1 ring-gray-200">
+    <main className="flex min-h-screen items-center justify-center bg-muted px-4">
+      <div className="w-full max-w-md rounded-lg bg-card p-8 shadow-md ring-1 ring-border">
         <h1 className="text-2xl font-bold">Set a new password</h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-muted-foreground">
           Pick a password you haven&apos;t used here before. You&apos;ll be signed in
           right after.
         </p>

@@ -25,29 +25,29 @@ export default async function CheckoutSuccessPage({
           a "complete" cart hanging. */}
       <ClearCartOnMount />
 
-      <div className="mx-auto max-w-xl rounded-lg bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">
+      <div className="mx-auto max-w-xl rounded-lg bg-card p-8 text-center shadow-sm ring-1 ring-border">
         <CheckCircleIcon
           className="mx-auto h-14 w-14 text-green-500"
           aria-hidden="true"
         />
-        <h1 className="mt-4 text-2xl font-bold text-gray-900 sm:text-3xl">
+        <h1 className="mt-4 text-2xl font-bold text-foreground sm:text-3xl">
           Order placed
         </h1>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-muted-foreground">
           Thanks — we&apos;ve got it. Someone from{' '}
           <span translate="no">{settings.name}</span> will reach the phone you
           provided to confirm availability and arrange payment.
         </p>
 
         {order && (
-          <div className="mt-6 rounded-md bg-primary-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary-700">
+          <div className="mt-6 rounded-md bg-accent p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-accent-foreground">
               Your order number
             </p>
-            <p className="mt-1 select-all font-mono text-lg font-bold text-primary-900">
+            <p className="mt-1 select-all font-mono text-lg font-bold text-primary">
               {order}
             </p>
-            <p className="mt-1 text-xs text-primary-700">
+            <p className="mt-1 text-xs text-accent-foreground">
               Keep this handy. Quote it when you message us if you have questions.
             </p>
           </div>
@@ -56,7 +56,7 @@ export default async function CheckoutSuccessPage({
         <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/products"
-            className="rounded-md bg-primary-600 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-primary-700"
+            className="rounded-md bg-primary text-primary-foreground px-5 py-2.5 font-semibold shadow-sm hover:opacity-90"
           >
             Keep shopping
           </Link>

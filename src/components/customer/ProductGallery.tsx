@@ -127,7 +127,7 @@ export default function ProductGallery({
   if (total === 0) {
     return (
       <div
-        className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-gray-100 text-7xl text-gray-300 ring-1 ring-gray-200"
+        className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-muted text-7xl text-muted-foreground ring-1 ring-border"
         aria-label={`No image available for ${productName}`}
       >
         <span aria-hidden="true">📦</span>
@@ -150,7 +150,7 @@ export default function ProductGallery({
           // `pan-y` lets vertical scrolling stay smooth; we own horizontal.
           // `select-none` stops mobile text-selection from kicking in.
           // `touch-callout` is iOS-only; nukes the "save image" long-press.
-          className="group relative block aspect-square w-full cursor-zoom-in select-none overflow-hidden rounded-lg bg-gray-100 ring-1 ring-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+          className="group relative block aspect-square w-full cursor-zoom-in select-none overflow-hidden rounded-lg bg-muted ring-1 ring-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           style={{ touchAction: 'pan-y', WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
         >
           {/* Crossfade the active image so switching thumbnails / swiping
@@ -178,13 +178,13 @@ export default function ProductGallery({
             </motion.div>
           </AnimatePresence>
           {discount > 0 && (
-            <span className="pointer-events-none absolute left-3 top-3 rounded bg-primary-600 px-2 py-0.5 text-sm font-bold text-white">
+            <span className="pointer-events-none absolute left-3 top-3 rounded bg-primary text-primary-foreground px-2 py-0.5 text-sm font-bold">
               -{discount}%
             </span>
           )}
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+            className="pointer-events-none absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-card/90 text-secondary-foreground shadow-sm opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
           >
             <MagnifyingGlassPlusIcon className="h-4 w-4" aria-hidden="true" />
           </span>
@@ -215,8 +215,8 @@ export default function ProductGallery({
                   onClick={() => setActive(i)}
                   aria-label={`Show image ${i + 1}`}
                   aria-current={isActive ? 'true' : undefined}
-                  className={`relative block aspect-square w-full overflow-hidden rounded-md ring-2 transition-shadow focus-visible:outline-none focus-visible:ring-primary-600 ${
-                    isActive ? 'ring-primary-600' : 'ring-gray-200 hover:ring-gray-400'
+                  className={`relative block aspect-square w-full overflow-hidden rounded-md ring-2 transition-shadow focus-visible:outline-none focus-visible:ring-ring ${
+                    isActive ? 'ring-ring' : 'ring-border hover:ring-muted-foreground'
                   }`}
                 >
                   <Image
@@ -267,7 +267,7 @@ function NavButton({
       aria-label={direction === 'prev' ? 'Previous image' : 'Next image'}
       className={`absolute top-1/2 -translate-y-1/2 ${
         direction === 'prev' ? 'left-2' : 'right-2'
-      } flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-gray-700 shadow-md ring-1 ring-gray-200 hover:bg-white sm:h-9 sm:w-9`}
+      } flex h-11 w-11 items-center justify-center rounded-full bg-card/95 text-secondary-foreground shadow-md ring-1 ring-border hover:bg-card sm:h-9 sm:w-9`}
     >
       <Icon className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden="true" />
     </button>
@@ -392,7 +392,7 @@ function Lightbox({
       aria-label={heading}
       tabIndex={-1}
       style={{ touchAction: 'pan-y' }}
-      className="fixed inset-0 z-[60] flex items-center justify-center overscroll-contain bg-black/90 p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/90"
+      className="fixed inset-0 z-[60] flex items-center justify-center overscroll-contain bg-black/90 p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-black/90"
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
@@ -403,7 +403,7 @@ function Lightbox({
         onPointerDown={(e) => e.stopPropagation()}
         onPointerUp={(e) => e.stopPropagation()}
         aria-label="Close"
-        className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+        className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full bg-card/10 text-white hover:bg-card/20"
         style={{ marginTop: 'env(safe-area-inset-top)' }}
       >
         <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -417,7 +417,7 @@ function Lightbox({
             onPointerDown={(e) => e.stopPropagation()}
             onPointerUp={(e) => e.stopPropagation()}
             aria-label="Previous image"
-            className="absolute left-2 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+            className="absolute left-2 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-card/10 text-white hover:bg-card/20"
           >
             <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
           </button>
@@ -427,7 +427,7 @@ function Lightbox({
             onPointerDown={(e) => e.stopPropagation()}
             onPointerUp={(e) => e.stopPropagation()}
             aria-label="Next image"
-            className="absolute right-2 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+            className="absolute right-2 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-card/10 text-white hover:bg-card/20"
           >
             <ChevronRightIcon className="h-6 w-6" aria-hidden="true" />
           </button>
@@ -451,7 +451,7 @@ function Lightbox({
 
       {total > 1 && (
         <p
-          className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-xs text-white tabular-nums"
+          className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-card/10 px-3 py-1 text-xs text-white tabular-nums"
           aria-live="polite"
           aria-atomic="true"
           style={{ marginBottom: 'env(safe-area-inset-bottom)' }}

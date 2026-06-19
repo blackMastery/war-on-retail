@@ -40,7 +40,7 @@ export default async function AdminTeamPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold">Team</h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-muted-foreground">
           Manage who can sign in to admin and which sections they can use. Super
           admins have full access; regular admins only see the sections you grant
           them. New admins must sign in once at <code>/admin/login</code> before

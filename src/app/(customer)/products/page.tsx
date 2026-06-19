@@ -55,7 +55,7 @@ export default async function ProductsPage({
     <div className="container py-6 sm:py-8">
       <header className="mb-6">
         <h1 className="text-pretty text-2xl font-bold sm:text-3xl">All Products</h1>
-        <p className="mt-1 text-sm text-gray-600 tabular-nums">
+        <p className="mt-1 text-sm text-muted-foreground tabular-nums">
           {page.totalCount === 0
             ? 'No products match the current filters.'
             : page.totalCount <= PAGE_SIZE
@@ -188,9 +188,9 @@ function parsePage(raw: string | string[] | undefined): number {
 
 function EmptyState() {
   return (
-    <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-      <p className="text-lg font-semibold text-gray-900">No matching products</p>
-      <p className="mt-1 text-sm text-gray-600">
+    <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
+      <p className="text-lg font-semibold text-foreground">No matching products</p>
+      <p className="mt-1 text-sm text-muted-foreground">
         Try widening the price range or clearing a filter or two.
       </p>
     </div>

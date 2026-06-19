@@ -27,9 +27,9 @@ export default function OrderNotesForm({
   }
 
   return (
-    <div className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <div className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
       <h2 className="font-semibold">Internal notes</h2>
-      <p className="mt-1 text-xs text-gray-500">
+      <p className="mt-1 text-xs text-muted-foreground">
         Only visible to admins. Useful for tracking conversations, special
         requests, or delivery instructions.
       </p>
@@ -38,7 +38,7 @@ export default function OrderNotesForm({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="e.g. Customer called — wants delivery on Thursday afternoon."
-        className="mt-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+        className="mt-3 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm"
       />
       <div className="mt-3 flex items-center justify-end gap-3">
         {saved && (
@@ -50,7 +50,7 @@ export default function OrderNotesForm({
           type="button"
           onClick={onSave}
           disabled={pending}
-          className="rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
+          className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold shadow-sm hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Saving…' : 'Save notes'}
         </button>

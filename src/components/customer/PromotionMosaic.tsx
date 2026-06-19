@@ -26,7 +26,7 @@ export default function PromotionMosaic({ promotions }: { promotions: Promotion[
   const rest = promotions.filter((_, i) => i !== featuredIdx);
 
   return (
-    <section aria-label="Current specials" className="bg-accent-600">
+    <section aria-label="Current specials">
       <div className="container py-8 md:py-12">
         <div
           className={`grid gap-4 ${
@@ -74,7 +74,7 @@ function Tile({
 }) {
   const inner = (
     <figure
-      className={`relative h-full w-full overflow-hidden rounded-lg bg-gray-200 shadow-sm ring-1 ring-gray-200 transition-shadow ${
+      className={`relative h-full w-full overflow-hidden rounded-lg bg-muted shadow-sm ring-1 ring-border transition-shadow ${
         promotion.link_url ? 'group-hover:shadow-lg group-focus-visible:shadow-lg' : ''
       } ${aspect}`}
     >
@@ -101,7 +101,7 @@ function Tile({
       <Link
         href={promotion.link_url}
         aria-label={promotion.title}
-        className="group block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+        className="group block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         {inner}
       </Link>
@@ -115,7 +115,7 @@ function Tile({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${promotion.title} (opens in a new tab)`}
-      className="group block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+      className="group block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
       {inner}
     </a>

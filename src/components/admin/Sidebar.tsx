@@ -68,10 +68,10 @@ export default function Sidebar({
 
   const asideClasses = [
     // Mobile (default): fixed off-canvas drawer that slides in from the left.
-    'fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-white shadow-xl transition-transform duration-200 ease-out',
+    'fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-sidebar text-sidebar-foreground shadow-xl transition-transform duration-200 ease-out',
     drawerOpen ? 'translate-x-0' : '-translate-x-full',
     // Desktop (md+): static rail, no transform, no shadow, narrower width.
-    'md:static md:z-auto md:w-60 md:max-w-none md:translate-x-0 md:border-r md:border-gray-200 md:shadow-none',
+    'md:static md:z-auto md:w-60 md:max-w-none md:translate-x-0 md:border-r md:border-sidebar-border md:shadow-none',
   ].join(' ');
 
   return (
@@ -79,7 +79,7 @@ export default function Sidebar({
       {/* Mobile top bar — visible only below md. Provides the hamburger,
           brand, and a quick sign-out so the admin always has an exit. */}
       <header
-        className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-200 bg-white px-3 py-2 md:hidden"
+        className="sticky top-0 z-30 flex items-center justify-between border-b border-sidebar-border bg-sidebar px-3 py-2 text-sidebar-foreground md:hidden"
         style={{ paddingTop: 'calc(0.5rem + env(safe-area-inset-top))' }}
       >
         <button
@@ -88,7 +88,7 @@ export default function Sidebar({
           aria-label="Open admin menu"
           aria-expanded={drawerOpen}
           aria-controls="admin-drawer"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
           <Bars3Icon className="h-6 w-6" aria-hidden="true" />
         </button>
@@ -110,7 +110,7 @@ export default function Sidebar({
           type="button"
           onClick={signOut}
           aria-label="Sign out"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-sidebar-foreground/80 hover:bg-white/10 hover:text-sidebar-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
           <ArrowRightOnRectangleIcon className="h-6 w-6" aria-hidden="true" />
         </button>
@@ -132,7 +132,7 @@ export default function Sidebar({
         className={asideClasses}
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center justify-between border-b border-gray-200 p-4">
+        <div className="flex items-center justify-between border-b border-sidebar-border p-4">
           <Link href="/admin" aria-label="War on Retail admin home" className="block">
             <Image
               src="/logo.png"
@@ -148,12 +148,12 @@ export default function Sidebar({
             type="button"
             onClick={() => setDrawerOpen(false)}
             aria-label="Close menu"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md hover:bg-gray-100 md:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md hover:bg-white/10 md:hidden"
           >
             <XMarkIcon className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
-        <p className="px-4 pt-2 text-xs uppercase tracking-wide text-gray-400">Admin</p>
+        <p className="px-4 pt-2 text-xs uppercase tracking-wide text-muted-foreground">Admin</p>
 
         <nav className="flex-1 space-y-1 overflow-y-auto p-3">
           {nav.map((item) => {
@@ -166,8 +166,8 @@ export default function Sidebar({
                 onClick={() => setDrawerOpen(false)}
                 className={`flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm ${
                   active
-                    ? 'bg-primary-50 font-semibold text-primary-700'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
+                    : 'text-sidebar-foreground/80 hover:bg-white/10 hover:text-sidebar-foreground'
                 }`}
               >
                 <span aria-hidden>{item.icon}</span>
@@ -178,11 +178,11 @@ export default function Sidebar({
         </nav>
 
         <div
-          className="border-t border-gray-200 p-3 text-xs"
+          className="border-t border-sidebar-border p-3 text-xs"
           style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
         >
           {bootstrap && (
-            <div className="mb-2 rounded-md bg-yellow-50 p-2 text-[11px] leading-tight text-yellow-800 ring-1 ring-yellow-200">
+            <div className="mb-2 rounded-md bg-sidebar-accent p-2 text-[11px] leading-tight text-sidebar-accent-foreground ring-1 ring-sidebar-border">
               <p className="font-semibold">Bootstrap access</p>
               <p className="mt-0.5">
                 You&apos;re in via <code>ADMIN_ALLOWED_EMAILS</code>. Persist this:
@@ -191,11 +191,11 @@ export default function Sidebar({
               <p className="mt-1">Run it in the Supabase SQL editor, then remove your email from the env.</p>
             </div>
           )}
-          <p className="truncate text-gray-500">{email}</p>
+          <p className="truncate text-muted-foreground">{email}</p>
           <button
             type="button"
             onClick={signOut}
-            className="mt-2 w-full rounded-md border border-gray-300 px-2 py-1.5 text-left font-medium hover:bg-gray-50"
+            className="mt-2 w-full rounded-md border border-sidebar-border px-2 py-1.5 text-left font-medium hover:bg-white/10"
           >
             Sign out
           </button>

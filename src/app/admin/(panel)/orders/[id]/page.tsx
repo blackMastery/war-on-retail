@@ -16,7 +16,7 @@ const STATUS_TONE: Record<OrderStatus, string> = {
   pending: 'bg-amber-100 text-amber-800',
   approved: 'bg-blue-100 text-blue-800',
   fulfilled: 'bg-green-100 text-green-800',
-  cancelled: 'bg-gray-100 text-gray-600',
+  cancelled: 'bg-muted text-muted-foreground',
 };
 
 export default async function AdminOrderDetailPage({
@@ -65,12 +65,12 @@ export default async function AdminOrderDetailPage({
         <div>
           <Link
             href="/admin/orders"
-            className="text-sm font-medium text-primary-600 hover:underline"
+            className="text-sm font-medium text-primary hover:underline"
           >
             ← All orders
           </Link>
           <h1 className="mt-1 font-mono text-2xl font-bold">{order.order_number}</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Placed{' '}
             {new Date(order.placed_at).toLocaleString('en-GY', {
               dateStyle: 'medium',
@@ -92,7 +92,7 @@ export default async function AdminOrderDetailPage({
             </span>
           )}
           {order.status_updated_by && (
-            <p className="w-full text-right text-xs text-gray-500">
+            <p className="w-full text-right text-xs text-muted-foreground">
               Status changed by {labelFor(order.status_updated_by, statusNames)} ·{' '}
               {formatAuditDate(order.status_updated_at)}
             </p>
@@ -102,28 +102,28 @@ export default async function AdminOrderDetailPage({
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Customer + fulfilment */}
-        <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200 lg:col-span-1">
+        <section className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border lg:col-span-1">
           <h2 className="font-semibold">Customer</h2>
           {customer ? (
             <div className="mt-3 space-y-1 text-sm">
-              <div className="font-medium text-gray-900">{customer.name}</div>
+              <div className="font-medium text-foreground">{customer.name}</div>
               <div>
                 <a
                   href={`tel:${customer.phone}`}
-                  className="text-primary-600 hover:underline"
+                  className="text-primary hover:underline"
                 >
                   {customer.phone}
                 </a>
               </div>
               <Link
                 href={`/admin/customers/${customer.id}`}
-                className="mt-2 inline-block text-xs font-medium text-primary-600 hover:underline"
+                className="mt-2 inline-block text-xs font-medium text-primary hover:underline"
               >
                 View all orders from this customer →
               </Link>
             </div>
           ) : (
-            <p className="mt-3 text-sm text-gray-500">Customer record was removed.</p>
+            <p className="mt-3 text-sm text-muted-foreground">Customer record was removed.</p>
           )}
 
           {customer && (
@@ -139,41 +139,41 @@ export default async function AdminOrderDetailPage({
             <span className="font-medium capitalize">{order.fulfillment_type}</span>
           </p>
           {order.fulfillment_type === 'delivery' && (
-            <dl className="mt-2 space-y-1 text-sm text-gray-700">
+            <dl className="mt-2 space-y-1 text-sm text-secondary-foreground">
               {order.delivery_city && (
                 <div>
-                  <dt className="text-xs uppercase tracking-wide text-gray-500">City</dt>
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">City</dt>
                   <dd>{order.delivery_city}</dd>
                 </div>
               )}
               {order.delivery_address && (
                 <div>
-                  <dt className="text-xs uppercase tracking-wide text-gray-500">Address</dt>
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">Address</dt>
                   <dd className="whitespace-pre-line">{order.delivery_address}</dd>
                 </div>
               )}
             </dl>
           )}
           {order.fulfillment_type === 'pickup' && (
-            <p className="mt-2 text-xs text-gray-500">
+            <p className="mt-2 text-xs text-muted-foreground">
               Customer will collect from {siteConfig.address}.
             </p>
           )}
 
           <h2 className="mt-6 font-semibold">Payment</h2>
-          <p className="mt-2 text-sm font-medium text-gray-900">
+          <p className="mt-2 text-sm font-medium text-foreground">
             {paymentMethod?.name ?? 'Unknown'}
           </p>
           {paymentMethod?.description && (
-            <p className="mt-1 text-xs text-gray-600">{paymentMethod.description}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{paymentMethod.description}</p>
           )}
         </section>
 
         {/* Items + total + actions */}
         <section className="space-y-6 lg:col-span-2">
-          <div className="overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-            <table className="min-w-full divide-y divide-gray-200 text-sm">
-              <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+          <div className="overflow-x-auto rounded-lg bg-card shadow-sm ring-1 ring-border">
+            <table className="min-w-full divide-y divide-border text-sm">
+              <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3">Product</th>
                   <th className="px-4 py-3">SKU</th>
@@ -182,12 +182,12 @@ export default async function AdminOrderDetailPage({
                   <th className="px-4 py-3 text-right">Line total</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border">
                 {(items ?? []).map((it) => (
                   <tr key={it.id}>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-medium text-gray-900">{it.product_name}</span>
+                        <span className="font-medium text-foreground">{it.product_name}</span>
                         {it.is_pre_order && (
                           <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-800">
                             Pre-order
@@ -197,19 +197,19 @@ export default async function AdminOrderDetailPage({
                       {it.product_id ? (
                         <Link
                           href={`/products/${it.product_slug}`}
-                          className="text-xs text-primary-600 hover:underline"
+                          className="text-xs text-primary hover:underline"
                           target="_blank"
                           rel="noreferrer"
                         >
                           View product →
                         </Link>
                       ) : (
-                        <span className="text-xs italic text-gray-500">
+                        <span className="text-xs italic text-muted-foreground">
                           Product was deleted; snapshot kept.
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-gray-500">
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                       {it.product_sku ?? '—'}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums">
@@ -223,7 +223,7 @@ export default async function AdminOrderDetailPage({
                 ))}
               </tbody>
               <tfoot>
-                <tr className={hasDiscount ? '' : 'bg-gray-50'}>
+                <tr className={hasDiscount ? '' : 'bg-muted'}>
                   <td colSpan={4} className="px-4 py-3 text-right font-semibold">
                     Subtotal
                   </td>
@@ -247,7 +247,7 @@ export default async function AdminOrderDetailPage({
                   </tr>
                 )}
                 {hasDiscount && (
-                  <tr className="bg-gray-50">
+                  <tr className="bg-muted">
                     <td colSpan={4} className="px-4 py-3 text-right font-semibold">
                       Total
                     </td>

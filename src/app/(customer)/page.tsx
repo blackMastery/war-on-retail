@@ -212,7 +212,7 @@ export default async function Homepage() {
       {hasPromotions ? (
         <PromotionMosaic promotions={promotions} />
       ) : (
-        <section className="bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white">
+        <section className="bg-gradient-to-r from-primary via-chart-2 to-chart-3 text-primary-foreground">
           <div className="container py-16 md:py-24">
             <div className="max-w-2xl">
               <h1 className="text-balance text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
@@ -224,13 +224,13 @@ export default async function Homepage() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/categories"
-                  className="inline-block rounded-md bg-white px-6 py-3 font-semibold text-primary-700 hover:bg-accent-100"
+                  className="inline-block rounded-md bg-card px-6 py-3 font-semibold text-card-foreground shadow-sm transition-colors hover:bg-muted"
                 >
                   Shop Categories
                 </Link>
                 <Link
                   href="/deals"
-                  className="inline-block rounded-md border-2 border-white px-6 py-3 font-semibold hover:bg-white/10"
+                  className="inline-block rounded-md border-2 border-primary-foreground px-6 py-3 font-semibold transition-colors hover:bg-black/10"
                 >
                   <span aria-hidden="true">🔥 </span>Today’s Deals
                 </Link>
@@ -244,7 +244,7 @@ export default async function Homepage() {
       <Reveal as="section" className="container py-12">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="text-2xl font-bold">Shop by Category</h2>
-          <Link href="/categories" className="text-sm font-medium text-primary-600 hover:underline">
+          <Link href="/categories" className="text-sm font-medium text-link underline-offset-4 hover:underline">
             View all <span aria-hidden="true">→</span>
           </Link>
         </div>
@@ -265,13 +265,13 @@ export default async function Homepage() {
               <h2 className="text-2xl font-bold">
                 <span aria-hidden="true">✨ </span>Just Arrived
               </h2>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Fresh stock added in the last {NEW_ARRIVAL_WINDOW_DAYS} days
               </p>
             </div>
             <Link
               href="/products?sort=newest"
-              className="shrink-0 text-sm font-medium text-primary-600 hover:underline"
+              className="shrink-0 text-sm font-medium text-link underline-offset-4 hover:underline"
             >
               View all <span aria-hidden="true">→</span>
             </Link>
@@ -292,13 +292,13 @@ export default async function Homepage() {
       <RecentlyViewedStrip title="Recently Viewed" minItems={2} />
 
       {/* Featured products */}
-      <Reveal as="section" className="bg-accent-600">
+      <Reveal as="section" className="bg-secondary">
         <div className="container py-12">
           <div className="mb-6 flex items-end justify-between">
             <h2 className="text-2xl font-bold">Featured Products</h2>
             <Link
               href="/products"
-              className="text-sm font-medium text-primary-600 hover:underline"
+              className="text-sm font-medium text-link underline-offset-4 hover:underline"
             >
               All products <span aria-hidden="true">→</span>
             </Link>
@@ -311,7 +311,7 @@ export default async function Homepage() {
       <Reveal as="section" className="container py-12">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="text-2xl font-bold">Popular Brands</h2>
-          <Link href="/brands" className="text-sm font-medium text-primary-600 hover:underline">
+          <Link href="/brands" className="text-sm font-medium text-link underline-offset-4 hover:underline">
             View all <span aria-hidden="true">→</span>
           </Link>
         </div>
@@ -334,13 +334,13 @@ export default async function Homepage() {
           ].map((v) => (
             <div
               key={v.title}
-              className="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200"
+              className="rounded-lg bg-card p-6 shadow-sm ring-1 ring-border"
             >
               <div className="text-3xl" aria-hidden="true">
                 {v.icon}
               </div>
               <h3 className="mt-3 font-bold">{v.title}</h3>
-              <p className="mt-1 text-pretty text-sm text-gray-600">{v.body}</p>
+              <p className="mt-1 text-pretty text-sm text-muted-foreground">{v.body}</p>
             </div>
           ))}
         </div>

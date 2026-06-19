@@ -14,33 +14,33 @@ export default async function PoliciesLayout({ children }: { children: React.Rea
   const settings = await getStoreSettings();
   return (
     <div className="container py-10">
-      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-gray-500">
-        <Link href="/" className="hover:text-primary-600">
+      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-link">
           Home
         </Link>{' '}
-        / <span className="text-gray-700">Policies</span>
+        / <span className="text-secondary-foreground">Policies</span>
       </nav>
 
-      <article className="prose prose-gray max-w-3xl">{children}</article>
+      <article className="prose-theme max-w-3xl">{children}</article>
 
-      <aside className="mt-12 max-w-3xl rounded-lg bg-accent-600 p-5 text-sm ring-1 ring-accent-700">
-        <p className="font-semibold text-gray-900">Questions about this policy?</p>
-        <p className="mt-1 text-gray-700">
+      <aside className="mt-12 max-w-3xl rounded-lg bg-secondary p-5 text-sm ring-1 ring-border">
+        <p className="font-semibold text-foreground">Questions about this policy?</p>
+        <p className="mt-1 text-secondary-foreground">
           The fastest way is WhatsApp:{' '}
           <a
             href={`https://wa.me/${settings.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-primary-600 hover:underline"
+            className="font-medium text-link hover:underline"
           >
             +{settings.whatsapp}
           </a>
           . You can also email{' '}
-          <a href={`mailto:${settings.email}`} className="font-medium text-primary-600 hover:underline">
+          <a href={`mailto:${settings.email}`} className="font-medium text-link hover:underline">
             {settings.email}
           </a>{' '}
           or call{' '}
-          <a href={`tel:${settings.phone}`} className="font-medium text-primary-600 hover:underline">
+          <a href={`tel:${settings.phone}`} className="font-medium text-link hover:underline">
             {settings.phone}
           </a>
           .

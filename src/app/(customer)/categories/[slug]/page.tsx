@@ -78,7 +78,7 @@ export default async function CategoryPage({
       <header className="mb-6">
         <h1 className="text-3xl font-bold">{category.name}</h1>
         {category.description && (
-          <p className="mt-2 max-w-2xl text-gray-600">{category.description}</p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">{category.description}</p>
         )}
         <ResultCount state={pag} emptyMessage="No products in this category yet." />
       </header>
@@ -89,7 +89,7 @@ export default async function CategoryPage({
             <Link
               key={s.id}
               href={`/categories/${s.slug}`}
-              className="rounded-full bg-white px-3 py-1 text-sm font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
+              className="rounded-full bg-card px-3 py-1 text-sm font-medium text-secondary-foreground ring-1 ring-border hover:bg-accent hover:text-accent-foreground"
             >
               {s.name}
             </Link>

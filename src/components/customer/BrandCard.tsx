@@ -7,7 +7,7 @@ export default function BrandCard({ brand }: { brand: Brand }) {
     <Link
       href={`/brands/${brand.slug}`}
       aria-label={brand.name}
-      className="group flex h-20 items-center justify-center rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-200 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none"
+      className="group flex h-20 items-center justify-center rounded-lg bg-card p-3 shadow-sm ring-1 ring-border transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none"
     >
       {brand.logo_url ? (
         <div className="relative h-12 w-full transition-transform duration-200 ease-out group-hover:scale-105 motion-reduce:transform-none">
@@ -15,7 +15,7 @@ export default function BrandCard({ brand }: { brand: Brand }) {
         </div>
       ) : (
         // Brand names should never be auto-translated by the browser.
-        <span translate="no" className="font-semibold text-gray-700">
+        <span translate="no" className="font-semibold text-secondary-foreground">
           {brand.name}
         </span>
       )}

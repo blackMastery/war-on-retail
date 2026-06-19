@@ -46,7 +46,7 @@ export default async function DealsPage({
         <h1 className="text-3xl font-bold">
           <span aria-hidden="true">🔥 </span>Today’s Deals
         </h1>
-        <p className="mt-1 text-gray-600">Live discounts across our catalogue.</p>
+        <p className="mt-1 text-muted-foreground">Live discounts across our catalogue.</p>
         <ResultCount state={pag} emptyMessage="No active deals right now — check back soon." />
       </header>
 

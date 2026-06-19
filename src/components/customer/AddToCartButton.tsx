@@ -99,7 +99,7 @@ export default function AddToCartButton({
     ? 'bg-green-600 text-white hover:bg-green-700'
     : isPreOrder
       ? 'bg-blue-600 text-white hover:bg-blue-700'
-      : 'bg-primary-600 text-white hover:bg-primary-700';
+      : 'bg-primary text-primary-foreground hover:opacity-90';
 
   const ariaLabel = isUnavailable
     ? 'Out of stock'

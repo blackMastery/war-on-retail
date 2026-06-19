@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { ADMIN_ALERT } from '@/lib/admin/tokens';
 import Pagination from '@/components/customer/Pagination';
 import { paginate, parsePage } from '@/lib/pagination';
 import DeleteButton from './DeleteButton';
@@ -28,7 +29,7 @@ function statusLabel(p: {
 
 const toneClass: Record<'green' | 'gray' | 'orange' | 'red', string> = {
   green: 'bg-green-100 text-green-800',
-  gray: 'bg-gray-100 text-gray-600',
+  gray: 'bg-muted text-muted-foreground',
   orange: 'bg-orange-100 text-orange-800',
   red: 'bg-red-100 text-red-700',
 };
@@ -63,7 +64,7 @@ export default async function AdminPromotionsPage({
       <header className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">Promotions</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Images shown on the homepage when at least one is live. Featured = takes the large slot.
           </p>
         </div>
@@ -72,20 +73,20 @@ export default async function AdminPromotionsPage({
             href="https://github.com/kevoncadogan/war-on-retail/blob/main/docs/promotion-images.md"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-md border border-border bg-card px-3 py-2 text-sm font-medium text-secondary-foreground hover:bg-muted"
           >
             Image guide ↗
           </a>
           <Link
             href="/admin/promotions/new"
-            className="rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+            className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90"
           >
             + New promotion
           </Link>
         </div>
       </header>
 
-      <details className="rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-900 ring-1 ring-blue-200 open:pb-4">
+      <details className={`${ADMIN_ALERT.info} open:pb-4`}>
         <summary className="cursor-pointer font-semibold">
           Quick reference: image specs &amp; link targets
         </summary>
@@ -117,16 +118,16 @@ export default async function AdminPromotionsPage({
       </details>
 
       {(!promotions || promotions.length === 0) && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-lg font-semibold text-gray-900">No promotions yet</p>
-          <p className="mt-1 text-sm text-gray-600">
+        <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
+          <p className="text-lg font-semibold text-foreground">No promotions yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Create one to show it on the homepage.
           </p>
         </div>
       )}
 
       {promotions && promotions.length > 0 && (
-        <p className="text-sm text-gray-600 tabular-nums">
+        <p className="text-sm text-muted-foreground tabular-nums">
           {pag.count <= pag.pageSize
             ? `${pag.count} promotion${pag.count === 1 ? '' : 's'}`
             : `Showing ${pag.firstIdx}–${pag.lastIdx} of ${pag.count} promotions`}
@@ -140,9 +141,9 @@ export default async function AdminPromotionsPage({
             return (
               <li
                 key={p.id}
-                className="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200"
+                className="overflow-hidden rounded-lg bg-card shadow-sm ring-1 ring-border"
               >
-                <div className="relative aspect-[16/9] bg-gray-100">
+                <div className="relative aspect-[16/9] bg-muted">
                   <Image
                     src={p.image_url}
                     alt={p.title}
@@ -151,14 +152,14 @@ export default async function AdminPromotionsPage({
                     className="object-cover"
                   />
                   {p.is_featured && (
-                    <span className="absolute left-2 top-2 rounded bg-primary-600 px-2 py-0.5 text-xs font-bold text-white">
+                    <span className="absolute left-2 top-2 rounded bg-primary text-primary-foreground px-2 py-0.5 text-xs font-bold">
                       Featured
                     </span>
                   )}
                 </div>
                 <div className="space-y-2 p-4">
                   <div className="flex items-start justify-between gap-2">
-                    <h2 className="line-clamp-2 font-semibold text-gray-900">{p.title}</h2>
+                    <h2 className="line-clamp-2 font-semibold text-foreground">{p.title}</h2>
                     <span
                       className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${toneClass[s.tone]}`}
                     >
@@ -166,24 +167,24 @@ export default async function AdminPromotionsPage({
                     </span>
                   </div>
                   {(p.starts_at || p.ends_at) && (
-                    <p className="text-xs text-gray-500 tabular-nums">
+                    <p className="text-xs text-muted-foreground tabular-nums">
                       {p.starts_at ? new Date(p.starts_at).toLocaleString() : '—'}
                       {' → '}
                       {p.ends_at ? new Date(p.ends_at).toLocaleString() : '—'}
                     </p>
                   )}
                   {p.link_url ? (
-                    <p className="truncate text-xs text-gray-500">
+                    <p className="truncate text-xs text-muted-foreground">
                       <span aria-hidden="true">→ </span>
-                      <span className="font-mono text-gray-700">{p.link_url}</span>
+                      <span className="font-mono text-secondary-foreground">{p.link_url}</span>
                     </p>
                   ) : (
-                    <p className="text-xs italic text-gray-400">No link (display-only)</p>
+                    <p className="text-xs italic text-muted-foreground">No link (display-only)</p>
                   )}
                   <div className="flex items-center justify-between pt-1 text-xs">
                     <Link
                       href={`/admin/promotions/${p.id}/edit`}
-                      className="font-medium text-primary-600 hover:underline"
+                      className="font-medium text-primary hover:underline"
                     >
                       Edit
                     </Link>

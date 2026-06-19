@@ -47,23 +47,23 @@ export default function CartView({
   if (!hydrated) {
     return (
       <div className="mt-6 animate-pulse space-y-3">
-        <div className="h-24 rounded-lg bg-gray-100" />
-        <div className="h-24 rounded-lg bg-gray-100" />
-        <div className="h-12 w-48 rounded-md bg-gray-100" />
+        <div className="h-24 rounded-lg bg-muted" />
+        <div className="h-24 rounded-lg bg-muted" />
+        <div className="h-12 w-48 rounded-md bg-muted" />
       </div>
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="mt-6 rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-        <p className="text-lg font-semibold text-gray-900">Your cart is empty</p>
-        <p className="mt-1 text-sm text-gray-600">
+      <div className="mt-6 rounded-lg border border-dashed border-border bg-card p-12 text-center">
+        <p className="text-lg font-semibold text-foreground">Your cart is empty</p>
+        <p className="mt-1 text-sm text-muted-foreground">
           Add products from the catalogue and they'll appear here.
         </p>
         <Link
           href="/products"
-          className="mt-6 inline-block rounded-md bg-primary-600 px-5 py-2 font-semibold text-white hover:bg-primary-700"
+          className="mt-6 inline-block rounded-md bg-primary text-primary-foreground px-5 py-2 font-semibold hover:opacity-90"
         >
           Browse products
         </Link>
@@ -77,7 +77,7 @@ export default function CartView({
   return (
     <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem]">
       {/* Line items */}
-      <ul role="list" className="divide-y divide-gray-200 rounded-lg bg-white ring-1 ring-gray-200">
+      <ul role="list" className="divide-y divide-border rounded-lg bg-card ring-1 ring-border">
         {/* Removing a line slides it out and lets the rest settle up (layout).
             initial={false} so the existing cart doesn't animate in on mount. */}
         <AnimatePresence initial={false}>
@@ -95,7 +95,7 @@ export default function CartView({
               href={`/products/${item.slug}`}
               aria-hidden="true"
               tabIndex={-1}
-              className="relative block aspect-square w-24 shrink-0 overflow-hidden rounded-md bg-gray-100 ring-1 ring-gray-200"
+              className="relative block aspect-square w-24 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border"
             >
               {item.imageUrl ? (
                 <Image
@@ -107,7 +107,7 @@ export default function CartView({
                 />
               ) : (
                 <div
-                  className="flex h-full items-center justify-center text-3xl text-gray-300"
+                  className="flex h-full items-center justify-center text-3xl text-muted-foreground"
                   aria-hidden="true"
                 >
                   📦
@@ -119,7 +119,7 @@ export default function CartView({
               <div className="flex items-start justify-between gap-2">
                 <Link
                   href={`/products/${item.slug}`}
-                  className="line-clamp-2 font-semibold text-gray-900 hover:text-primary-600"
+                  className="line-clamp-2 font-semibold text-foreground hover:text-link-on-light"
                 >
                   {item.name}
                 </Link>
@@ -127,13 +127,13 @@ export default function CartView({
                   type="button"
                   onClick={() => removeItem(item.productId)}
                   aria-label={`Remove ${item.name} from cart`}
-                  className="shrink-0 rounded-full p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600"
+                  className="shrink-0 rounded-full p-1.5 text-muted-foreground hover:bg-red-50 hover:text-red-600"
                 >
                   <TrashIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
               {item.sku && (
-                <p className="mt-0.5 font-mono text-xs text-gray-500">SKU: {item.sku}</p>
+                <p className="mt-0.5 font-mono text-xs text-muted-foreground">SKU: {item.sku}</p>
               )}
               {item.isPreOrder && (
                 <span className="mt-1 inline-flex w-fit items-center rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-800">
@@ -148,11 +148,11 @@ export default function CartView({
                   label={`Quantity of ${item.name}`}
                 />
                 <div className="text-right">
-                  <div className="font-semibold tabular-nums text-gray-900">
+                  <div className="font-semibold tabular-nums text-foreground">
                     {formatPrice(item.price * item.quantity)}
                   </div>
                   {item.quantity > 1 && (
-                    <div className="text-xs text-gray-500 tabular-nums">
+                    <div className="text-xs text-muted-foreground tabular-nums">
                       {formatPrice(item.price)} each
                     </div>
                   )}
@@ -166,12 +166,12 @@ export default function CartView({
 
       {/* Sticky summary */}
       <aside className="lg:sticky lg:top-32 lg:self-start">
-        <div className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+        <div className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
           <h2 className="text-lg font-bold">Inquiry summary</h2>
 
           <dl className="space-y-2 text-sm" aria-live="polite" aria-atomic="true">
             <div className="flex justify-between">
-              <dt className="text-gray-600">
+              <dt className="text-muted-foreground">
                 Items <span className="tabular-nums">({totalItems})</span>
               </dt>
               <dd className="tabular-nums">{formatPrice(subtotal)}</dd>
@@ -185,11 +185,11 @@ export default function CartView({
                 <dd className="tabular-nums">−{formatPrice(discountAmount)}</dd>
               </div>
             )}
-            <div className="flex justify-between border-t border-gray-200 pt-3">
-              <dt className="font-semibold text-gray-900">
+            <div className="flex justify-between border-t border-border pt-3">
+              <dt className="font-semibold text-foreground">
                 {appliedDiscount ? 'Total' : 'Subtotal'}
               </dt>
-              <dd className="text-lg font-bold tabular-nums text-gray-900">
+              <dd className="text-lg font-bold tabular-nums text-foreground">
                 {formatPrice(total)}
               </dd>
             </div>
@@ -197,14 +197,14 @@ export default function CartView({
 
           <DiscountCodeInput />
 
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Pick delivery or pickup, choose how you'd like to pay, and we'll confirm
             availability before anything is charged.
           </p>
 
           <Link
             href="/checkout"
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-primary-600 px-6 py-3 font-semibold text-white hover:bg-primary-700"
+            className="flex w-full items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground px-6 py-3 font-semibold hover:opacity-90"
           >
             Continue to checkout
             <span aria-hidden="true">→</span>
@@ -222,7 +222,7 @@ export default function CartView({
           <div className="flex flex-col gap-2 text-xs">
             <Link
               href="/products"
-              className="text-center font-medium text-primary-600 hover:underline"
+              className="text-center font-medium text-link hover:underline"
             >
               ← Continue shopping
             </Link>
@@ -231,15 +231,15 @@ export default function CartView({
               onClick={() => {
                 if (confirm('Empty your cart? This cannot be undone.')) clear();
               }}
-              className="text-center text-gray-500 hover:text-red-600 hover:underline"
+              className="text-center text-muted-foreground hover:text-red-600 hover:underline"
             >
               Clear cart
             </button>
           </div>
 
-          <p className="text-center text-xs text-gray-500">
+          <p className="text-center text-xs text-muted-foreground">
             Or call us:{' '}
-            <a href={`tel:${storeInfo.phone}`} className="font-medium hover:text-gray-700">
+            <a href={`tel:${storeInfo.phone}`} className="font-medium hover:text-secondary-foreground">
               {storeInfo.phone}
             </a>
           </p>
@@ -260,7 +260,7 @@ function QuantityStepper({
 }) {
   return (
     <div
-      className="inline-flex items-center rounded-md ring-1 ring-gray-300"
+      className="inline-flex items-center rounded-md ring-1 ring-border"
       role="group"
       aria-label={label}
     >
@@ -268,7 +268,7 @@ function QuantityStepper({
         type="button"
         onClick={() => onChange(value - 1)}
         aria-label="Decrease quantity"
-        className="flex h-9 w-9 items-center justify-center rounded-l-md text-gray-600 hover:bg-gray-50 disabled:opacity-30"
+        className="flex h-9 w-9 items-center justify-center rounded-l-md text-muted-foreground hover:bg-muted disabled:opacity-30"
         disabled={value <= 1}
       >
         <MinusIcon className="h-4 w-4" aria-hidden="true" />
@@ -283,13 +283,13 @@ function QuantityStepper({
           if (Number.isFinite(n) && n >= 1) onChange(n);
         }}
         aria-label={label}
-        className="h-9 w-12 border-0 bg-transparent text-center text-sm tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        className="h-9 w-12 border-0 bg-transparent text-center text-sm tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       />
       <button
         type="button"
         onClick={() => onChange(value + 1)}
         aria-label="Increase quantity"
-        className="flex h-9 w-9 items-center justify-center rounded-r-md text-gray-600 hover:bg-gray-50"
+        className="flex h-9 w-9 items-center justify-center rounded-r-md text-muted-foreground hover:bg-muted"
       >
         <PlusIcon className="h-4 w-4" aria-hidden="true" />
       </button>

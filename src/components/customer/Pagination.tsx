@@ -55,7 +55,7 @@ export default function Pagination({
           scroll={false}
           rel="prev"
           aria-label="Previous page"
-          className="inline-flex h-9 items-center gap-1 rounded-md border border-gray-300 bg-white px-3 font-medium text-gray-700 hover:bg-gray-50"
+          className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-card px-3 font-medium text-secondary-foreground hover:bg-muted"
         >
           <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
           <span className="hidden sm:inline">Previous</span>
@@ -63,7 +63,7 @@ export default function Pagination({
       ) : (
         <span
           aria-hidden="true"
-          className="inline-flex h-9 items-center gap-1 rounded-md border border-gray-200 bg-gray-50 px-3 font-medium text-gray-300"
+          className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-muted px-3 font-medium text-muted-foreground"
         >
           <ChevronLeftIcon className="h-4 w-4" />
           <span className="hidden sm:inline">Previous</span>
@@ -76,7 +76,7 @@ export default function Pagination({
             <li
               key={`gap-${i}`}
               aria-hidden="true"
-              className="px-2 text-gray-400"
+              className="px-2 text-muted-foreground"
             >
               …
             </li>
@@ -89,8 +89,8 @@ export default function Pagination({
                 aria-current={p === safeCurrent ? 'page' : undefined}
                 className={`inline-flex h-9 min-w-9 items-center justify-center rounded-md border px-2 text-sm tabular-nums ${
                   p === safeCurrent
-                    ? 'border-primary-600 bg-primary-600 font-semibold text-white'
-                    : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                    ? 'border-primary bg-primary font-semibold text-primary-foreground'
+                    : 'border-border bg-card text-secondary-foreground hover:bg-muted'
                 }`}
               >
                 {p}
@@ -106,7 +106,7 @@ export default function Pagination({
           scroll={false}
           rel="next"
           aria-label="Next page"
-          className="inline-flex h-9 items-center gap-1 rounded-md border border-gray-300 bg-white px-3 font-medium text-gray-700 hover:bg-gray-50"
+          className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-card px-3 font-medium text-secondary-foreground hover:bg-muted"
         >
           <span className="hidden sm:inline">Next</span>
           <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
@@ -114,7 +114,7 @@ export default function Pagination({
       ) : (
         <span
           aria-hidden="true"
-          className="inline-flex h-9 items-center gap-1 rounded-md border border-gray-200 bg-gray-50 px-3 font-medium text-gray-300"
+          className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-muted px-3 font-medium text-muted-foreground"
         >
           <span className="hidden sm:inline">Next</span>
           <ChevronRightIcon className="h-4 w-4" />

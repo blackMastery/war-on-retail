@@ -36,9 +36,9 @@ export default async function AdminCategoriesPage() {
       <header className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">Categories</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Hierarchy shown on{' '}
-            <Link href="/categories" className="text-primary-600 hover:underline">
+            <Link href="/categories" className="text-primary hover:underline">
               /categories
             </Link>
             . Use the Parent field on the form to nest sub-categories.
@@ -46,25 +46,25 @@ export default async function AdminCategoriesPage() {
         </div>
         <Link
           href="/admin/categories/new"
-          className="rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90"
         >
           + New category
         </Link>
       </header>
 
       {(!cats || cats.length === 0) && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-lg font-semibold text-gray-900">No categories yet</p>
-          <p className="mt-1 text-sm text-gray-600">
+        <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
+          <p className="text-lg font-semibold text-foreground">No categories yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Start with top-level categories like Electronics, Home Appliances, etc.
           </p>
         </div>
       )}
 
       {cats && cats.length > 0 && (
-        <div className="overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+        <div className="overflow-x-auto rounded-lg bg-card shadow-sm ring-1 ring-border">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Slug</th>
@@ -76,18 +76,18 @@ export default async function AdminCategoriesPage() {
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {cats.map((c) => {
                 const childN = childCount.get(c.id) ?? 0;
                 const prodN = productCount.get(c.id) ?? 0;
                 return (
-                  <tr key={c.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">
-                      {c.parent_id && <span className="text-gray-400">↳ </span>}
+                  <tr key={c.id} className="hover:bg-muted">
+                    <td className="px-4 py-3 font-medium text-foreground">
+                      {c.parent_id && <span className="text-muted-foreground">↳ </span>}
                       {c.name}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-gray-500">{c.slug}</td>
-                    <td className="px-4 py-3 text-gray-700">
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{c.slug}</td>
+                    <td className="px-4 py-3 text-secondary-foreground">
                       {c.parent_id ? byId.get(c.parent_id) ?? '—' : '—'}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums">{childN}</td>
@@ -98,7 +98,7 @@ export default async function AdminCategoriesPage() {
                         className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                           c.is_active
                             ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-600'
+                            : 'bg-muted text-muted-foreground'
                         }`}
                       >
                         {c.is_active ? 'Active' : 'Hidden'}
@@ -108,7 +108,7 @@ export default async function AdminCategoriesPage() {
                       <div className="flex justify-end gap-3 text-xs">
                         <Link
                           href={`/admin/categories/${c.id}/edit`}
-                          className="font-medium text-primary-600 hover:underline"
+                          className="font-medium text-primary hover:underline"
                         >
                           Edit
                         </Link>

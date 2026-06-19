@@ -23,7 +23,7 @@ export default async function AdminSettingsPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold">Store settings</h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-muted-foreground">
           What the customer sees on the public site — name, contact channels,
           opening hours, the pickup map pin, and the social links in the footer.
         </p>

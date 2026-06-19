@@ -9,7 +9,7 @@ import type { DiscountCode, DiscountType } from '@/types/database';
 
 const initial: DiscountFormState = {};
 const INPUT =
-  'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm';
+  'mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm';
 
 const TYPE_OPTIONS: { value: DiscountType; label: string; hint: string }[] = [
   { value: 'percentage', label: 'Percentage off', hint: 'e.g. 20 = 20% off the subtotal' },
@@ -52,11 +52,11 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
         </div>
       )}
 
-      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Code</h2>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">Code</span>
+          <span className="font-medium text-secondary-foreground">Code</span>
           <div className="mt-1 flex gap-2">
             <input
               name="code"
@@ -64,19 +64,19 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="e.g. WOR6788"
-              className="block w-full rounded-md border-gray-300 font-mono uppercase shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+              className="block w-full rounded-md border-border font-mono uppercase shadow-sm focus:border-ring focus:ring-ring text-sm"
             />
             {!discount?.id && (
               <button
                 type="button"
                 onClick={() => setCode(generateCode())}
-                className="shrink-0 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="shrink-0 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium text-secondary-foreground hover:bg-muted"
               >
                 Regenerate
               </button>
             )}
           </div>
-          <span className="mt-1 block text-xs text-gray-500">
+          <span className="mt-1 block text-xs text-muted-foreground">
             Auto-generated as <code>WOR####</code> — edit it or regenerate. Case-insensitive at
             checkout; stored upper-cased.
           </span>
@@ -84,8 +84,8 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
         </label>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">
-            Description <span className="font-normal text-gray-500">(optional)</span>
+          <span className="font-medium text-secondary-foreground">
+            Description <span className="font-normal text-muted-foreground">(optional)</span>
           </span>
           <input
             name="description"
@@ -96,11 +96,11 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
         </label>
       </section>
 
-      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Discount</h2>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">Type</span>
+          <span className="font-medium text-secondary-foreground">Type</span>
           <select
             name="discount_type"
             value={type}
@@ -116,10 +116,10 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
         </label>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">{valueLabel}</span>
+          <span className="font-medium text-secondary-foreground">{valueLabel}</span>
           <div className="relative mt-1">
             {type !== 'fixed_amount' ? null : (
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                 GYD $
               </span>
             )}
@@ -131,30 +131,30 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
               max={type === 'fixed_amount' ? undefined : 100}
               required
               defaultValue={discount?.discount_value ?? ''}
-              className={`block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 ${
+              className={`block w-full rounded-md border-border text-sm shadow-sm focus:border-ring focus:ring-ring ${
                 type === 'fixed_amount' ? 'pl-14' : 'pr-8'
               }`}
             />
             {type !== 'fixed_amount' && (
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                 %
               </span>
             )}
           </div>
-          <span className="mt-1 block text-xs text-gray-500">{valueHint}</span>
+          <span className="mt-1 block text-xs text-muted-foreground">{valueHint}</span>
           {err('discount_value') && (
             <span className="mt-1 block text-xs text-red-600">{err('discount_value')}</span>
           )}
         </label>
       </section>
 
-      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Limits</h2>
-        <p className="text-xs text-gray-600">Leave any field blank for no limit.</p>
+        <p className="text-xs text-muted-foreground">Leave any field blank for no limit.</p>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="font-medium text-gray-700">Minimum purchase (GYD)</span>
+            <span className="font-medium text-secondary-foreground">Minimum purchase (GYD)</span>
             <input
               name="min_purchase_amount"
               type="number"
@@ -169,7 +169,7 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
           </label>
 
           <label className="block text-sm">
-            <span className="font-medium text-gray-700">Max discount (GYD)</span>
+            <span className="font-medium text-secondary-foreground">Max discount (GYD)</span>
             <input
               name="max_discount_amount"
               type="number"
@@ -178,7 +178,7 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
               defaultValue={discount?.max_discount_amount ?? ''}
               className={INPUT}
             />
-            <span className="mt-1 block text-xs text-gray-500">
+            <span className="mt-1 block text-xs text-muted-foreground">
               Caps the savings (handy for % codes).
             </span>
             {err('max_discount_amount') && (
@@ -187,7 +187,7 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
           </label>
 
           <label className="block text-sm">
-            <span className="font-medium text-gray-700">Total usage limit</span>
+            <span className="font-medium text-secondary-foreground">Total usage limit</span>
             <input
               name="usage_limit"
               type="number"
@@ -196,14 +196,14 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
               defaultValue={discount?.usage_limit ?? ''}
               className={INPUT}
             />
-            <span className="mt-1 block text-xs text-gray-500">Across all customers.</span>
+            <span className="mt-1 block text-xs text-muted-foreground">Across all customers.</span>
             {err('usage_limit') && (
               <span className="mt-1 block text-xs text-red-600">{err('usage_limit')}</span>
             )}
           </label>
 
           <label className="block text-sm">
-            <span className="font-medium text-gray-700">Per-customer limit</span>
+            <span className="font-medium text-secondary-foreground">Per-customer limit</span>
             <input
               name="per_customer_limit"
               type="number"
@@ -212,7 +212,7 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
               defaultValue={discount?.per_customer_limit ?? 1}
               className={INPUT}
             />
-            <span className="mt-1 block text-xs text-gray-500">
+            <span className="mt-1 block text-xs text-muted-foreground">
               By phone number. Blank or 0 = unlimited.
             </span>
             {err('per_customer_limit') && (
@@ -222,14 +222,14 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
         </div>
       </section>
 
-      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Schedule</h2>
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-muted-foreground">
           Leave both blank to run indefinitely. The code is rejected outside the window.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="font-medium text-gray-700">Valid from</span>
+            <span className="font-medium text-secondary-foreground">Valid from</span>
             <input
               name="valid_from"
               type="datetime-local"
@@ -238,7 +238,7 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
             />
           </label>
           <label className="block text-sm">
-            <span className="font-medium text-gray-700">Valid until</span>
+            <span className="font-medium text-secondary-foreground">Valid until</span>
             <input
               name="valid_until"
               type="datetime-local"
@@ -249,23 +249,23 @@ export default function DiscountCodeForm({ discount }: { discount?: DiscountCode
         </div>
       </section>
 
-      <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
             name="is_active"
             defaultChecked={discount?.is_active ?? true}
-            className="rounded text-primary-600"
+            className="rounded text-primary"
           />
           Active — uncheck to disable regardless of the schedule
         </label>
       </section>
 
-      <div className="flex items-center justify-end gap-2 border-t border-gray-200 pt-4">
+      <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-primary-600 px-5 py-2 font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+          className="rounded-md bg-primary text-primary-foreground px-5 py-2 font-semibold hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Saving…' : discount ? 'Save changes' : 'Create code'}
         </button>

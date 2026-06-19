@@ -10,9 +10,9 @@ export default function ImportPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">CSV product import</h1>
 
-      <div className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <div className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">How it works</h2>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-secondary-foreground">
           <li>
             Required columns: <code>name</code>, <code>price</code>
           </li>
@@ -28,10 +28,10 @@ export default function ImportPage() {
           </li>
         </ul>
         <details className="mt-3">
-          <summary className="cursor-pointer text-sm font-medium text-primary-600">
+          <summary className="cursor-pointer text-sm font-medium text-primary">
             Show sample CSV
           </summary>
-          <pre className="mt-2 overflow-x-auto rounded bg-gray-900 p-3 text-xs text-gray-100">
+          <pre className="mt-2 overflow-x-auto rounded bg-secondary p-3 text-xs text-foreground">
             {SAMPLE}
           </pre>
         </details>

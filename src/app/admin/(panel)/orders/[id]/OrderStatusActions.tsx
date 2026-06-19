@@ -36,8 +36,8 @@ export default function OrderStatusActions({
 
   if (status === 'fulfilled' || status === 'cancelled') {
     return (
-      <div className="rounded-lg bg-white p-5 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
-        <h2 className="font-semibold text-gray-900">Order closed</h2>
+      <div className="rounded-lg bg-card p-5 text-sm text-muted-foreground shadow-sm ring-1 ring-border">
+        <h2 className="font-semibold text-foreground">Order closed</h2>
         <p className="mt-1">
           {status === 'fulfilled'
             ? 'This order has been fulfilled. No further actions available.'
@@ -48,7 +48,7 @@ export default function OrderStatusActions({
   }
 
   return (
-    <div className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <div className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
       <h2 className="font-semibold">Actions</h2>
       <div className="mt-4 flex flex-wrap gap-3">
         {status === 'pending' && (

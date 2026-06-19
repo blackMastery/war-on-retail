@@ -53,14 +53,14 @@ export default function ProductCard({
   return (
     <article
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200',
-        'transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg hover:ring-gray-300 motion-reduce:transform-none',
+        'group relative flex flex-col overflow-hidden rounded-lg bg-card shadow-sm ring-1 ring-border',
+        'transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg hover:ring-border motion-reduce:transform-none',
         isStrip && 'h-full',
         className,
       )}
     >
       {/* Image area */}
-      <div className="relative aspect-square bg-gray-100">
+      <div className="relative aspect-square bg-muted">
         {product.featured_image_url ? (
           <Image
             src={product.featured_image_url}
@@ -71,7 +71,7 @@ export default function ProductCard({
           />
         ) : (
           <div
-            className="flex h-full items-center justify-center text-5xl text-gray-300"
+            className="flex h-full items-center justify-center text-5xl text-muted-foreground"
             aria-hidden="true"
           >
             📦
@@ -81,12 +81,12 @@ export default function ProductCard({
         {/* Badge stack — top-left; wishlist sits bottom-right of the image. */}
         <div className="absolute left-1.5 top-1.5 flex flex-col gap-0.5 sm:left-2 sm:top-2 sm:gap-1">
           {discount > 0 && (
-            <span className="rounded bg-primary-600 px-1.5 py-0.5 text-[10px] font-bold text-white sm:px-2 sm:text-xs">
+            <span className="rounded bg-primary text-primary-foreground px-1.5 py-0.5 text-[10px] font-bold sm:px-2 sm:text-xs">
               -{discount}%
             </span>
           )}
           {product.is_featured && (
-            <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold text-gray-900 sm:px-2 sm:text-xs">
+            <span className="rounded bg-chart-1 px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground sm:px-2 sm:text-xs">
               Featured
             </span>
           )}
@@ -113,7 +113,7 @@ export default function ProductCard({
 
         {isOutOfStock && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
-            <span className="rounded bg-gray-900 px-2 py-1 text-xs font-bold text-white sm:px-3 sm:py-1.5 sm:text-sm">
+            <span className="rounded bg-card px-2 py-1 text-xs font-bold text-card-foreground sm:px-3 sm:py-1.5 sm:text-sm">
               Out of stock
             </span>
           </div>
@@ -124,16 +124,16 @@ export default function ProductCard({
       <div className={cn('flex flex-1 flex-col', isStrip ? 'p-4' : 'p-3 sm:p-4')}>
         <h3
           className={cn(
-            'line-clamp-2 font-semibold text-gray-900',
+            'line-clamp-2 font-semibold text-foreground',
             isStrip
-              ? 'min-h-[2.75rem] text-base sm:group-hover:text-primary-600'
-              : 'min-h-[2.5rem] text-sm sm:min-h-[2.75rem] sm:text-base sm:group-hover:text-primary-600',
+              ? 'min-h-[2.75rem] text-base sm:group-hover:text-link-on-light'
+              : 'min-h-[2.5rem] text-sm sm:min-h-[2.75rem] sm:text-base sm:group-hover:text-link-on-light',
           )}
         >
           {product.name}
         </h3>
         {!isStrip && product.short_description && (
-          <p className="mt-1 hidden line-clamp-2 text-sm text-gray-500 sm:block">
+          <p className="mt-1 hidden line-clamp-2 text-sm text-muted-foreground sm:block">
             {product.short_description}
           </p>
         )}
@@ -145,21 +145,21 @@ export default function ProductCard({
         >
           <span
             className={cn(
-              'font-bold text-gray-900',
+              'font-bold text-foreground',
               isStrip ? 'text-lg' : 'text-base sm:text-lg',
             )}
           >
             {formatPrice(product.price)}
           </span>
           {product.compare_at_price && product.compare_at_price > product.price && (
-            <del className="text-xs text-gray-500 line-through sm:text-sm">
+            <del className="text-xs text-muted-foreground line-through sm:text-sm">
               <span className="sr-only">Original price: </span>
               {formatPrice(product.compare_at_price)}
             </del>
           )}
         </div>
         {!isStrip && product.track_inventory && !isOutOfStock && (
-          <p className="mt-1 hidden text-xs text-gray-500 sm:block">
+          <p className="mt-1 hidden text-xs text-muted-foreground sm:block">
             {product.stock_quantity} in stock
           </p>
         )}
@@ -183,7 +183,7 @@ export default function ProductCard({
       <Link
         href={`/products/${product.slug}`}
         aria-label={product.name}
-        className="absolute inset-0 z-0 rounded-lg transition-colors active:bg-gray-900/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+        className="absolute inset-0 z-0 rounded-lg transition-colors active:bg-secondary/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       />
     </article>
   );

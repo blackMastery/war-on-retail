@@ -39,14 +39,14 @@ export default function CategoryImageField({ initialUrl }: Props) {
 
       {url ? (
         <div className="space-y-2">
-          <div className="relative aspect-[3/2] overflow-hidden rounded-md bg-gray-100 ring-1 ring-gray-200">
+          <div className="relative aspect-[3/2] overflow-hidden rounded-md bg-muted ring-1 ring-border">
             <Image src={url} alt="" fill className="object-cover" />
           </div>
           <div className="flex gap-2 text-xs">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="rounded-md border border-gray-300 px-3 py-1.5 font-medium hover:bg-gray-50"
+              className="rounded-md border border-border px-3 py-1.5 font-medium hover:bg-muted"
             >
               Replace
             </button>
@@ -62,11 +62,11 @@ export default function CategoryImageField({ initialUrl }: Props) {
       ) : (
         <label
           htmlFor="category-image-input"
-          className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-600 transition hover:border-primary-400 hover:bg-primary-50"
+          className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted px-4 py-8 text-center text-sm text-muted-foreground transition hover:border-primary hover:bg-accent"
         >
           <div>
-            <p className="font-medium text-gray-700">Click to upload category image</p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="font-medium text-secondary-foreground">Click to upload category image</p>
+            <p className="mt-1 text-xs text-muted-foreground">
               Shown on the category landing page. Up to 5&nbsp;MB.
             </p>
           </div>
@@ -84,7 +84,7 @@ export default function CategoryImageField({ initialUrl }: Props) {
 
       {error && <p className="rounded-md bg-red-50 p-2 text-xs text-red-700">{error}</p>}
       {pending && (
-        <p className="text-xs text-gray-500" aria-live="polite">
+        <p className="text-xs text-muted-foreground" aria-live="polite">
           Uploading…
         </p>
       )}

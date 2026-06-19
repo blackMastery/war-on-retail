@@ -23,6 +23,8 @@ type Props = {
   width?: 'sm' | 'md' | 'lg';
   /** Render the trigger in bold. */
   highlight?: boolean;
+  /** Yellow primary nav — use dark hover states instead of yellow-on-yellow. */
+  tone?: 'default' | 'onPrimary';
 };
 
 const widthClass = {
@@ -53,6 +55,7 @@ export default function NavDropdown({
   groups,
   width = 'sm',
   highlight = false,
+  tone = 'default',
 }: Props) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -123,9 +126,9 @@ export default function NavDropdown({
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={panelId}
-        className={`flex items-center gap-1 hover:text-accent-400 ${
-          highlight ? 'font-bold' : ''
-        }`}
+        className={`flex items-center gap-1 ${
+          tone === 'onPrimary' ? 'hover:opacity-75' : 'hover:text-link-on-light'
+        } ${highlight ? 'font-bold' : ''}`}
       >
         {label}
         <ChevronDownIcon
@@ -139,7 +142,7 @@ export default function NavDropdown({
           id={panelId}
           role="menu"
           aria-label={label}
-          className={`absolute left-0 top-full z-50 mt-1 ${widthClass[width]} max-h-[min(32rem,80vh)] overflow-y-auto rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-gray-200`}
+          className={`absolute left-0 top-full z-50 mt-1 ${widthClass[width]} max-h-[min(32rem,80vh)] overflow-y-auto rounded-md bg-card text-foreground shadow-lg ring-1 ring-border`}
         >
           {groups ? (
             <Groups groups={groups} onSelect={close} pathname={pathname} />
@@ -162,7 +165,7 @@ function Items({
   pathname: string;
 }) {
   if (!items.length) {
-    return <p className="px-4 py-3 text-sm italic text-gray-500">Nothing here yet.</p>;
+    return <p className="px-4 py-3 text-sm italic text-muted-foreground">Nothing here yet.</p>;
   }
   return (
     <ul role="none" className="py-2">
@@ -173,7 +176,7 @@ function Items({
             role="menuitem"
             aria-current={pathname === it.href ? 'page' : undefined}
             onClick={onSelect}
-            className="block px-4 py-2 text-sm hover:bg-primary-50 hover:text-primary-700 focus-visible:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-600 aria-[current=page]:font-semibold aria-[current=page]:text-primary-700"
+            className="block px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring aria-[current=page]:font-semibold aria-[current=page]:text-accent-foreground"
           >
             {it.label}
           </Link>
@@ -203,12 +206,12 @@ function Groups({
                 onClick={onSelect}
                 role="menuitem"
                 aria-current={pathname === g.href ? 'page' : undefined}
-                className="mb-2 block text-sm font-bold text-primary-700 hover:underline aria-[current=page]:underline"
+                className="mb-2 block text-sm font-bold text-accent-foreground hover:underline aria-[current=page]:underline"
               >
                 {g.label}
               </Link>
             ) : (
-              <p role="heading" aria-level={3} className="mb-2 text-sm font-bold text-gray-900">
+              <p role="heading" aria-level={3} className="mb-2 text-sm font-bold text-foreground">
                 {g.label}
               </p>
             ))}
@@ -220,7 +223,7 @@ function Groups({
                   role="menuitem"
                   aria-current={pathname === it.href ? 'page' : undefined}
                   onClick={onSelect}
-                  className="block py-0.5 text-sm text-gray-700 hover:text-primary-600 focus-visible:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 aria-[current=page]:font-semibold aria-[current=page]:text-primary-700"
+                  className="block py-0.5 text-sm text-secondary-foreground hover:text-link-on-light focus-visible:text-link-on-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:font-semibold aria-[current=page]:text-accent-foreground"
                 >
                   {it.label}
                 </Link>

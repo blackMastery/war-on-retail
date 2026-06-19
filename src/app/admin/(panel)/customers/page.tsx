@@ -61,7 +61,7 @@ export default async function AdminCustomersPage({
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Customers</h1>
-          <p className="mt-1 text-sm text-gray-600 tabular-nums">
+          <p className="mt-1 text-sm text-muted-foreground tabular-nums">
             {pag.count === 0
               ? 'No customers yet.'
               : pag.count <= CUSTOMER_PAGE_SIZE
@@ -79,24 +79,24 @@ export default async function AdminCustomersPage({
             name="q"
             defaultValue={q}
             placeholder="Search by name or phone…"
-            className="w-72 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+            className="w-72 rounded-md border-border shadow-sm focus:border-ring focus:ring-ring sm:text-sm"
           />
         </form>
       </header>
 
       {(!customers || customers.length === 0) && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-lg font-semibold text-gray-900">No customers to show</p>
-          <p className="mt-1 text-sm text-gray-600">
+        <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
+          <p className="text-lg font-semibold text-foreground">No customers to show</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Customers are added automatically when they place an order at checkout.
           </p>
         </div>
       )}
 
       {customers && customers.length > 0 && (
-        <div className="overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+        <div className="overflow-x-auto rounded-lg bg-card shadow-sm ring-1 ring-border">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Phone</th>
@@ -105,14 +105,14 @@ export default async function AdminCustomersPage({
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {customers.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">{c.name}</td>
+                <tr key={c.id} className="hover:bg-muted">
+                  <td className="px-4 py-3 font-medium text-foreground">{c.name}</td>
                   <td className="px-4 py-3">
                     <a
                       href={`tel:${c.phone}`}
-                      className="text-primary-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       {c.phone}
                     </a>
@@ -120,7 +120,7 @@ export default async function AdminCustomersPage({
                   <td className="px-4 py-3 text-right tabular-nums">
                     {orderCountByCustomer.get(c.id) ?? 0}
                   </td>
-                  <td className="px-4 py-3 text-xs text-gray-500">
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
                     {new Date(c.created_at).toLocaleDateString('en-GY', {
                       dateStyle: 'medium',
                     })}
@@ -128,7 +128,7 @@ export default async function AdminCustomersPage({
                   <td className="px-4 py-3 text-right">
                     <Link
                       href={`/admin/customers/${c.id}`}
-                      className="text-xs font-medium text-primary-600 hover:underline"
+                      className="text-xs font-medium text-primary hover:underline"
                     >
                       View →
                     </Link>

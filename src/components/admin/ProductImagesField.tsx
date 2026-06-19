@@ -154,14 +154,14 @@ export default function ProductImagesField({
       {/* Picker */}
       <label
         htmlFor="product-images-input"
-        className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-600 transition hover:border-primary-400 hover:bg-primary-50"
+        className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted px-4 py-8 text-center text-sm text-muted-foreground transition hover:border-primary hover:bg-accent"
       >
         <div>
-          <p className="font-medium text-gray-700">
+          <p className="font-medium text-secondary-foreground">
             Click to add images
-            <span className="text-gray-400"> (or drag &amp; drop)</span>
+            <span className="text-muted-foreground"> (or drag &amp; drop)</span>
           </p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             JPG, PNG, WebP, AVIF — up to 5&nbsp;MB each
           </p>
         </div>
@@ -183,7 +183,7 @@ export default function ProductImagesField({
       {/* Thumbnails */}
       {items.length > 0 && (
         <fieldset>
-          <legend className="text-xs font-medium text-gray-600">
+          <legend className="text-xs font-medium text-muted-foreground">
             {items.length} image{items.length === 1 ? '' : 's'} — pick the
             featured image and (optionally) describe each one for accessibility +
             search.
@@ -202,14 +202,14 @@ export default function ProductImagesField({
                 <li
                   key={`${item.url}-${i}`}
                   className={`group overflow-hidden rounded-md ring-2 ${
-                    isFeatured ? 'ring-primary-600' : 'ring-gray-200'
-                  } bg-gray-100`}
+                    isFeatured ? 'ring-ring' : 'ring-border'
+                  } bg-muted`}
                 >
                   <div className="relative aspect-square">
                     {isPending || hasError ? (
                       <div
                         className={`flex h-full items-center justify-center text-xs ${
-                          hasError ? 'text-red-700' : 'text-gray-500'
+                          hasError ? 'text-red-700' : 'text-muted-foreground'
                         }`}
                       >
                         {hasError ? `✗ ${item.error}` : 'Uploading…'}
@@ -224,7 +224,7 @@ export default function ProductImagesField({
                       />
                     )}
                     {isFeatured && !isPending && !hasError && (
-                      <span className="absolute left-1 top-1 rounded bg-primary-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                      <span className="absolute left-1 top-1 rounded bg-primary text-primary-foreground px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
                         Featured
                       </span>
                     )}
@@ -239,7 +239,7 @@ export default function ProductImagesField({
                   </div>
 
                   {!isPending && !hasError && (
-                    <div className="border-t border-gray-200 bg-white">
+                    <div className="border-t border-border bg-card">
                       <div className="flex items-center justify-between gap-1 px-2 py-1.5 text-xs">
                         <label className="flex cursor-pointer items-center gap-1">
                           <input
@@ -247,7 +247,7 @@ export default function ProductImagesField({
                             name="featured_image_radio"
                             checked={isFeatured}
                             onChange={() => setFeaturedIndex(i)}
-                            className="text-primary-600"
+                            className="text-primary"
                           />
                           Featured
                         </label>
@@ -257,7 +257,7 @@ export default function ProductImagesField({
                             setOpenMetaIndex((cur) => (cur === i ? -1 : i))
                           }
                           aria-expanded={openMetaIndex === i}
-                          className="font-medium text-primary-600 hover:text-primary-700"
+                          className="font-medium text-primary hover:text-accent-foreground"
                         >
                           {openMetaIndex === i ? 'Hide' : hasMeta ? 'Edit meta' : 'Add meta'}
                         </button>
@@ -271,9 +271,9 @@ export default function ProductImagesField({
                       </div>
 
                       {openMetaIndex === i && (
-                        <div className="space-y-2 border-t border-gray-100 bg-gray-50 px-2 py-2 text-xs">
+                        <div className="space-y-2 border-t border-border bg-muted px-2 py-2 text-xs">
                           <label className="block">
-                            <span className="font-medium text-gray-700">
+                            <span className="font-medium text-secondary-foreground">
                               Alt text
                             </span>
                             <input
@@ -283,11 +283,11 @@ export default function ProductImagesField({
                                 updateMeta(item.url, { alt: e.target.value })
                               }
                               placeholder="What's in the image (screen readers + SEO)"
-                              className="mt-1 block w-full rounded-md border-gray-300 text-xs shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                              className="mt-1 block w-full rounded-md border-border text-xs shadow-sm focus:border-ring focus:ring-ring"
                             />
                           </label>
                           <label className="block">
-                            <span className="font-medium text-gray-700">
+                            <span className="font-medium text-secondary-foreground">
                               Caption
                             </span>
                             <textarea
@@ -297,11 +297,11 @@ export default function ProductImagesField({
                                 updateMeta(item.url, { caption: e.target.value })
                               }
                               placeholder="One-line description (used in JSON-LD)"
-                              className="mt-1 block w-full rounded-md border-gray-300 text-xs shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                              className="mt-1 block w-full rounded-md border-border text-xs shadow-sm focus:border-ring focus:ring-ring"
                             />
                           </label>
                           <label className="block">
-                            <span className="font-medium text-gray-700">
+                            <span className="font-medium text-secondary-foreground">
                               Keywords
                             </span>
                             <input
@@ -311,7 +311,7 @@ export default function ProductImagesField({
                                 updateMeta(item.url, { keywords: e.target.value })
                               }
                               placeholder="comma-separated"
-                              className="mt-1 block w-full rounded-md border-gray-300 text-xs shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                              className="mt-1 block w-full rounded-md border-border text-xs shadow-sm focus:border-ring focus:ring-ring"
                             />
                           </label>
                         </div>
@@ -326,7 +326,7 @@ export default function ProductImagesField({
       )}
 
       {pending && (
-        <p className="text-xs text-gray-500" aria-live="polite">
+        <p className="text-xs text-muted-foreground" aria-live="polite">
           Uploading…
         </p>
       )}

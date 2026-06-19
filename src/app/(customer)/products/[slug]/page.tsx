@@ -29,6 +29,13 @@ function truncateAtWord(input: string, max = 200): string {
   return (lastSpace > 0 ? slice.slice(0, lastSpace) : slice).trimEnd() + '…';
 }
 
+/** Avoid "Samsung Samsung …" when the product name already starts with the brand. */
+function titleWithBrand(brandName: string, productName: string): string {
+  const name = productName.trim();
+  if (name.toLowerCase().startsWith(brandName.toLowerCase())) return name;
+  return `${brandName} ${name}`;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -73,7 +80,7 @@ export async function generateMetadata({
   // The root layout's title template appends " · War on Retail" automatically.
   const title =
     product.meta_title ??
-    (brand?.name ? `${brand.name} ${product.name}` : product.name);
+    (brand?.name ? titleWithBrand(brand.name, product.name) : product.name);
 
   // Description fallback ladder. Each step is intentional:
   //  1. meta_description — explicit marketing copy
@@ -87,7 +94,7 @@ export async function generateMetadata({
     if (product.short_description) return product.short_description;
     if (product.description) return product.description;
     const lead = brand?.name
-      ? `Buy the ${brand.name} ${product.name}`
+      ? `Buy the ${titleWithBrand(brand.name, product.name)}`
       : `Buy ${product.name}`;
     return `${lead} for ${formatPrice(product.price)} at ${settings.name}. Authentic products, manufacturer warranty, delivery across Guyana.`;
   })();
@@ -98,7 +105,7 @@ export async function generateMetadata({
   const ogImageUrl =
     product.featured_image_url ?? product.image_urls?.[0] ?? '/logo.png';
   const ogImageAlt = brand?.name
-    ? `${brand.name} ${product.name}`
+    ? titleWithBrand(brand.name, product.name)
     : product.name;
 
   // Three-way availability classification — drives the structured-data
@@ -256,8 +263,8 @@ export default async function ProductDetailPage({
       {/* Headless: record this view in the customer's recently-viewed list. */}
       <RecentlyViewedTracker slug={product.slug} />
 
-      <nav className="mb-4 text-sm text-gray-500">
-        <Link href="/" className="hover:text-primary-600">
+      <nav className="mb-4 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-link">
           Home
         </Link>{' '}
         /{' '}
@@ -265,14 +272,14 @@ export default async function ProductDetailPage({
           <>
             <Link
               href={`/categories/${category.slug}`}
-              className="hover:text-primary-600"
+              className="hover:text-link"
             >
               {category.name}
             </Link>{' '}
             /{' '}
           </>
         )}
-        <span className="text-gray-700">{product.name}</span>
+        <span className="text-secondary-foreground">{product.name}</span>
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">
@@ -289,20 +296,20 @@ export default async function ProductDetailPage({
           {brand && (
             <Link
               href={`/brands/${brand.slug}`}
-              className="text-sm font-medium uppercase tracking-wide text-primary-600 hover:underline"
+              className="text-sm font-medium uppercase tracking-wide text-link hover:underline"
             >
               {brand.name}
             </Link>
           )}
-          <h1 className="mt-1 text-pretty text-2xl font-bold text-gray-900 sm:text-3xl">{product.name}</h1>
-          {product.sku && <p className="mt-1 text-xs text-gray-500">SKU: {product.sku}</p>}
+          <h1 className="mt-1 text-pretty text-2xl font-bold text-foreground sm:text-3xl">{product.name}</h1>
+          {product.sku && <p className="mt-1 text-xs text-muted-foreground">SKU: {product.sku}</p>}
 
           <div className="mt-4 flex flex-wrap items-baseline gap-3">
-            <span className="text-2xl font-bold tabular-nums text-gray-900 sm:text-3xl">
+            <span className="text-2xl font-bold tabular-nums text-foreground sm:text-3xl">
               {formatPrice(product.price)}
             </span>
             {product.compare_at_price && product.compare_at_price > product.price && (
-              <del className="text-lg text-gray-500 line-through">
+              <del className="text-lg text-muted-foreground line-through">
                 <span className="sr-only">Original price: </span>
                 {formatPrice(product.compare_at_price)}
               </del>
@@ -310,14 +317,12 @@ export default async function ProductDetailPage({
           </div>
 
           {product.short_description && (
-            <p className="mt-4 text-gray-700">{product.short_description}</p>
+            <p className="mt-4 text-secondary-foreground">{product.short_description}</p>
           )}
 
           <div
-            className={`mt-6 rounded-md p-4 ring-1 ${
-              isPreOrder
-                ? 'bg-blue-50 ring-blue-200'
-                : 'bg-gray-50 ring-gray-200'
+            className={`mt-6 rounded-md bg-card p-4 ring-1 ring-border ${
+              isPreOrder ? 'ring-blue-200' : ''
             }`}
           >
             {isPreOrder ? (
@@ -335,16 +340,16 @@ export default async function ProductDetailPage({
                 )}
               </div>
             ) : isOutOfStock ? (
-              <p className="font-semibold text-red-600">Currently out of stock</p>
+              <p className="font-semibold text-destructive">Currently out of stock</p>
             ) : (
-              <p className="text-sm">
+              <p className="text-sm text-card-foreground">
                 {product.track_inventory ? (
                   <>
-                    <span className="font-semibold text-green-700">In stock</span>{' '}
-                    <span className="text-gray-500">— {product.stock_quantity} available</span>
+                    <span className="font-semibold text-emerald-700">In stock</span>{' '}
+                    <span className="text-muted-foreground">— {product.stock_quantity} available</span>
                   </>
                 ) : (
-                  <span className="font-semibold text-green-700">In stock</span>
+                  <span className="font-semibold text-emerald-700">In stock</span>
                 )}
               </p>
             )}
@@ -378,7 +383,7 @@ export default async function ProductDetailPage({
             <WishlistButton slug={product.slug} productName={product.name} />
             <a
               href={`tel:${settings.phone}`}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-surface-dark bg-surface-dark px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-900"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-sidebar-border bg-sidebar px-6 py-3 font-semibold text-sidebar-foreground transition-colors hover:bg-secondary"
             >
               <span aria-hidden="true">📞 </span>
               <span className="sm:hidden">Call us</span>
@@ -389,16 +394,16 @@ export default async function ProductDetailPage({
           {Object.keys(specs).length > 0 && (
             <div className="mt-8">
               <h2 className="mb-3 text-lg font-semibold">Specifications</h2>
-              <dl className="overflow-hidden rounded-md ring-1 ring-gray-200">
+              <dl className="overflow-hidden rounded-md bg-card ring-1 ring-border">
                 {Object.entries(specs).map(([k, v], i) => (
                   <div
                     key={k}
-                    className={`grid grid-cols-3 text-sm ${i % 2 ? 'bg-white' : 'bg-gray-50'}`}
+                    className={`grid grid-cols-3 text-sm ${i % 2 ? 'bg-black/[0.04]' : ''}`}
                   >
-                    <dt className="col-span-1 px-4 py-2 font-medium text-gray-600 capitalize">
+                    <dt className="col-span-1 px-4 py-2 font-medium text-muted-foreground capitalize">
                       {k.replace(/_/g, ' ')}
                     </dt>
-                    <dd className="col-span-2 break-words px-4 py-2 text-gray-900">{String(v)}</dd>
+                    <dd className="col-span-2 break-words px-4 py-2 text-card-foreground">{String(v)}</dd>
                   </div>
                 ))}
               </dl>
@@ -406,8 +411,8 @@ export default async function ProductDetailPage({
           )}
 
           {product.description && (
-            <div className="prose prose-sm mt-8 max-w-none">
-              <h2 className="text-lg font-semibold">Description</h2>
+            <div className="prose-theme prose-sm mt-8 max-w-none">
+              <h2 className="text-lg font-semibold text-foreground">Description</h2>
               <p>{product.description}</p>
             </div>
           )}
@@ -423,7 +428,7 @@ export default async function ProductDetailPage({
             {product.category_id && category && (
               <Link
                 href={`/categories/${category.slug}`}
-                className="text-sm font-medium text-primary-600 hover:underline"
+                className="text-sm font-medium text-link underline-offset-4 hover:underline"
               >
                 More in {category.name} <span aria-hidden="true">→</span>
               </Link>
@@ -445,7 +450,7 @@ export default async function ProductDetailPage({
             </h2>
             <Link
               href={`/brands/${brand.slug}`}
-              className="text-sm font-medium text-primary-600 hover:underline"
+              className="text-sm font-medium text-link underline-offset-4 hover:underline"
             >
               All <span translate="no">{brand.name}</span> products{' '}
               <span aria-hidden="true">→</span>

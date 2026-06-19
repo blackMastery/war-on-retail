@@ -8,7 +8,7 @@ import type { Category } from '@/types/database';
 
 const initial: CategoryFormState = {};
 const INPUT =
-  'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm';
+  'mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm';
 
 type Props = {
   category?: Category;
@@ -41,11 +41,11 @@ export default function CategoryForm({ category, allCategories }: Props) {
         <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{state.error}</div>
       )}
 
-      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Basics</h2>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">Name</span>
+          <span className="font-medium text-secondary-foreground">Name</span>
           <input
             name="name"
             required
@@ -57,8 +57,8 @@ export default function CategoryForm({ category, allCategories }: Props) {
         </label>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">
-            Slug <span className="font-normal text-gray-500">(optional)</span>
+          <span className="font-medium text-secondary-foreground">
+            Slug <span className="font-normal text-muted-foreground">(optional)</span>
           </span>
           <input
             name="slug"
@@ -66,15 +66,15 @@ export default function CategoryForm({ category, allCategories }: Props) {
             placeholder="auto-generated from name"
             className={INPUT}
           />
-          <span className="mt-1 block text-xs text-gray-500">
+          <span className="mt-1 block text-xs text-muted-foreground">
             URL becomes <code>/categories/your-slug</code>.
           </span>
           {err('slug') && <span className="mt-1 block text-xs text-red-600">{err('slug')}</span>}
         </label>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">
-            Description <span className="font-normal text-gray-500">(optional)</span>
+          <span className="font-medium text-secondary-foreground">
+            Description <span className="font-normal text-muted-foreground">(optional)</span>
           </span>
           <textarea
             name="description"
@@ -86,8 +86,8 @@ export default function CategoryForm({ category, allCategories }: Props) {
         </label>
 
         <label className="block text-sm">
-          <span className="font-medium text-gray-700">
-            Parent category <span className="font-normal text-gray-500">(optional)</span>
+          <span className="font-medium text-secondary-foreground">
+            Parent category <span className="font-normal text-muted-foreground">(optional)</span>
           </span>
           <select
             name="parent_id"
@@ -101,7 +101,7 @@ export default function CategoryForm({ category, allCategories }: Props) {
               </option>
             ))}
           </select>
-          <span className="mt-1 block text-xs text-gray-500">
+          <span className="mt-1 block text-xs text-muted-foreground">
             Selecting a parent makes this a sub-category (shown nested under the parent on{' '}
             <code>/categories</code>).
           </span>
@@ -111,14 +111,14 @@ export default function CategoryForm({ category, allCategories }: Props) {
         </label>
       </section>
 
-      <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="mb-3 font-semibold">Image</h2>
         <CategoryImageField initialUrl={category?.image_url ?? null} />
       </section>
 
-      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">SEO</h2>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           Optional. Used by the category landing page&apos;s {`<title>`}, meta
           description, and meta keywords tags.
         </p>
@@ -136,18 +136,18 @@ export default function CategoryForm({ category, allCategories }: Props) {
         />
       </section>
 
-      <section className="space-y-4 rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Status</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="font-medium text-gray-700">Display order</span>
+            <span className="font-medium text-secondary-foreground">Display order</span>
             <input
               name="display_order"
               type="number"
               defaultValue={category?.display_order ?? 0}
               className={INPUT}
             />
-            <span className="mt-1 block text-xs text-gray-500">
+            <span className="mt-1 block text-xs text-muted-foreground">
               Lower numbers appear first.
             </span>
           </label>
@@ -156,18 +156,18 @@ export default function CategoryForm({ category, allCategories }: Props) {
               type="checkbox"
               name="is_active"
               defaultChecked={category?.is_active ?? true}
-              className="rounded text-primary-600"
+              className="rounded text-primary"
             />
             Active (visible in storefront)
           </label>
         </div>
       </section>
 
-      <div className="flex items-center justify-end gap-2 border-t border-gray-200 pt-4">
+      <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-primary-600 px-5 py-2 font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+          className="rounded-md bg-primary text-primary-foreground px-5 py-2 font-semibold hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Saving…' : category ? 'Save changes' : 'Create category'}
         </button>

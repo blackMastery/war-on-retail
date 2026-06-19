@@ -11,7 +11,7 @@ const STATUS_TONE: Record<OrderStatus, string> = {
   pending: 'bg-amber-100 text-amber-800',
   approved: 'bg-blue-100 text-blue-800',
   fulfilled: 'bg-green-100 text-green-800',
-  cancelled: 'bg-gray-100 text-gray-600',
+  cancelled: 'bg-muted text-muted-foreground',
 };
 
 export default async function AdminCustomerDetailPage({
@@ -43,12 +43,12 @@ export default async function AdminCustomerDetailPage({
   return (
     <div className="space-y-6">
       <header>
-        <Link href="/admin/customers" className="text-sm font-medium text-primary-600 hover:underline">
+        <Link href="/admin/customers" className="text-sm font-medium text-primary hover:underline">
           ← All customers
         </Link>
         <h1 className="mt-1 text-2xl font-bold">{customer.name}</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          <a href={`tel:${customer.phone}`} className="text-primary-600 hover:underline">
+        <p className="mt-1 text-sm text-muted-foreground">
+          <a href={`tel:${customer.phone}`} className="text-primary hover:underline">
             {customer.phone}
           </a>{' '}
           · First seen{' '}
@@ -68,15 +68,15 @@ export default async function AdminCustomerDetailPage({
       </div>
 
       {(!orders || orders.length === 0) && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-lg font-semibold text-gray-900">No orders yet</p>
+        <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
+          <p className="text-lg font-semibold text-foreground">No orders yet</p>
         </div>
       )}
 
       {orders && orders.length > 0 && (
-        <div className="overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+        <div className="overflow-x-auto rounded-lg bg-card shadow-sm ring-1 ring-border">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Order #</th>
                 <th className="px-4 py-3">Placed</th>
@@ -86,13 +86,13 @@ export default async function AdminCustomerDetailPage({
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {orders.map((o) => (
-                <tr key={o.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-mono text-xs font-medium text-gray-900">
+                <tr key={o.id} className="hover:bg-muted">
+                  <td className="px-4 py-3 font-mono text-xs font-medium text-foreground">
                     {o.order_number}
                   </td>
-                  <td className="px-4 py-3 text-xs text-gray-500">
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
                     {new Date(o.placed_at).toLocaleString('en-GY', {
                       dateStyle: 'medium',
                       timeStyle: 'short',
@@ -114,7 +114,7 @@ export default async function AdminCustomerDetailPage({
                   <td className="px-4 py-3 text-right">
                     <Link
                       href={`/admin/orders/${o.id}`}
-                      className="text-xs font-medium text-primary-600 hover:underline"
+                      className="text-xs font-medium text-primary hover:underline"
                     >
                       View →
                     </Link>
@@ -131,9 +131,9 @@ export default async function AdminCustomerDetailPage({
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
-      <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-gray-900 tabular-nums">{value}</p>
+    <div className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">{value}</p>
     </div>
   );
 }

@@ -75,7 +75,7 @@ export default function PriceRangeSlider({ bounds, value, onCommit, step }: Prop
 
   return (
     <div className="space-y-3">
-      <div className="flex items-baseline justify-between text-xs tabular-nums text-gray-600">
+      <div className="flex items-baseline justify-between text-xs tabular-nums text-muted-foreground">
         <span aria-hidden="true">{formatPrice(draft[0])}</span>
         <span aria-hidden="true">{formatPrice(draft[1])}</span>
       </div>
@@ -91,16 +91,16 @@ export default function PriceRangeSlider({ bounds, value, onCommit, step }: Prop
         aria-label="Price range"
         className="relative flex h-5 w-full touch-none select-none items-center"
       >
-        <Slider.Track className="relative h-1.5 grow rounded-full bg-gray-200">
-          <Slider.Range className="absolute h-full rounded-full bg-primary-600" />
+        <Slider.Track className="relative h-1.5 grow rounded-full bg-muted">
+          <Slider.Range className="absolute h-full rounded-full bg-primary" />
         </Slider.Track>
         <Slider.Thumb
           aria-label="Minimum price"
-          className="block h-4 w-4 rounded-full border border-primary-700 bg-white shadow ring-primary-600 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2"
+          className="block h-4 w-4 rounded-full border border-primary bg-card shadow ring-ring transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2"
         />
         <Slider.Thumb
           aria-label="Maximum price"
-          className="block h-4 w-4 rounded-full border border-primary-700 bg-white shadow ring-primary-600 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2"
+          className="block h-4 w-4 rounded-full border border-primary bg-card shadow ring-ring transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2"
         />
       </Slider.Root>
 
@@ -127,10 +127,10 @@ export default function PriceRangeSlider({ bounds, value, onCommit, step }: Prop
             onKeyDown={(e) => {
               if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
             }}
-            className="w-full rounded-md border-gray-300 text-sm tabular-nums shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            className="w-full rounded-md border-border text-sm tabular-nums shadow-sm focus:border-ring focus:ring-ring"
           />
         </label>
-        <span aria-hidden="true" className="text-gray-400">
+        <span aria-hidden="true" className="text-muted-foreground">
           –
         </span>
         <label htmlFor={maxId} className="flex-1 text-xs">
@@ -155,7 +155,7 @@ export default function PriceRangeSlider({ bounds, value, onCommit, step }: Prop
             onKeyDown={(e) => {
               if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
             }}
-            className="w-full rounded-md border-gray-300 text-sm tabular-nums shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            className="w-full rounded-md border-border text-sm tabular-nums shadow-sm focus:border-ring focus:ring-ring"
           />
         </label>
       </div>

@@ -13,7 +13,7 @@ import {
 const QuillEditor = dynamic(() => import('@/components/admin/QuillEditor'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[360px] items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-500">
+    <div className="flex h-[360px] items-center justify-center rounded-md border border-dashed border-border bg-muted text-sm text-muted-foreground">
       Loading editor…
     </div>
   ),
@@ -61,32 +61,32 @@ export default function EmailHtmlEditor({ name, defaultValue = '', subject = '',
       <input type="hidden" name={name} value={value} />
 
       <div className="flex flex-wrap items-center gap-1.5">
-        <span className="mr-1 text-xs font-medium text-gray-500">Insert variable:</span>
+        <span className="mr-1 text-xs font-medium text-muted-foreground">Insert variable:</span>
         {EMAIL_VARIABLES.map((v) => (
           <button
             key={v.key}
             type="button"
             onClick={() => insertVariable(v.key)}
             title={v.description}
-            className="rounded border border-gray-300 bg-white px-2 py-0.5 font-mono text-xs text-gray-700 hover:border-primary-400 hover:bg-primary-50"
+            className="rounded border border-border bg-card px-2 py-0.5 font-mono text-xs text-secondary-foreground hover:border-primary hover:bg-accent"
           >
             {`{{${v.key}}}`}
           </button>
         ))}
       </div>
 
-      <div data-color-mode="light" className="rounded-md bg-white">
+      <div data-color-mode="light" className="rounded-md bg-card">
         <QuillEditor value={value} onChange={setValue} insertSignal={insertSignal} />
       </div>
 
-      <div className="flex items-center justify-between border-t border-gray-200 pt-3">
-        <span className="text-xs text-gray-500">
+      <div className="flex items-center justify-between border-t border-border pt-3">
+        <span className="text-xs text-muted-foreground">
           Preview uses sample data and your live store branding.
         </span>
         <button
           type="button"
           onClick={() => setShowPreview((s) => !s)}
-          className="text-xs font-medium text-primary-600 hover:underline"
+          className="text-xs font-medium text-primary hover:underline"
         >
           {showPreview ? 'Hide preview' : 'Show preview'}
         </button>
@@ -96,7 +96,7 @@ export default function EmailHtmlEditor({ name, defaultValue = '', subject = '',
         <iframe
           title="Email preview"
           srcDoc={previewHtml}
-          className="h-[520px] w-full rounded-md border border-gray-200 bg-gray-100"
+          className="h-[520px] w-full rounded-md border border-border bg-muted"
         />
       )}
     </div>

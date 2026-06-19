@@ -14,7 +14,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear();
 export default function Footer({ settings }: { settings: ResolvedStoreSettings }) {
   const { name, description, phone, email, address, social } = settings;
   return (
-    <footer className="mt-16 bg-surface-dark text-gray-300">
+    <footer className="mt-16 border-t border-border bg-header text-secondary-foreground">
       <div className="container py-12">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -27,12 +27,12 @@ export default function Footer({ settings }: { settings: ResolvedStoreSettings }
             />
             <p className="mt-3 text-pretty text-sm">{description}</p>
             <address className="mt-4 text-sm not-italic">
-              <a href={`tel:${phone}`} className="hover:text-white">
+              <a href={`tel:${phone}`} className="transition-colors hover:text-primary">
                 <span aria-hidden="true">📞 </span>
                 {phone}
               </a>
               <br />
-              <a href={`mailto:${email}`} className="hover:text-white">
+              <a href={`mailto:${email}`} className="transition-colors hover:text-primary">
                 <span aria-hidden="true">✉ </span>
                 {email}
               </a>
@@ -46,7 +46,7 @@ export default function Footer({ settings }: { settings: ResolvedStoreSettings }
           <FooterColumn title="Company" items={footerLinks.company} />
         </div>
 
-        <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-gray-800 pt-6 text-xs text-gray-400 sm:flex-row sm:items-center">
+        <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center">
           <p>
             © {COPYRIGHT_YEAR} <span translate="no">{name}</span>. All rights reserved.
           </p>
@@ -58,7 +58,7 @@ export default function Footer({ settings }: { settings: ResolvedStoreSettings }
                   aria-label={`${name} on Facebook`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white"
+                  className="transition-colors hover:text-primary"
                 >
                   Facebook
                 </a>
@@ -71,7 +71,7 @@ export default function Footer({ settings }: { settings: ResolvedStoreSettings }
                   aria-label={`${name} on Instagram`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white"
+                  className="transition-colors hover:text-primary"
                 >
                   Instagram
                 </a>
@@ -84,7 +84,7 @@ export default function Footer({ settings }: { settings: ResolvedStoreSettings }
                   aria-label={`${name} on Twitter`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white"
+                  className="transition-colors hover:text-primary"
                 >
                   Twitter
                 </a>
@@ -106,11 +106,11 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-white">{title}</h3>
+      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-header-foreground">{title}</h3>
       <ul className="space-y-2 text-sm">
         {items.map((item) => (
           <li key={item.href}>
-            <Link href={item.href} className="hover:text-white">
+            <Link href={item.href} className="transition-colors hover:text-primary">
               {item.label}
             </Link>
           </li>

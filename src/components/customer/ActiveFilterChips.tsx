@@ -66,7 +66,7 @@ export default function ActiveFilterChips({ filters, categories, brands }: Props
             <Link
               href={qs ? `/products?${qs}` : '/products'}
               scroll={false}
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary-200 hover:bg-primary-100"
+              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground ring-1 ring-border hover:bg-accent"
               aria-label={`Remove filter: ${chip.label}`}
             >
               {chip.label}
@@ -79,7 +79,7 @@ export default function ActiveFilterChips({ filters, categories, brands }: Props
         <Link
           href="/products"
           scroll={false}
-          className="text-xs font-medium text-gray-600 hover:text-primary-700 hover:underline"
+          className="text-xs font-medium text-muted-foreground hover:text-link hover:underline"
         >
           Clear all
         </Link>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { ADMIN_ALERT_ON_CARD } from '@/lib/admin/tokens';
 
 type Mode = 'signin' | 'reset';
 type Status = 'idle' | 'pending' | 'sent' | 'error';
@@ -74,7 +75,7 @@ export default function LoginForm({ next }: { next?: string }) {
   if (status === 'sent') {
     return (
       <div className="space-y-3">
-        <div className="rounded-md bg-green-50 p-4 text-sm text-green-800">
+        <div className={ADMIN_ALERT_ON_CARD.success}>
           Check <span className="font-semibold">{email}</span> for a password-reset
           link. You can close this tab.
         </div>
@@ -85,7 +86,7 @@ export default function LoginForm({ next }: { next?: string }) {
             setStatus('idle');
             setPassword('');
           }}
-          className="text-sm font-medium text-primary-600 hover:underline"
+          className="text-sm font-medium text-link-on-light hover:underline"
         >
           ← Back to sign in
         </button>
@@ -97,7 +98,7 @@ export default function LoginForm({ next }: { next?: string }) {
     return (
       <form onSubmit={onSendReset} className="space-y-4">
         <div>
-          <label htmlFor="reset-email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="reset-email" className="block text-sm font-medium text-secondary-foreground">
             Email
           </label>
           <input
@@ -108,11 +109,11 @@ export default function LoginForm({ next }: { next?: string }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@waronretail.com"
-            className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            className="mt-1 w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
           />
         </div>
         {status === 'error' && (
-          <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{errorMsg}</p>
+          <p className={ADMIN_ALERT_ON_CARD.error}>{errorMsg}</p>
         )}
         <div className="flex items-center justify-between gap-3">
           <button
@@ -122,14 +123,14 @@ export default function LoginForm({ next }: { next?: string }) {
               setStatus('idle');
               setErrorMsg('');
             }}
-            className="text-sm font-medium text-primary-600 hover:underline"
+            className="text-sm font-medium text-link-on-light hover:underline"
           >
             ← Back to sign in
           </button>
           <button
             type="submit"
             disabled={status === 'pending'}
-            className="rounded-md bg-primary-600 px-4 py-2 font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
+            className="rounded-md bg-primary text-primary-foreground px-4 py-2 font-semibold shadow-sm hover:opacity-90 disabled:opacity-60"
           >
             {status === 'pending' ? 'Sending…' : 'Send reset email'}
           </button>
@@ -141,7 +142,7 @@ export default function LoginForm({ next }: { next?: string }) {
   return (
     <form onSubmit={onSignIn} className="space-y-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="block text-sm font-medium text-secondary-foreground">
           Email
         </label>
         <input
@@ -152,11 +153,11 @@ export default function LoginForm({ next }: { next?: string }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@waronretail.com"
-          className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          className="mt-1 w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="password" className="block text-sm font-medium text-secondary-foreground">
           Password
         </label>
         <input
@@ -166,16 +167,16 @@ export default function LoginForm({ next }: { next?: string }) {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          className="mt-1 w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring"
         />
       </div>
       {status === 'error' && (
-        <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{errorMsg}</p>
+        <p className={ADMIN_ALERT_ON_CARD.error}>{errorMsg}</p>
       )}
       <button
         type="submit"
         disabled={status === 'pending'}
-        className="w-full rounded-md bg-primary-600 px-4 py-2 font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
+        className="w-full rounded-md bg-primary text-primary-foreground px-4 py-2 font-semibold shadow-sm hover:opacity-90 disabled:opacity-60"
       >
         {status === 'pending' ? 'Signing in…' : 'Sign in'}
       </button>
@@ -187,11 +188,11 @@ export default function LoginForm({ next }: { next?: string }) {
             setStatus('idle');
             setErrorMsg('');
           }}
-          className="font-medium text-primary-600 hover:underline"
+          className="font-medium text-link-on-light hover:underline"
         >
           Forgot your password?
         </button>
-        <Link href="/" className="text-gray-500 hover:underline">
+        <Link href="/" className="text-muted-foreground hover:underline">
           Back to site
         </Link>
       </div>

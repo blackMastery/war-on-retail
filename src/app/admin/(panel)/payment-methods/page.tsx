@@ -32,31 +32,31 @@ export default async function AdminPaymentMethodsPage() {
       <header className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">Payment methods</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Shown to customers in Step 3 of <Link href="/checkout" className="text-primary-600 hover:underline">checkout</Link>.
+          <p className="mt-1 text-sm text-muted-foreground">
+            Shown to customers in Step 3 of <Link href="/checkout" className="text-primary hover:underline">checkout</Link>.
           </p>
         </div>
         <Link
           href="/admin/payment-methods/new"
-          className="rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90"
         >
           + New payment method
         </Link>
       </header>
 
       {(!methods || methods.length === 0) && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-lg font-semibold text-gray-900">No payment methods yet</p>
-          <p className="mt-1 text-sm text-gray-600">
+        <div className="rounded-lg border border-dashed border-border bg-card p-12 text-center">
+          <p className="text-lg font-semibold text-foreground">No payment methods yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Add at least one so customers can complete checkout.
           </p>
         </div>
       )}
 
       {methods && methods.length > 0 && (
-        <div className="overflow-x-auto rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+        <div className="overflow-x-auto rounded-lg bg-card shadow-sm ring-1 ring-border">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Description</th>
@@ -66,11 +66,11 @@ export default async function AdminPaymentMethodsPage() {
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {methods.map((m) => (
-                <tr key={m.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">{m.name}</td>
-                  <td className="max-w-md px-4 py-3 text-xs text-gray-600">
+                <tr key={m.id} className="hover:bg-muted">
+                  <td className="px-4 py-3 font-medium text-foreground">{m.name}</td>
+                  <td className="max-w-md px-4 py-3 text-xs text-muted-foreground">
                     {m.description ?? '—'}
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">
@@ -82,7 +82,7 @@ export default async function AdminPaymentMethodsPage() {
                       className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                         m.is_active
                           ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-600'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {m.is_active ? 'Active' : 'Hidden'}
@@ -92,7 +92,7 @@ export default async function AdminPaymentMethodsPage() {
                     <div className="flex justify-end gap-3 text-xs">
                       <Link
                         href={`/admin/payment-methods/${m.id}/edit`}
-                        className="font-medium text-primary-600 hover:underline"
+                        className="font-medium text-primary hover:underline"
                       >
                         Edit
                       </Link>
