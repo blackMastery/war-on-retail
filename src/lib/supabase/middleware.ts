@@ -40,14 +40,30 @@ export async function updateSession(request: NextRequest) {
   // bootstrap fallback) happens in `requireAdmin()` inside the panel layout —
   // doing it here too would mean a Supabase round-trip per request.
   const path = request.nextUrl.pathname;
-  const needsSession =
+  const needsAdminSession =
     path.startsWith('/admin') &&
     !path.startsWith('/admin/login') &&
     !path.startsWith('/admin/auth');
 
-  if (needsSession && !user) {
+  if (needsAdminSession && !user) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/admin/login';
+    loginUrl.searchParams.set('next', path);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Customer dashboard gate: everything under /account requires a session
+  // except the public auth pages. `/auth/callback` lives outside /account so
+  // it's never gated.
+  const needsCustomerSession =
+    path.startsWith('/account') &&
+    !path.startsWith('/account/login') &&
+    !path.startsWith('/account/signup') &&
+    !path.startsWith('/account/reset-password');
+
+  if (needsCustomerSession && !user) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = '/account/login';
     loginUrl.searchParams.set('next', path);
     return NextResponse.redirect(loginUrl);
   }

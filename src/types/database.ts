@@ -312,6 +312,8 @@ export type CustomerRow = {
   phone: string;
   /** Optional — checkout never asks for it; admins add it for email receipts. */
   email: string | null;
+  /** Linked Supabase auth user, if this customer owns an account. Null for guests. */
+  user_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -320,10 +322,24 @@ type CustomerInsert = {
   name: string;
   phone: string;
   email?: string | null;
+  user_id?: string | null;
   created_at?: string;
   updated_at?: string;
 };
 type CustomerUpdate = Partial<CustomerInsert>;
+
+// ---------- Wishlist items (DB-backed, per signed-in customer) ----------
+export type WishlistItemRow = {
+  user_id: string;
+  product_slug: string;
+  created_at: string;
+};
+type WishlistItemInsert = {
+  user_id: string;
+  product_slug: string;
+  created_at?: string;
+};
+type WishlistItemUpdate = Partial<WishlistItemInsert>;
 
 // ---------- Payment methods ----------
 export type PaymentMethodRow = {
@@ -792,6 +808,12 @@ export type Database = {
         Update: EmailLogUpdate;
         Relationships: Empty;
       };
+      wishlist_items: {
+        Row: WishlistItemRow;
+        Insert: WishlistItemInsert;
+        Update: WishlistItemUpdate;
+        Relationships: Empty;
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -834,6 +856,21 @@ export type Database = {
         Args: { p_email: string };
         Returns: AdminUserRow;
       };
+      /** Links the caller's existing customer rows by verified email. Returns the row count linked. */
+      link_customer_account: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      /** Renames the caller's linked customer rows. Returns the row count updated. */
+      update_my_profile: {
+        Args: { p_name: string };
+        Returns: number;
+      };
+      /** Bulk-merges localStorage wishlist slugs into the caller's account. Returns inserted count. */
+      merge_wishlist: {
+        Args: { p_slugs: string[] };
+        Returns: number;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
@@ -852,6 +889,7 @@ export type Promotion = PromotionRow;
 export type DiscountCode = DiscountCodeRow;
 export type DiscountCodeUsage = DiscountCodeUsageRow;
 export type Customer = CustomerRow;
+export type WishlistItem = WishlistItemRow;
 export type PaymentMethod = PaymentMethodRow;
 export type Order = OrderRow;
 export type OrderItem = OrderItemRow;

@@ -12,6 +12,7 @@ import {
   ShoppingBagIcon,
   Squares2X2Icon,
   TagIcon,
+  UserIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
@@ -46,11 +47,14 @@ type Props = {
   brands: Brand[];
   /** Store settings the header chrome needs — name, phone, weekday hours, whatsapp. */
   settings: HeaderSettings;
+  /** Whether a customer session exists — toggles the account link target. */
+  isAuthed: boolean;
 };
 
 const FEATURED_CATEGORY_SLUGS = ['electronics', 'home-appliances', 'kitchen-appliances'];
 
-export default function Header({ categories, brands, settings }: Props) {
+export default function Header({ categories, brands, settings, isAuthed }: Props) {
+  const accountHref = isAuthed ? '/account' : '/account/login';
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -184,6 +188,13 @@ export default function Header({ categories, brands, settings }: Props) {
           >
             <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
           </button>
+          <Link
+            href={accountHref}
+            aria-label={isAuthed ? 'My account' : 'Sign in'}
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header"
+          >
+            <UserIcon className="h-6 w-6" aria-hidden="true" />
+          </Link>
           <WishlistIcon tone="dark" />
           <CartIcon tone="dark" />
           <button
@@ -345,6 +356,14 @@ export default function Header({ categories, brands, settings }: Props) {
             className="container flex flex-1 flex-col gap-1 overflow-y-auto overscroll-contain py-3 text-sm"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}
           >
+            <MobileLink
+              href={accountHref}
+              onSelect={() => setMobileMenuOpen(false)}
+              thumbnail={<UtilityThumb icon={UserIcon} />}
+            >
+              {isAuthed ? 'My account' : 'Sign in'}
+            </MobileLink>
+
             <MobileLink
               href="/products"
               onSelect={() => setMobileMenuOpen(false)}

@@ -3,6 +3,7 @@ import Header from '@/components/customer/Header';
 import Footer from '@/components/customer/Footer';
 import Chatbot from '@/components/customer/Chatbot';
 import CookieNotice from '@/components/customer/CookieNotice';
+import WishlistSync from '@/components/customer/WishlistSync';
 import MotionProvider from '@/components/customer/motion/MotionProvider';
 import { getStoreSettings } from '@/lib/store-settings';
 
@@ -12,7 +13,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
   // Fetch nav data + admin-edited store settings once at the layout level —
   // every page shares them, no need to repeat the queries per route.
   const supabase = await createClient();
-  const [{ data: categories }, { data: brands }, settings] = await Promise.all([
+  const [{ data: categories }, { data: brands }, settings, { data: auth }] = await Promise.all([
     supabase
       .from('categories')
       .select('id, name, slug, parent_id, display_order, image_url')
@@ -26,7 +27,9 @@ export default async function CustomerLayout({ children }: { children: React.Rea
       .order('display_order')
       .order('name'),
     getStoreSettings(),
+    supabase.auth.getUser(),
   ]);
+  const isAuthed = !!auth?.user;
 
   // Header is a client component; pass only the slice it needs so the
   // bundle stays small.
@@ -44,6 +47,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
           categories={categories ?? []}
           brands={brands ?? []}
           settings={headerSettings}
+          isAuthed={isAuthed}
         />
         <main id="main" tabIndex={-1} className="flex-1 scroll-mt-28 md:scroll-mt-24">
           {children}
@@ -51,6 +55,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
         <Footer settings={settings} />
         <Chatbot settings={{ name: settings.name, whatsapp: settings.whatsapp }} />
         <CookieNotice />
+        <WishlistSync />
       </div>
     </MotionProvider>
   );
