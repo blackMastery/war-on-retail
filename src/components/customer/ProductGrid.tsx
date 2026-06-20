@@ -2,7 +2,14 @@ import ProductCard from './ProductCard';
 import { StaggerIn, StaggerItem } from './motion/primitives';
 import type { Product } from '@/types/database';
 
-export default function ProductGrid({ products }: { products: Product[] }) {
+export default function ProductGrid({
+  products,
+  gridClassName = 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4',
+}: {
+  products: Product[];
+  /** Override the grid layout classes. Defaults to 2-up on mobile, 3/4-up on larger screens. */
+  gridClassName?: string;
+}) {
   if (!products.length) {
     return (
       <section
@@ -19,7 +26,7 @@ export default function ProductGrid({ products }: { products: Product[] }) {
     // them instantly (MotionConfig), and SSR still emits the full markup. Each
     // item stretches so cards keep equal heights in the grid.
     <section aria-label="Products">
-      <StaggerIn className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+      <StaggerIn className={gridClassName}>
         {products.map((p) => (
           <StaggerItem key={p.id} className="flex">
             <ProductCard product={p} className="h-full w-full" />

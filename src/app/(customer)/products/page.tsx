@@ -77,7 +77,14 @@ export default async function ProductsPage({
             categories={categories ?? []}
             brands={brands ?? []}
           />
-          {page.rows.length === 0 ? <EmptyState /> : <ProductGrid products={page.rows} />}
+          {page.rows.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <ProductGrid
+              products={page.rows}
+              gridClassName="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4"
+            />
+          )}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

@@ -101,7 +101,7 @@ export default function WishlistButton({ slug, productName, variant = 'button' }
       aria-pressed={displaySaved}
       whileTap={{ scale: 0.97 }}
       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-      className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border-2 px-6 py-3 font-semibold transition-colors ${
+      className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border-2 px-6 py-3 font-semibold transition-colors ${
         displaySaved
           ? 'border-red-600 bg-red-50 text-red-700 hover:bg-red-100'
           : 'border-chart-4 bg-chart-1 text-primary-foreground hover:bg-chart-2'

@@ -376,14 +376,14 @@ export default async function ProductDetailPage({
               href={`https://wa.me/${settings.whatsapp}?text=${inquiryMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
             >
               <span aria-hidden="true">💬 </span>Buy via WhatsApp
             </a>
             <WishlistButton slug={product.slug} productName={product.name} />
             <a
               href={`tel:${settings.phone}`}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-sidebar-border bg-sidebar px-6 py-3 font-semibold text-sidebar-foreground transition-colors hover:bg-secondary"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-2 border-sidebar-border bg-sidebar px-6 py-3 font-semibold text-sidebar-foreground transition-colors hover:bg-secondary"
             >
               <span aria-hidden="true">📞 </span>
               <span className="sm:hidden">Call us</span>

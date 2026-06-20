@@ -2,11 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Bars3Icon,
+  ChevronLeftIcon,
   FireIcon,
   MagnifyingGlassIcon,
   ShoppingBagIcon,
@@ -25,6 +26,7 @@ import CartIcon from './CartIcon';
 import SearchBar from './SearchBar';
 import NavDropdown, { type NavGroup, type NavItem } from './NavDropdown';
 import WishlistIcon from './WishlistIcon';
+import { isNestedCustomerPath } from '@/lib/customer-routes';
 
 type Category = {
   id: string;
@@ -56,6 +58,8 @@ const FEATURED_CATEGORY_SLUGS = ['electronics', 'home-appliances', 'kitchen-appl
 export default function Header({ categories, brands, settings, isAuthed }: Props) {
   const accountHref = isAuthed ? '/account' : '/account/login';
   const pathname = usePathname();
+  const router = useRouter();
+  const isNested = isNestedCustomerPath(pathname);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -158,11 +162,21 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
       {/* Main bar */}
       <div className="bg-header text-header-foreground">
         <div className="container flex items-center gap-2 py-3 sm:gap-4 sm:py-4">
+        {isNested && (
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="Go back"
+            className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header md:hidden"
+          >
+            <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
+          </button>
+        )}
         <Link
           href="/"
           aria-label={`${settings.name} home`}
           translate="no"
-          className="flex shrink-0 items-center"
+          className={`flex shrink-0 items-center ${isNested ? 'max-md:hidden' : ''}`}
         >
           <Image
             src="/logo.png"

@@ -86,11 +86,11 @@ export default function AddToCartButton({
   }
 
   const base =
-    'inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50';
+    'inline-flex items-center justify-center gap-2 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50';
   const sizing =
     variant === 'primary'
-      ? 'min-h-11 px-6 py-3'
-      : 'min-h-11 w-full px-3 py-2.5 text-sm sm:py-2';
+      ? 'min-h-11 rounded-full px-6 py-3'
+      : 'min-h-11 w-full rounded-md px-3 py-2.5 text-sm sm:py-2';
   // Tone vocabulary:
   //   added     → green (success)
   //   preorder  → blue (pending stock — distinct from the regular red primary)
