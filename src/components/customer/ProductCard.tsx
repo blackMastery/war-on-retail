@@ -86,7 +86,7 @@ export default function ProductCard({
             </span>
           )}
           {product.is_featured && (
-            <span className="rounded bg-chart-1 px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground sm:px-2 sm:text-xs">
+            <span className="rounded bg-chart-1 px-1.5 py-0.5 text-[10px] font-bold text-accent-foreground sm:px-2 sm:text-xs">
               Featured
             </span>
           )}

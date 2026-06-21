@@ -127,7 +127,7 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
   return (
     <>
     <header
-      className={`sticky top-0 z-40 transition-shadow duration-200 ${
+      className={`sticky top-0 z-40 bg-card transition-shadow duration-200 ${
         scrolled ? 'shadow-md' : 'shadow-sm'
       }`}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
@@ -138,7 +138,7 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
           <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <a
               href={`tel:${settings.phone}`}
-              className="truncate transition-colors hover:text-primary"
+              className="truncate transition-colors hover:text-chart-1"
             >
               <span aria-hidden="true">📞 </span>
               {settings.phone}
@@ -152,7 +152,7 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
             href={`https://wa.me/${settings.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 hover:text-primary"
+            className="shrink-0 hover:text-chart-1"
           >
             WhatsApp
           </a>
@@ -160,14 +160,13 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
       </div>
 
       {/* Main bar */}
-      <div className="bg-header text-header-foreground">
-        <div className="container flex items-center gap-2 py-3 sm:gap-4 sm:py-4">
+      <div className="container flex items-center gap-2 py-3 sm:gap-4 sm:py-4">
         {isNested && (
           <button
             type="button"
             onClick={() => router.back()}
             aria-label="Go back"
-            className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header md:hidden"
+            className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:hidden"
           >
             <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
           </button>
@@ -198,19 +197,19 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
             onClick={() => (mobileSearchOpen ? setMobileSearchOpen(false) : openSearch())}
             aria-label={mobileSearchOpen ? 'Close search' : 'Open search'}
             aria-expanded={mobileSearchOpen}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header md:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:hidden"
           >
             <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
           </button>
           <Link
             href={accountHref}
             aria-label={isAuthed ? 'My account' : 'Sign in'}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <UserIcon className="h-6 w-6" aria-hidden="true" />
           </Link>
-          <WishlistIcon tone="dark" />
-          <CartIcon tone="dark" />
+          <WishlistIcon />
+          <CartIcon />
           <button
             ref={menuButtonRef}
             type="button"
@@ -218,7 +217,7 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
             aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-nav-drawer"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header md:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:hidden"
           >
             {mobileMenuOpen ? (
               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -227,14 +226,11 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
             )}
           </button>
         </div>
-        </div>
       </div>
 
       {mobileSearchOpen && (
-        <div className="border-t border-white/10 bg-header pb-3 pt-3 md:hidden">
-          <div className="container">
+        <div className="container border-t border-border pb-3 pt-3 md:hidden">
           <SearchBar />
-          </div>
         </div>
       )}
 
@@ -244,7 +240,7 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
           <Link
             href="/products"
             aria-current={pathname === '/products' ? 'page' : undefined}
-            className="hover:opacity-75"
+            className="hover:text-chart-1"
           >
             All Products
           </Link>
@@ -261,7 +257,7 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
                   key={c.id}
                   href={`/categories/${c.slug}`}
                   aria-current={pathname === `/categories/${c.slug}` ? 'page' : undefined}
-                  className="hover:opacity-75"
+                  className="hover:text-chart-1"
                 >
                   {c.name}
                 </Link>
@@ -283,7 +279,7 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
           <Link
             href="/deals"
             aria-current={pathname === '/deals' ? 'page' : undefined}
-            className="font-bold hover:opacity-75"
+            className="font-bold hover:text-chart-1"
           >
             <span aria-hidden="true">🔥 </span>Deals
           </Link>

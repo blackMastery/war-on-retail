@@ -4,52 +4,52 @@
 
 :root {
   --card: #ffffff;
-  --ring: #ffd400;
+  --ring: #C91919;
   --input: #e5e7eb;
   --muted: #f9fafb;
-  --accent: #fffbeb;
+  --accent: #FFF9C4;
   --border: #e5e7eb;
   --radius: 0.375rem;
-  --chart-1: #ffd400;
-  --chart-2: #d97706;
-  --chart-3: #b45309;
+  --chart-1: #FFD700;
+  --chart-2: #E61E1E;
+  --chart-3: #FFD700;
   --chart-4: #92400e;
   --chart-5: #78350f;
   --popover: #ffffff;
-  --primary: #ffd400;
+  --primary: #C91919;
   --header: #000000;
   --header-foreground: #ffffff;
   --sidebar: #f9fafb;
   --spacing: 0.25rem;
   --font-mono: JetBrains Mono, monospace;
   --font-sans: Inter, sans-serif;
-  --secondary: #f3f4f6;
-  --background: #ffffff;
+  --secondary: #F0C800;
+  --background: #FFD700;
   --font-serif: Source Serif 4, serif;
-  --foreground: #262626;
-  --link: #ffd400;
-  --link-on-light: #7a6200;
+  --foreground: #111827;
+  --link: #C91919;
+  --link-on-light: #A81414;
   --destructive: #ef4444;
   --shadow-blur: 8px;
   --shadow-color: hsl(0 0% 0%);
-  --sidebar-ring: #ffd400;
+  --sidebar-ring: #C91919;
   --shadow-spread: -1px;
   --letter-spacing: 0em;
   --shadow-opacity: 0.1;
-  --sidebar-accent: #fffbeb;
+  --sidebar-accent: #FFF9C4;
   --sidebar-border: #e5e7eb;
-  --card-foreground: #262626;
+  --card-foreground: #111827;
   --shadow-offset-x: 0px;
   --shadow-offset-y: 4px;
-  --sidebar-primary: #ffd400;
+  --sidebar-primary: #C91919;
   --muted-foreground: #6b7280;
-  --accent-foreground: #92400e;
-  --popover-foreground: #262626;
-  --primary-foreground: #000000;
-  --sidebar-foreground: #262626;
+  --accent-foreground: #111827;
+  --popover-foreground: #111827;
+  --primary-foreground: #ffffff;
+  --sidebar-foreground: #111827;
   --secondary-foreground: #4b5563;
   --destructive-foreground: #ffffff;
-  --sidebar-accent-foreground: #92400e;
+  --sidebar-accent-foreground: #111827;
   --sidebar-primary-foreground: #ffffff;
 }
 
@@ -96,7 +96,7 @@
   html {
     @apply antialiased;
     overflow-x: clip;
-    color-scheme: dark;
+    color-scheme: light;
     /* Kills the 300ms tap delay on iOS for every link/button. */
     touch-action: manipulation;
   }

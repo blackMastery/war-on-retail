@@ -12,7 +12,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
   const { user, via, isFullAccess, allowedPages } = await requireAdmin();
 
   return (
-    <div className="flex min-h-screen flex-col bg-background md:flex-row">
+    <div className="flex min-h-screen flex-col bg-gray-100 md:flex-row">
       <Sidebar
         email={user.email ?? ''}
         bootstrap={via === 'env-bootstrap'}

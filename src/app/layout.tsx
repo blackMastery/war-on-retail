@@ -47,12 +47,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#171717',
+  themeColor: '#FFD700',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${jetbrainsMono.variable} ${sourceSerif.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${sourceSerif.variable}`}>
       <Analytics />
       <body className="font-sans">
         {/* Keyboard skip-link — invisible until focused, then jumps past the header. */}
