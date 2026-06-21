@@ -341,6 +341,23 @@ type WishlistItemInsert = {
 };
 type WishlistItemUpdate = Partial<WishlistItemInsert>;
 
+// ---------- Cart items (DB-backed, per signed-in customer) ----------
+export type CartItemRow = {
+  user_id: string;
+  product_id: string;
+  quantity: number;
+  created_at: string;
+  updated_at: string;
+};
+type CartItemInsert = {
+  user_id: string;
+  product_id: string;
+  quantity: number;
+  created_at?: string;
+  updated_at?: string;
+};
+type CartItemUpdate = Partial<CartItemInsert>;
+
 // ---------- Payment methods ----------
 export type PaymentMethodRow = {
   id: string;
@@ -814,6 +831,12 @@ export type Database = {
         Update: WishlistItemUpdate;
         Relationships: Empty;
       };
+      cart_items: {
+        Row: CartItemRow;
+        Insert: CartItemInsert;
+        Update: CartItemUpdate;
+        Relationships: Empty;
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -876,6 +899,11 @@ export type Database = {
         Args: { p_slugs: string[] };
         Returns: number;
       };
+      /** Bulk-merges localStorage cart lines into the caller's account. Returns affected row count. */
+      merge_cart: {
+        Args: { p_items: Array<{ product_id: string; quantity: number }> };
+        Returns: number;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
@@ -895,6 +923,7 @@ export type DiscountCode = DiscountCodeRow;
 export type DiscountCodeUsage = DiscountCodeUsageRow;
 export type Customer = CustomerRow;
 export type WishlistItem = WishlistItemRow;
+export type DbCartItem = CartItemRow;
 export type PaymentMethod = PaymentMethodRow;
 export type Order = OrderRow;
 export type OrderItem = OrderItemRow;

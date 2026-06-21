@@ -4,6 +4,7 @@ import Footer from '@/components/customer/Footer';
 import Chatbot from '@/components/customer/Chatbot';
 import CookieNotice from '@/components/customer/CookieNotice';
 import WishlistSync from '@/components/customer/WishlistSync';
+import CartSync from '@/components/customer/CartSync';
 import MotionProvider from '@/components/customer/motion/MotionProvider';
 import { getStoreSettings } from '@/lib/store-settings';
 
@@ -56,6 +57,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
         <Chatbot settings={{ name: settings.name, whatsapp: settings.whatsapp }} />
         <CookieNotice />
         <WishlistSync />
+        <CartSync />
       </div>
     </MotionProvider>
   );

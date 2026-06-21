@@ -13,7 +13,7 @@ export default async function CustomerLoginPage({
       <div className="w-full max-w-md rounded-lg bg-card p-8 shadow-sm ring-1 ring-border">
         <h1 className="text-2xl font-bold">Sign in</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Sign in to track your orders and save your wishlist.
+          Sign in to track your orders and save your cart and wishlist.
         </p>
         <div className="mt-6">
           <CustomerAuthForm next={next} />
