@@ -11,6 +11,7 @@ import {
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import { createClient } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
 
 const TABS = [
   { href: '/account', label: 'Overview', icon: Squares2X2Icon, exact: true },
@@ -35,7 +36,7 @@ export default function DashboardNav() {
   return (
     <nav
       aria-label="Account"
-      className="flex flex-row gap-1 overflow-x-auto md:flex-col md:overflow-visible"
+      className="flex w-full flex-row md:w-auto md:flex-col md:gap-1"
     >
       {TABS.map(({ href, label, icon: Icon, exact }) => {
         const active = exact ? pathname === href : pathname.startsWith(href);
@@ -43,15 +44,20 @@ export default function DashboardNav() {
           <Link
             key={href}
             href={href}
+            aria-label={label}
             aria-current={active ? 'page' : undefined}
-            className={`flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+            className={cn(
+              'flex flex-1 items-center justify-center gap-2.5 rounded-md px-2 py-2.5 text-sm font-medium transition-colors md:flex-none md:justify-start md:px-3',
               active
-                ? 'bg-accent text-accent-foreground'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-            }`}
+                ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+            )}
           >
-            <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-            {label}
+            <Icon
+              className={cn('h-5 w-5 shrink-0', active ? 'text-primary' : 'text-muted-foreground')}
+              aria-hidden="true"
+            />
+            <span className="hidden md:inline">{label}</span>
           </Link>
         );
       })}
@@ -59,10 +65,11 @@ export default function DashboardNav() {
         type="button"
         onClick={onSignOut}
         disabled={signingOut}
-        className="flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-red-600 disabled:opacity-60 md:mt-2 md:border-t md:border-border md:pt-3"
+        aria-label={signingOut ? 'Signing out' : 'Sign out'}
+        className="flex flex-1 items-center justify-center gap-2.5 rounded-md px-2 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-60 md:mt-1 md:flex-none md:justify-start md:border-t md:border-border md:px-3 md:pt-3"
       >
         <ArrowLeftOnRectangleIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
-        {signingOut ? 'Signing out…' : 'Sign out'}
+        <span className="hidden md:inline">{signingOut ? 'Signing out…' : 'Sign out'}</span>
       </button>
     </nav>
   );

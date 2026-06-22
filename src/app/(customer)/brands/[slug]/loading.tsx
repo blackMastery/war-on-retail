@@ -8,7 +8,10 @@ export default function Loading() {
         <div className="mt-2 h-4 w-72 rounded bg-muted" />
         <div className="mt-3 h-4 w-32 rounded bg-muted" />
       </header>
-      <ProductGridSkeleton count={12} />
+      <ProductGridSkeleton
+        count={12}
+        gridClassName="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4"
+      />
     </div>
   );
 }

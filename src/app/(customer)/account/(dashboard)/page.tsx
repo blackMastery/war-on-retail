@@ -25,21 +25,21 @@ export default async function AccountOverviewPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href="/account/orders"
-          className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border transition-shadow hover:shadow-md"
+          className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border transition-[box-shadow,ring-color] hover:shadow-md hover:ring-primary/20"
         >
-          <p className="text-sm text-muted-foreground">Orders</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums">{orderCount}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-sm font-medium text-muted-foreground">Orders</p>
+          <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">{orderCount}</p>
+          <p className="mt-1 text-sm text-link-on-light">
             {orderCount ? 'View your order history →' : 'No orders linked yet'}
           </p>
         </Link>
         <Link
           href="/account/wishlist"
-          className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border transition-shadow hover:shadow-md"
+          className="rounded-lg bg-card p-5 shadow-sm ring-1 ring-border transition-[box-shadow,ring-color] hover:shadow-md hover:ring-primary/20"
         >
-          <p className="text-sm text-muted-foreground">Wishlist</p>
-          <p className="mt-1 text-sm font-medium text-foreground">Saved items</p>
-          <p className="mt-1 text-sm text-muted-foreground">View your wishlist →</p>
+          <p className="text-sm font-medium text-muted-foreground">Wishlist</p>
+          <p className="mt-1 text-sm font-semibold text-foreground">Saved items</p>
+          <p className="mt-1 text-sm text-link-on-light">View your wishlist →</p>
         </Link>
       </div>
 

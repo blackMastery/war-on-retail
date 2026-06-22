@@ -8,15 +8,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="container py-8">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold sm:text-3xl">Hi, {displayName}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
-      </header>
-
-      <div className="grid gap-6 md:grid-cols-[200px_1fr]">
+      <div className="grid gap-6 md:grid-cols-[minmax(0,15rem)_1fr] lg:grid-cols-[minmax(0,16rem)_1fr]">
         <aside className="md:sticky md:top-28 md:self-start">
-          <DashboardNav />
+          <div className="overflow-hidden rounded-lg bg-card shadow-sm ring-1 ring-border">
+            <div className="border-b border-border bg-sidebar px-4 py-4">
+              <p className="truncate font-semibold text-sidebar-foreground">Hi, {displayName}</p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">{user.email}</p>
+            </div>
+            <div className="p-2">
+              <DashboardNav />
+            </div>
+          </div>
         </aside>
+
         <section className="min-w-0">{children}</section>
       </div>
     </div>

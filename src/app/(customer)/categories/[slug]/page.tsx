@@ -97,7 +97,10 @@ export default async function CategoryPage({
         </div>
       )}
 
-      <ProductGrid products={products ?? []} />
+      <ProductGrid
+        products={products ?? []}
+        gridClassName="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4"
+      />
 
       <Pagination
         currentPage={pag.currentPage}
