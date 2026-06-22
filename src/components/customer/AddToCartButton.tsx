@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckIcon, ClockIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
-import { useCartStore } from '@/lib/cart/store';
+import { useCartHydrated, useCartStore } from '@/lib/cart/store';
 import type { CartItem } from '@/lib/cart/types';
 
 type Mode = 'add' | 'preorder' | 'unavailable';
@@ -53,7 +54,13 @@ export default function AddToCartButton({
   variant = 'primary',
   quantity = 1,
 }: Props) {
+  const router = useRouter();
+  const hydrated = useCartHydrated();
   const addItem = useCartStore((s) => s.addItem);
+  const cartQuantity = useCartStore((s) => {
+    const line = s.items.find((i) => i.productId === product.productId);
+    return line?.quantity ?? 0;
+  });
   const [justAdded, setJustAdded] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
@@ -62,6 +69,8 @@ export default function AddToCartButton({
   const effectiveMode: Mode = disabled ? 'unavailable' : (mode ?? 'add');
   const isPreOrder = effectiveMode === 'preorder';
   const isUnavailable = effectiveMode === 'unavailable';
+  const inCart = hydrated && cartQuantity > 0;
+  const showInCart = !isUnavailable && (justAdded || inCart);
 
   // Clear the feedback after FEEDBACK_MS, but reset the timer if the user
   // mashes the button so they always see the latest "Added!" cycle.
@@ -81,6 +90,10 @@ export default function AddToCartButton({
     e.preventDefault();
     e.stopPropagation();
     if (isUnavailable) return;
+    if (inCart && !justAdded) {
+      router.push(variant === 'compact' ? `/products/${product.slug}` : '/cart');
+      return;
+    }
     addItem({ ...product, isPreOrder }, quantity);
     setJustAdded(true);
   }
@@ -90,12 +103,12 @@ export default function AddToCartButton({
   const sizing =
     variant === 'primary'
       ? 'min-h-11 rounded-full px-6 py-3'
-      : 'min-h-11 w-full rounded-md px-3 py-2.5 text-sm sm:py-2';
+      : 'min-h-11 w-full rounded-full px-3 py-2.5 text-sm sm:py-2';
   // Tone vocabulary:
   //   added     → green (success)
   //   preorder  → blue (pending stock — distinct from the regular red primary)
   //   default   → primary red
-  const colours = justAdded
+  const colours = showInCart
     ? 'bg-green-600 text-white hover:bg-green-700'
     : isPreOrder
       ? 'bg-blue-600 text-white hover:bg-blue-700'
@@ -103,10 +116,14 @@ export default function AddToCartButton({
 
   const ariaLabel = isUnavailable
     ? 'Out of stock'
-    : justAdded
-      ? isPreOrder
-        ? 'Pre-order added to cart'
-        : 'Added to cart'
+    : showInCart
+      ? inCart && !justAdded
+        ? variant === 'compact'
+          ? `View ${product.name} details`
+          : `Go to cart (${cartQuantity} in cart)`
+        : isPreOrder
+          ? 'Pre-order added to cart'
+          : 'Added to cart'
       : isPreOrder
         ? 'Pre-order'
         : 'Add to cart';
@@ -129,17 +146,45 @@ export default function AddToCartButton({
             rather than hard-cutting. mode="wait" keeps width stable. */}
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
-            key={justAdded ? 'added' : isUnavailable ? 'unavailable' : isPreOrder ? 'preorder' : 'add'}
+            key={
+              showInCart
+                ? 'incart'
+                : isUnavailable
+                  ? 'unavailable'
+                  : isPreOrder
+                    ? 'preorder'
+                    : 'add'
+            }
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.85 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
             className="inline-flex items-center gap-2"
           >
-            {justAdded ? (
+            {showInCart ? (
               <>
                 <CheckIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                Added{variant === 'primary' ? ' to cart' : ''}
+                {variant === 'compact' ? (
+                  inCart && !justAdded ? (
+                    <>
+                      <span className="sm:hidden">View</span>
+                      <span className="hidden sm:inline">View details</span>
+                    </>
+                  ) : (
+                    'In cart'
+                  )
+                ) : inCart && !justAdded ? (
+                  <>
+                    <span className="sm:hidden">Go to cart</span>
+                    <span className="hidden sm:inline">
+                      {cartQuantity > 1
+                        ? `In cart (${cartQuantity}) · Go to cart`
+                        : 'In cart · Go to cart'}
+                    </span>
+                  </>
+                ) : (
+                  'Added to cart'
+                )}
               </>
             ) : isUnavailable ? (
               <>

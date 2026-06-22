@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ShoppingBagIcon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { selectItemCount, useCartHydrated, useCartStore } from '@/lib/cart/store';
 
 /**
@@ -36,7 +36,10 @@ export default function CartIcon({ tone = 'light' }: { tone?: 'light' | 'dark' }
           : 'hover:bg-muted focus-visible:ring-offset-background'
       }`}
     >
-      <ShoppingBagIcon className="h-6 w-6" aria-hidden="true" />
+      <ShoppingCartIcon
+        className={`h-6 w-6 shrink-0 ${isDark ? 'text-header-foreground' : 'text-foreground'}`}
+        aria-hidden="true"
+      />
       <AnimatePresence>
         {showBadge && (
           <motion.span
@@ -48,8 +51,8 @@ export default function CartIcon({ tone = 'light' }: { tone?: 'light' | 'dark' }
             exit={{ scale: 0.4, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeOut', times: [0, 0.6, 1] }}
             aria-hidden="true"
-            className={`absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary text-primary-foreground px-1 text-[10px] font-bold leading-none ring-2 tabular-nums ${
-              isDark ? 'ring-header' : 'ring-background'
+            className={`absolute -right-0.5 -top-0.5 z-10 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground ring-2 tabular-nums ${
+              isDark ? 'ring-header' : 'ring-chart-1'
             }`}
           >
             {count > 99 ? '99+' : count}
