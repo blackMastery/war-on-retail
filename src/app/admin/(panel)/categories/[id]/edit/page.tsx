@@ -25,7 +25,6 @@ export default async function EditCategoryPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Edit · {category.name}</h1>
       <CategoryForm category={category} allCategories={allCategories ?? []} />
       <AuditInfo
         createdBy={category.created_by}

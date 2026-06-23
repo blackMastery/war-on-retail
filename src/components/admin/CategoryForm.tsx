@@ -3,6 +3,7 @@
 import { useActionState, useMemo } from 'react';
 import { upsertCategory, type CategoryFormState } from '@/app/admin/(panel)/categories/actions';
 import CategoryImageField from '@/components/admin/CategoryImageField';
+import FormSwitch from '@/components/admin/FormSwitch';
 import SeoMetaFields from '@/components/admin/SeoMetaFields';
 import type { Category } from '@/types/database';
 
@@ -33,9 +34,22 @@ export default function CategoryForm({ category, allCategories }: Props) {
     return allCategories.filter((c) => !blocked.has(c.id));
   }, [allCategories, category]);
 
+  const isEdit = Boolean(category);
+
   return (
     <form action={action} className="space-y-6">
       {category?.id && <input type="hidden" name="id" value={category.id} />}
+
+      {isEdit && category && (
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-bold">Edit · {category.name}</h1>
+          <FormSwitch
+            name="is_active"
+            defaultChecked={category.is_active}
+            label="Active (visible in storefront)"
+          />
+        </header>
+      )}
 
       {state.error && (
         <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{state.error}</div>
@@ -138,7 +152,7 @@ export default function CategoryForm({ category, allCategories }: Props) {
 
       <section className="space-y-4 rounded-lg bg-card p-5 shadow-sm ring-1 ring-border">
         <h2 className="font-semibold">Status</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className={isEdit ? undefined : 'grid gap-4 sm:grid-cols-2'}>
           <label className="block text-sm">
             <span className="font-medium text-secondary-foreground">Display order</span>
             <input
@@ -151,15 +165,17 @@ export default function CategoryForm({ category, allCategories }: Props) {
               Lower numbers appear first.
             </span>
           </label>
-          <label className="flex items-center gap-2 pt-7 text-sm">
-            <input
-              type="checkbox"
-              name="is_active"
-              defaultChecked={category?.is_active ?? true}
-              className="rounded text-primary"
-            />
-            Active (visible in storefront)
-          </label>
+          {!isEdit && (
+            <label className="flex items-center gap-2 pt-7 text-sm">
+              <input
+                type="checkbox"
+                name="is_active"
+                defaultChecked
+                className="rounded text-primary"
+              />
+              Active (visible in storefront)
+            </label>
+          )}
         </div>
       </section>
 

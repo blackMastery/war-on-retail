@@ -58,7 +58,7 @@ export default function DeleteCategoryButton({
       type="button"
       onClick={onClick}
       disabled={pending}
-      className="font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
+      className="rounded-md border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60"
       title="Click to deactivate · Shift+click to permanently delete"
     >
       {pending ? 'Working…' : isActive ? 'Deactivate' : 'Delete'}

@@ -42,7 +42,8 @@
   --shadow-offset-x: 0px;
   --shadow-offset-y: 4px;
   --sidebar-primary: #C91919;
-  --muted-foreground: #6b7280;
+  /* Tuned for the yellow --background; #6b7280 only hits ~3.45:1 on gold. */
+  --muted-foreground: #525252;
   --accent-foreground: #111827;
   --popover-foreground: #111827;
   --primary-foreground: #ffffff;
