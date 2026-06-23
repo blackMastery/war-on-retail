@@ -25,6 +25,7 @@ export type AdminPage = {
 export const ADMIN_PAGES: AdminPage[] = [
   { key: 'dashboard', label: 'Dashboard', href: '/admin', icon: '📊' },
   { key: 'orders', label: 'Orders', href: '/admin/orders', icon: '🧾' },
+  { key: 'reviews', label: 'Reviews', href: '/admin/reviews', icon: '⭐' },
   { key: 'customers', label: 'Customers', href: '/admin/customers', icon: '👥' },
   { key: 'products', label: 'Products', href: '/admin/products', icon: '📦' },
   { key: 'products', label: 'CSV Import', href: '/admin/products/import', icon: '⬆️' },

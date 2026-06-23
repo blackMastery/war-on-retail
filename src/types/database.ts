@@ -358,6 +358,36 @@ type CartItemInsert = {
 };
 type CartItemUpdate = Partial<CartItemInsert>;
 
+// ---------- Product reviews (verified purchase, admin-moderated) ----------
+export type ReviewStatus = 'pending' | 'approved' | 'rejected';
+export type ProductReviewRow = {
+  id: string;
+  product_id: string;
+  user_id: string;
+  rating: number;
+  body: string;
+  reviewer_name: string;
+  status: ReviewStatus;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+type ProductReviewInsert = {
+  id?: string;
+  product_id: string;
+  user_id: string;
+  rating: number;
+  body: string;
+  reviewer_name?: string;
+  status?: ReviewStatus;
+  reviewed_by?: string | null;
+  reviewed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+type ProductReviewUpdate = Partial<ProductReviewInsert>;
+
 // ---------- Payment methods ----------
 export type PaymentMethodRow = {
   id: string;
@@ -837,6 +867,12 @@ export type Database = {
         Update: CartItemUpdate;
         Relationships: Empty;
       };
+      product_reviews: {
+        Row: ProductReviewRow;
+        Insert: ProductReviewInsert;
+        Update: ProductReviewUpdate;
+        Relationships: Empty;
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -904,6 +940,16 @@ export type Database = {
         Args: { p_items: Array<{ product_id: string; quantity: number }> };
         Returns: number;
       };
+      /** True when the caller bought the product on a fulfilled order. */
+      user_purchased_product: {
+        Args: { p_product_id: string };
+        Returns: boolean;
+      };
+      /** Submit or update a verified-purchase review (resets to pending). Returns review id. */
+      submit_product_review: {
+        Args: { p_product_id: string; p_rating: number; p_body: string };
+        Returns: string;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
@@ -927,5 +973,6 @@ export type DbCartItem = CartItemRow;
 export type PaymentMethod = PaymentMethodRow;
 export type Order = OrderRow;
 export type OrderItem = OrderItemRow;
+export type ProductReview = ProductReviewRow;
 export type StoreSettings = StoreSettingsRow;
 export type PageSeo = PageSeoRow;

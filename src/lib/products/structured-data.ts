@@ -11,6 +11,11 @@ export type StructuredDataStoreInfo = {
   url: string;
 };
 
+export type StructuredDataAggregateRating = {
+  ratingValue: number;
+  reviewCount: number;
+};
+
 /**
  * Per-image JSON-LD. When the admin has set caption/keywords/alt, emit an
  * ImageObject so Google can index those signals. Otherwise the bare URL
@@ -51,8 +56,9 @@ export function buildProductJsonLd(opts: {
   brand: Pick<Brand, 'name'> | null;
   images: string[];
   storeInfo: StructuredDataStoreInfo;
+  aggregateRating?: StructuredDataAggregateRating;
 }): Record<string, unknown> {
-  const { product, brand, images, storeInfo } = opts;
+  const { product, brand, images, storeInfo, aggregateRating } = opts;
   const base = storeInfo.url.replace(/\/+$/, '');
   const url = `${base}/products/${product.slug}`;
 
@@ -88,6 +94,16 @@ export function buildProductJsonLd(opts: {
       undefined,
     keywords: keywords && keywords.length ? keywords : undefined,
     brand: brand ? { '@type': 'Brand', name: brand.name } : undefined,
+    aggregateRating:
+      aggregateRating && aggregateRating.reviewCount > 0
+        ? {
+            '@type': 'AggregateRating',
+            ratingValue: aggregateRating.ratingValue.toFixed(1),
+            reviewCount: aggregateRating.reviewCount,
+            bestRating: 5,
+            worstRating: 1,
+          }
+        : undefined,
     offers: {
       '@type': 'Offer',
       url,

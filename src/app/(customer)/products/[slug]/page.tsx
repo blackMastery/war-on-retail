@@ -13,6 +13,11 @@ import WishlistButton from '@/components/customer/WishlistButton';
 import { fetchMoreFromBrand, fetchRelatedProducts } from '@/lib/products/recommendations';
 import { buildProductJsonLd } from '@/lib/products/structured-data';
 import { productAvailability } from '@/lib/products/availability';
+import { fetchApprovedProductReviews, fetchReviewEligibility } from '@/lib/products/reviews';
+import { getCustomerContext } from '@/lib/customer/auth';
+import ProductReviewCard from '@/components/customer/ProductReviewCard';
+import ProductReviewForm from '@/components/customer/ProductReviewForm';
+import StarRating from '@/components/customer/StarRating';
 
 export const revalidate = 60;
 
@@ -233,12 +238,20 @@ export default async function ProductDetailPage({
   // "More from {brand}" strip when the brand has at least 3 other items.
   // Both queries run in parallel; we de-duplicate after the fact so the user
   // never sees the same product in both rows.
-  const [related, brandMore] = await Promise.all([
+  const [related, brandMore, customerCtx, reviewSummary] = await Promise.all([
     fetchRelatedProducts(supabase, product, { limit: 8 }),
     fetchMoreFromBrand(supabase, product, { limit: 6 }),
+    getCustomerContext(),
+    fetchApprovedProductReviews(supabase, product.id),
   ]);
   const relatedIds = new Set(related.map((p) => p.id));
   const brandMoreDeduped = brandMore.filter((p) => !relatedIds.has(p.id)).slice(0, 4);
+
+  const { canReview, existingReview } = await fetchReviewEligibility(
+    supabase,
+    product.id,
+    customerCtx?.user.id ?? null,
+  );
 
   const inquiryMessage = encodeURIComponent(
     `Hi War on Retail, I'm interested in "${product.name}" (SKU ${product.sku ?? 'n/a'}).`,
@@ -250,6 +263,13 @@ export default async function ProductDetailPage({
     brand,
     images: allImages,
     storeInfo: { name: settings.name, url: settings.url },
+    aggregateRating:
+      reviewSummary.reviewCount > 0
+        ? {
+            ratingValue: reviewSummary.averageRating,
+            reviewCount: reviewSummary.reviewCount,
+          }
+        : undefined,
   });
 
   return (
@@ -418,6 +438,44 @@ export default async function ProductDetailPage({
           )}
         </div>
       </div>
+
+      <section id="reviews" aria-labelledby="reviews-heading" className="mt-16 scroll-mt-28">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 id="reviews-heading" className="text-xl font-bold">
+              Customer reviews
+            </h2>
+            {reviewSummary.reviewCount > 0 && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                <StarRating rating={reviewSummary.averageRating} size="sm" className="mr-2" />
+                {reviewSummary.averageRating.toFixed(1)} · {reviewSummary.reviewCount}{' '}
+                {reviewSummary.reviewCount === 1 ? 'review' : 'reviews'}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="space-y-4">
+            {reviewSummary.reviews.length === 0 ? (
+              <p className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-sm text-muted-foreground">
+                No reviews yet. Be the first to share your experience after your order is fulfilled.
+              </p>
+            ) : (
+              reviewSummary.reviews.map((review) => (
+                <ProductReviewCard key={review.id} review={review} />
+              ))
+            )}
+          </div>
+          <ProductReviewForm
+            productId={product.id}
+            productSlug={product.slug}
+            isAuthed={Boolean(customerCtx)}
+            canReview={canReview}
+            existingReview={existingReview}
+          />
+        </div>
+      </section>
 
       {related.length > 0 && (
         <section aria-labelledby="related-heading" className="mt-16">
