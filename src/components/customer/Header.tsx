@@ -51,11 +51,13 @@ type Props = {
   settings: HeaderSettings;
   /** Whether a customer session exists — toggles the account link target. */
   isAuthed: boolean;
+  /** Signed-in label for the account link — name, or email when no name is set. */
+  accountLabel?: string | null;
 };
 
 const FEATURED_CATEGORY_SLUGS = ['electronics', 'home-appliances', 'kitchen-appliances'];
 
-export default function Header({ categories, brands, settings, isAuthed }: Props) {
+export default function Header({ categories, brands, settings, isAuthed, accountLabel }: Props) {
   const accountHref = isAuthed ? '/account' : '/account/login';
   const pathname = usePathname();
   const router = useRouter();
@@ -203,10 +205,13 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
           </button>
           <Link
             href={accountHref}
-            aria-label={isAuthed ? 'My account' : 'Sign in'}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            aria-label={isAuthed ? accountLabel ?? 'My account' : 'Sign in'}
+            className="inline-flex min-h-11 max-w-[11rem] items-center justify-center gap-1.5 rounded-full px-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:max-w-[14rem] sm:px-3"
           >
-            <UserIcon className="h-6 w-6" aria-hidden="true" />
+            <UserIcon className="h-6 w-6 shrink-0" aria-hidden="true" />
+            {isAuthed && accountLabel && (
+              <span className="hidden truncate text-sm font-medium sm:inline">{accountLabel}</span>
+            )}
           </Link>
           <WishlistIcon />
           <CartIcon />
@@ -371,7 +376,7 @@ export default function Header({ categories, brands, settings, isAuthed }: Props
               onSelect={() => setMobileMenuOpen(false)}
               thumbnail={<UtilityThumb icon={UserIcon} />}
             >
-              {isAuthed ? 'My account' : 'Sign in'}
+              {isAuthed ? accountLabel ?? 'My account' : 'Sign in'}
             </MobileLink>
 
             <MobileLink

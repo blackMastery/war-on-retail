@@ -20,9 +20,11 @@ export type CustomerContext = {
   customers: CustomerRow[];
   /** From user_metadata.full_name, falling back to a linked customer's name, then the email local-part. */
   displayName: string;
+  /** For nav chrome: name when known, otherwise the full email. */
+  navLabel: string;
 };
 
-function resolveDisplayName(user: User, customers: CustomerRow[]): string {
+function resolveName(user: User, customers: CustomerRow[]): string | null {
   const metaName =
     typeof user.user_metadata?.full_name === 'string'
       ? user.user_metadata.full_name.trim()
@@ -30,7 +32,15 @@ function resolveDisplayName(user: User, customers: CustomerRow[]): string {
   if (metaName) return metaName;
   const fromCustomer = customers.find((c) => c.name?.trim())?.name?.trim();
   if (fromCustomer) return fromCustomer;
-  return user.email?.split('@')[0] ?? 'there';
+  return null;
+}
+
+function resolveDisplayName(user: User, customers: CustomerRow[]): string {
+  return resolveName(user, customers) ?? user.email?.split('@')[0] ?? 'there';
+}
+
+function resolveNavLabel(user: User, customers: CustomerRow[]): string {
+  return resolveName(user, customers) ?? user.email ?? 'Account';
 }
 
 /**
@@ -54,7 +64,12 @@ export async function getCustomerContext(): Promise<CustomerContext | null> {
   }
 
   const rows = customers ?? [];
-  return { user, customers: rows, displayName: resolveDisplayName(user, rows) };
+  return {
+    user,
+    customers: rows,
+    displayName: resolveDisplayName(user, rows),
+    navLabel: resolveNavLabel(user, rows),
+  };
 }
 
 /**

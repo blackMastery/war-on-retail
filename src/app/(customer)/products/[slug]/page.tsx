@@ -433,7 +433,7 @@ export default async function ProductDetailPage({
           {product.description && (
             <div className="prose-theme prose-sm mt-8 max-w-none">
               <h2 className="text-lg font-semibold text-foreground">Description</h2>
-              <p>{product.description}</p>
+              <p className="text-black">{product.description}</p>
             </div>
           )}
         </div>
@@ -458,7 +458,7 @@ export default async function ProductDetailPage({
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="space-y-4">
             {reviewSummary.reviews.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-sm text-muted-foreground">
+              <p className="rounded-lg bg-card p-6 text-sm text-secondary-foreground ring-1 ring-border">
                 No reviews yet. Be the first to share your experience after your order is fulfilled.
               </p>
             ) : (

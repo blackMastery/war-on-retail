@@ -7,6 +7,7 @@ import BrandCard from '@/components/customer/BrandCard';
 import HorizontalScroller from '@/components/customer/HorizontalScroller';
 import ProductCard from '@/components/customer/ProductCard';
 import ProductGrid from '@/components/customer/ProductGrid';
+import HomeHeroBanner from '@/components/customer/HomeHeroBanner';
 import PromotionMosaic from '@/components/customer/PromotionMosaic';
 import RecentlyViewedStrip from '@/components/customer/RecentlyViewedStrip';
 import { Reveal } from '@/components/customer/motion/primitives';
@@ -212,32 +213,7 @@ export default async function Homepage() {
       {hasPromotions ? (
         <PromotionMosaic promotions={promotions} />
       ) : (
-        <section className="bg-gradient-to-r from-primary via-chart-2 to-chart-3 text-primary-foreground">
-          <div className="container py-16 md:py-24">
-            <div className="max-w-2xl">
-              <h1 className="text-balance text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
-                Electronics &amp; Home Appliances, Delivered Across Guyana.
-              </h1>
-              <p className="mt-4 text-pretty text-lg opacity-95 md:text-xl">
-                Authentic products, manufacturer warranties, and real human support — every order.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  href="/categories"
-                  className="inline-block rounded-md bg-card px-6 py-3 font-semibold text-card-foreground shadow-sm transition-colors hover:bg-muted"
-                >
-                  Shop Categories
-                </Link>
-                <Link
-                  href="/deals"
-                  className="inline-block rounded-md border-2 border-primary-foreground px-6 py-3 font-semibold transition-colors hover:bg-black/10"
-                >
-                  <span aria-hidden="true">🔥 </span>Today’s Deals
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+        <HomeHeroBanner />
       )}
 
       {/* Categories — horizontal scroller */}

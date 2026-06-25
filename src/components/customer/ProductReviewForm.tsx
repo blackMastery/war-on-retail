@@ -40,9 +40,9 @@ export default function ProductReviewForm({
 
   if (!isAuthed) {
     return (
-      <div className="rounded-lg border border-dashed border-border bg-muted/30 p-5 text-sm">
+      <div className="rounded-lg bg-card p-5 text-sm ring-1 ring-border">
         <p className="font-medium text-foreground">Sign in to write a review</p>
-        <p className="mt-1 text-muted-foreground">
+        <p className="mt-1 text-secondary-foreground">
           Only customers who purchased this product on a fulfilled order can leave a review.
         </p>
         <Link
@@ -57,9 +57,9 @@ export default function ProductReviewForm({
 
   if (!canReview && !existingReview) {
     return (
-      <div className="rounded-lg border border-dashed border-border bg-muted/30 p-5 text-sm">
+      <div className="rounded-lg bg-card p-5 text-sm ring-1 ring-border">
         <p className="font-medium text-foreground">Verified purchase required</p>
-        <p className="mt-1 text-muted-foreground">
+        <p className="mt-1 text-secondary-foreground">
           You can review this product after your order has been fulfilled.
         </p>
       </div>

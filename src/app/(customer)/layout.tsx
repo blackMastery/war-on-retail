@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { getCustomerContext } from '@/lib/customer/auth';
 import Header from '@/components/customer/Header';
 import Footer from '@/components/customer/Footer';
 import Chatbot from '@/components/customer/Chatbot';
@@ -14,7 +15,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
   // Fetch nav data + admin-edited store settings once at the layout level —
   // every page shares them, no need to repeat the queries per route.
   const supabase = await createClient();
-  const [{ data: categories }, { data: brands }, settings, { data: auth }] = await Promise.all([
+  const [{ data: categories }, { data: brands }, settings, customerCtx] = await Promise.all([
     supabase
       .from('categories')
       .select('id, name, slug, parent_id, display_order, image_url')
@@ -28,9 +29,10 @@ export default async function CustomerLayout({ children }: { children: React.Rea
       .order('display_order')
       .order('name'),
     getStoreSettings(),
-    supabase.auth.getUser(),
+    getCustomerContext(),
   ]);
-  const isAuthed = !!auth?.user;
+  const isAuthed = !!customerCtx;
+  const accountLabel = customerCtx?.navLabel ?? null;
 
   // Header is a client component; pass only the slice it needs so the
   // bundle stays small.
@@ -49,6 +51,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
           brands={brands ?? []}
           settings={headerSettings}
           isAuthed={isAuthed}
+          accountLabel={accountLabel}
         />
         <main id="main" tabIndex={-1} className="flex-1 scroll-mt-28 md:scroll-mt-24">
           {children}
