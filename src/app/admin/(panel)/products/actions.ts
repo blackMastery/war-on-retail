@@ -30,8 +30,8 @@ const ProductInput = z.object({
   stock_quantity: z.coerce.number().int().nonnegative().default(0),
   low_stock_threshold: z.coerce.number().int().nonnegative().default(5),
   track_inventory: z.coerce.boolean().default(true),
-  category_id: z.string().uuid().optional().nullable(),
-  brand_id: z.string().uuid().optional().nullable(),
+  category_id: z.string().uuid().optional().nullable().or(z.literal('')),
+  brand_id: z.string().uuid().optional().nullable().or(z.literal('')),
   featured_image_url: z.string().url().optional().nullable().or(z.literal('')),
   featured_image_alt: z.string().optional().nullable(),
   // JSON-encoded string[] of gallery image URLs (everything except the featured).
@@ -52,6 +52,10 @@ const ProductInput = z.object({
 export type ProductFormState = {
   error?: string;
   fieldErrors?: Record<string, string>;
+  /** Raw submitted values — used to repopulate the form after validation errors. */
+  values?: Record<string, string>;
+  /** Bumps when validation fails so inputs remount with `values`. */
+  formKey?: string;
 };
 
 function parseForm(fd: FormData) {
@@ -68,13 +72,19 @@ function parseForm(fd: FormData) {
 
 export async function upsertProduct(_prev: ProductFormState, fd: FormData): Promise<ProductFormState> {
   const { user } = await requirePageAccess('products');
-  const parsed = ProductInput.safeParse(parseForm(fd));
+  const raw = parseForm(fd);
+  const parsed = ProductInput.safeParse(raw);
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
       fieldErrors[issue.path.join('.')] = issue.message;
     }
-    return { error: 'Please correct the highlighted fields.', fieldErrors };
+    return {
+      error: 'Please correct the highlighted fields.',
+      fieldErrors,
+      values: raw,
+      formKey: String(Date.now()),
+    };
   }
 
   const input = parsed.data;

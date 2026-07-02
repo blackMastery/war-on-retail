@@ -19,9 +19,30 @@ const initial: ProductFormState = {};
 const INPUT =
   'mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm';
 
+function str(
+  values: Record<string, string> | undefined,
+  key: string,
+  fallback = '',
+): string {
+  const v = values?.[key];
+  return v !== undefined ? v : fallback;
+}
+
+function bool(
+  values: Record<string, string> | undefined,
+  key: string,
+  fallback: boolean,
+): boolean {
+  if (values && key in values) return values[key] === 'true';
+  return fallback;
+}
+
 export default function ProductForm({ product, categories, brands }: Props) {
   const [state, action, pending] = useActionState(upsertProduct, initial);
   const err = (k: string) => state.fieldErrors?.[k];
+  const values = state.values;
+  const formKey = state.formKey ?? 'initial';
+  const k = (name: string) => `${name}-${formKey}`;
 
   return (
     <form action={action} className="space-y-6">
@@ -34,31 +55,44 @@ export default function ProductForm({ product, categories, brands }: Props) {
       <Section title="Basics">
         <Field label="Name" error={err('name')}>
           <input
+            key={k('name')}
             name="name"
-            defaultValue={product?.name}
+            defaultValue={str(values, 'name', product?.name ?? '')}
             required
             className={INPUT}
           />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Slug (optional)" hint="Auto-generated from name if blank">
-            <input name="slug" defaultValue={product?.slug} className={INPUT} />
+            <input
+              key={k('slug')}
+              name="slug"
+              defaultValue={str(values, 'slug', product?.slug ?? '')}
+              className={INPUT}
+            />
           </Field>
           <Field label="SKU">
-            <input name="sku" defaultValue={product?.sku ?? ''} className={INPUT} />
+            <input
+              key={k('sku')}
+              name="sku"
+              defaultValue={str(values, 'sku', product?.sku ?? '')}
+              className={INPUT}
+            />
           </Field>
         </div>
         <Field label="Short description">
           <input
+            key={k('short_description')}
             name="short_description"
-            defaultValue={product?.short_description ?? ''}
+            defaultValue={str(values, 'short_description', product?.short_description ?? '')}
             className={INPUT}
           />
         </Field>
         <Field label="Description">
           <textarea
+            key={k('description')}
             name="description"
-            defaultValue={product?.description ?? ''}
+            defaultValue={str(values, 'description', product?.description ?? '')}
             rows={5}
             className={INPUT}
           />
@@ -69,32 +103,39 @@ export default function ProductForm({ product, categories, brands }: Props) {
         <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Price (GYD)" error={err('price')}>
             <input
+              key={k('price')}
               name="price"
               type="number"
               step="0.01"
               min="0"
-              defaultValue={product?.price}
+              defaultValue={str(values, 'price', product?.price != null ? String(product.price) : '')}
               required
               className={INPUT}
             />
           </Field>
-          <Field label="Compare-at price">
+          <Field label="Compare-at price" error={err('compare_at_price')}>
             <input
+              key={k('compare_at_price')}
               name="compare_at_price"
               type="number"
               step="0.01"
               min="0"
-              defaultValue={product?.compare_at_price ?? ''}
+              defaultValue={str(
+                values,
+                'compare_at_price',
+                product?.compare_at_price != null ? String(product.compare_at_price) : '',
+              )}
               className={INPUT}
             />
           </Field>
-          <Field label="Cost">
+          <Field label="Cost" error={err('cost')}>
             <input
+              key={k('cost')}
               name="cost"
               type="number"
               step="0.01"
               min="0"
-              defaultValue={product?.cost ?? ''}
+              defaultValue={str(values, 'cost', product?.cost != null ? String(product.cost) : '')}
               className={INPUT}
             />
           </Field>
@@ -103,29 +144,40 @@ export default function ProductForm({ product, categories, brands }: Props) {
 
       <Section title="Inventory">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Stock quantity">
+          <Field label="Stock quantity" error={err('stock_quantity')}>
             <input
+              key={k('stock_quantity')}
               name="stock_quantity"
               type="number"
               min="0"
-              defaultValue={product?.stock_quantity ?? 0}
+              defaultValue={str(
+                values,
+                'stock_quantity',
+                product?.stock_quantity != null ? String(product.stock_quantity) : '0',
+              )}
               className={INPUT}
             />
           </Field>
-          <Field label="Low-stock threshold">
+          <Field label="Low-stock threshold" error={err('low_stock_threshold')}>
             <input
+              key={k('low_stock_threshold')}
               name="low_stock_threshold"
               type="number"
               min="0"
-              defaultValue={product?.low_stock_threshold ?? 5}
+              defaultValue={str(
+                values,
+                'low_stock_threshold',
+                product?.low_stock_threshold != null ? String(product.low_stock_threshold) : '5',
+              )}
               className={INPUT}
             />
           </Field>
           <label className="flex items-center gap-2 pt-7 text-sm">
             <input
+              key={k('track_inventory')}
               type="checkbox"
               name="track_inventory"
-              defaultChecked={product?.track_inventory ?? true}
+              defaultChecked={bool(values, 'track_inventory', product?.track_inventory ?? true)}
               className="rounded text-primary"
             />
             Track inventory
@@ -141,9 +193,10 @@ export default function ProductForm({ product, categories, brands }: Props) {
         </p>
         <label className="flex items-center gap-2 text-sm">
           <input
+            key={k('is_pre_order_enabled')}
             type="checkbox"
             name="is_pre_order_enabled"
-            defaultChecked={product?.is_pre_order_enabled ?? false}
+            defaultChecked={bool(values, 'is_pre_order_enabled', product?.is_pre_order_enabled ?? false)}
             className="rounded text-primary"
           />
           Allow pre-orders when out of stock
@@ -153,9 +206,10 @@ export default function ProductForm({ product, categories, brands }: Props) {
             Pre-order message <span className="font-normal text-muted-foreground">(optional)</span>
           </span>
           <textarea
+            key={k('pre_order_message')}
             name="pre_order_message"
             rows={2}
-            defaultValue={product?.pre_order_message ?? ''}
+            defaultValue={str(values, 'pre_order_message', product?.pre_order_message ?? '')}
             placeholder="e.g. Ships within 3–4 weeks. Confirmed by our team."
             className="mt-1 block w-full rounded-md border-border shadow-sm focus:border-ring focus:ring-ring text-sm"
           />
@@ -168,10 +222,11 @@ export default function ProductForm({ product, categories, brands }: Props) {
 
       <Section title="Classification">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Category">
+          <Field label="Category" error={err('category_id')}>
             <select
+              key={k('category_id')}
               name="category_id"
-              defaultValue={product?.category_id ?? ''}
+              defaultValue={str(values, 'category_id', product?.category_id ?? '')}
               className={INPUT}
             >
               <option value="">— None —</option>
@@ -182,8 +237,13 @@ export default function ProductForm({ product, categories, brands }: Props) {
               ))}
             </select>
           </Field>
-          <Field label="Brand">
-            <select name="brand_id" defaultValue={product?.brand_id ?? ''} className={INPUT}>
+          <Field label="Brand" error={err('brand_id')}>
+            <select
+              key={k('brand_id')}
+              name="brand_id"
+              defaultValue={str(values, 'brand_id', product?.brand_id ?? '')}
+              className={INPUT}
+            >
               <option value="">— None —</option>
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -226,10 +286,11 @@ export default function ProductForm({ product, categories, brands }: Props) {
           from brand + name and the short / long description.
         </p>
         <SeoMetaFields
+          key={k('seo')}
           defaultValues={{
-            meta_title: product?.meta_title,
-            meta_description: product?.meta_description,
-            meta_keywords: product?.meta_keywords,
+            meta_title: values?.meta_title ?? product?.meta_title,
+            meta_description: values?.meta_description ?? product?.meta_description,
+            meta_keywords: values?.meta_keywords ?? product?.meta_keywords,
           }}
           fieldErrors={state.fieldErrors}
           fallback={{
@@ -244,18 +305,20 @@ export default function ProductForm({ product, categories, brands }: Props) {
         <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
           <label className="flex items-center gap-2 text-sm">
             <input
+              key={k('is_active')}
               type="checkbox"
               name="is_active"
-              defaultChecked={product?.is_active ?? true}
+              defaultChecked={bool(values, 'is_active', product?.is_active ?? true)}
               className="rounded text-primary"
             />
             Active (visible in storefront)
           </label>
           <label className="flex items-center gap-2 text-sm">
             <input
+              key={k('is_featured')}
               type="checkbox"
               name="is_featured"
-              defaultChecked={product?.is_featured ?? false}
+              defaultChecked={bool(values, 'is_featured', product?.is_featured ?? false)}
               className="rounded text-primary"
             />
             Featured (homepage)
