@@ -18,6 +18,12 @@ type Props = {
   discount?: number;
   /** Per-image admin-set alt/caption/keywords, keyed by URL. */
   imageMeta?: Record<string, ProductImageMeta>;
+  /**
+   * When set and present in `images`, the gallery jumps to this URL — used by
+   * the variant selector to show the chosen variant's image. The customer can
+   * still browse freely afterwards.
+   */
+  activeUrl?: string | null;
 };
 
 // Gesture thresholds (in CSS pixels).
@@ -49,10 +55,19 @@ export default function ProductGallery({
   productName,
   discount = 0,
   imageMeta,
+  activeUrl,
 }: Props) {
   const [active, setActive] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const total = images.length;
+
+  // Follow the externally-selected image (variant switch) when it exists.
+  useEffect(() => {
+    if (!activeUrl) return;
+    const idx = images.indexOf(activeUrl);
+    if (idx >= 0) setActive(idx);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeUrl]);
   const safeActive = total === 0 ? 0 : Math.min(active, total - 1);
   const current = images[safeActive];
 

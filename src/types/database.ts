@@ -99,6 +99,15 @@ export type ProductImageMeta = {
   keywords: string | null;
 };
 
+/**
+ * One option axis a variantized product offers, stored in `products.options`
+ * (jsonb array, max 3). e.g. { name: 'Size', values: ['S', 'M', 'L'] }.
+ */
+export type ProductOption = {
+  name: string;
+  values: string[];
+};
+
 export type ProductRow = {
   id: string;
   created_by: string | null;
@@ -128,6 +137,17 @@ export type ProductRow = {
   is_pre_order_enabled: boolean;
   /** Optional admin blurb shown beside the customer Pre-order CTA. */
   pre_order_message: string | null;
+  /** Option axes for variantized products (empty array = variantless). */
+  options: ProductOption[];
+  /**
+   * Trigger-maintained: true when ANY variant row exists (active or not).
+   * When true, `stock_quantity` mirrors the sum of active variant stock and
+   * the product can only be bought by selecting a variant.
+   */
+  has_variants: boolean;
+  /** Trigger-maintained min/max over active variant prices (null when none). */
+  variant_price_min: number | null;
+  variant_price_max: number | null;
   is_active: boolean;
   is_featured: boolean;
   created_at: string;
@@ -160,12 +180,49 @@ type ProductInsert = {
   meta_keywords?: string | null;
   is_pre_order_enabled?: boolean;
   pre_order_message?: string | null;
+  options?: ProductOption[];
+  has_variants?: boolean;
+  variant_price_min?: number | null;
+  variant_price_max?: number | null;
   is_active?: boolean;
   is_featured?: boolean;
   created_at?: string;
   updated_at?: string;
 };
 type ProductUpdate = Partial<ProductInsert>;
+
+// ---------- Product variants ----------
+export type ProductVariantRow = {
+  id: string;
+  product_id: string;
+  /** e.g. {"Size":"M","Color":"Red"} — keys match the parent product's option names. */
+  option_values: Record<string, string>;
+  sku: string | null;
+  price: number;
+  compare_at_price: number | null;
+  stock_quantity: number;
+  /** Picked from the parent product's gallery URLs. */
+  image_url: string | null;
+  is_active: boolean;
+  position: number;
+  created_at: string;
+  updated_at: string;
+};
+type ProductVariantInsert = {
+  id?: string;
+  product_id: string;
+  option_values: Record<string, string>;
+  sku?: string | null;
+  price: number;
+  compare_at_price?: number | null;
+  stock_quantity?: number;
+  image_url?: string | null;
+  is_active?: boolean;
+  position?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+type ProductVariantUpdate = Partial<ProductVariantInsert>;
 
 // ---------- FAQ categories ----------
 export type FAQCategoryRow = {
@@ -343,15 +400,20 @@ type WishlistItemUpdate = Partial<WishlistItemInsert>;
 
 // ---------- Cart items (DB-backed, per signed-in customer) ----------
 export type CartItemRow = {
+  id: string;
   user_id: string;
   product_id: string;
+  /** NULL for variantless products; unique per (user, product, variant). */
+  variant_id: string | null;
   quantity: number;
   created_at: string;
   updated_at: string;
 };
 type CartItemInsert = {
+  id?: string;
   user_id: string;
   product_id: string;
+  variant_id?: string | null;
   quantity: number;
   created_at?: string;
   updated_at?: string;
@@ -478,6 +540,10 @@ export type OrderItemRow = {
   line_total: number;
   /** True when this line was placed as a pre-order (stock was insufficient + product allowed it). */
   is_pre_order: boolean;
+  /** NULL for variantless lines, or after the variant is hard-deleted; snapshots survive. */
+  variant_id: string | null;
+  /** Snapshot of the variant's option_values at placement (e.g. {"Size":"M"}). */
+  variant_options: Record<string, string> | null;
   created_at: string;
 };
 type OrderItemInsert = {
@@ -491,6 +557,8 @@ type OrderItemInsert = {
   quantity: number;
   line_total: number;
   is_pre_order?: boolean;
+  variant_id?: string | null;
+  variant_options?: Record<string, string> | null;
   created_at?: string;
 };
 type OrderItemUpdate = Partial<OrderItemInsert>;
@@ -759,6 +827,12 @@ export type Database = {
         Update: ProductUpdate;
         Relationships: Empty;
       };
+      product_variants: {
+        Row: ProductVariantRow;
+        Insert: ProductVariantInsert;
+        Update: ProductVariantUpdate;
+        Relationships: Empty;
+      };
       faq_categories: {
         Row: FAQCategoryRow;
         Insert: FAQCategoryInsert;
@@ -887,7 +961,7 @@ export type Database = {
             | { type: 'delivery'; city?: string | null; address: string }
             | { type: 'pickup' };
           p_payment_method_id: string;
-          p_items: Array<{ product_id: string; quantity: number }>;
+          p_items: Array<{ product_id: string; variant_id?: string | null; quantity: number }>;
           /** Optional discount code, re-validated authoritatively inside the RPC. */
           p_discount_code?: string | null;
         };
@@ -937,7 +1011,9 @@ export type Database = {
       };
       /** Bulk-merges localStorage cart lines into the caller's account. Returns affected row count. */
       merge_cart: {
-        Args: { p_items: Array<{ product_id: string; quantity: number }> };
+        Args: {
+          p_items: Array<{ product_id: string; variant_id?: string | null; quantity: number }>;
+        };
         Returns: number;
       };
       /** True when the caller bought the product on a fulfilled order. */
@@ -958,6 +1034,7 @@ export type Database = {
 
 // Convenience aliases used throughout the app.
 export type Product = ProductRow;
+export type ProductVariant = ProductVariantRow;
 export type Category = CategoryRow;
 export type Brand = BrandRow;
 export type FAQ = FAQRow;

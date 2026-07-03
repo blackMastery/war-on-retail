@@ -35,4 +35,27 @@ export type CartItem = {
    * before this field existed don't need a migration.
    */
   isPreOrder?: boolean;
+  /**
+   * Chosen variant id, or null for variantless products. Part of the line's
+   * identity — two variants of the same product are two separate lines.
+   * Optional so legacy persisted rows read as null.
+   */
+  variantId?: string | null;
+  /** Display label for the chosen options, e.g. "Size: M · Color: Red". */
+  variantLabel?: string | null;
 };
+
+/**
+ * The line's identity key: two cart entries are the same line iff product AND
+ * variant match. Use everywhere a line is matched, keyed, or deduped.
+ */
+export function cartLineKey(item: Pick<CartItem, 'productId' | 'variantId'>): string {
+  return `${item.productId}:${item.variantId ?? ''}`;
+}
+
+/** Builds the "Size: M · Color: Red" label from a variant's option_values. */
+export function variantLabelFrom(optionValues: Record<string, string>): string {
+  return Object.entries(optionValues)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(' · ');
+}

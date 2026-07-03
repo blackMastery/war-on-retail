@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { createClient } from '@/lib/supabase/client';
 import { hydrateCartItems } from './hydrate';
-import type { CartItem } from './types';
+import { cartLineKey, type CartItem } from './types';
 import type { AppliedDiscount } from '@/types/discount';
 
 const STORAGE_KEY = 'wor_cart_v2';
@@ -27,12 +27,12 @@ type CartState = {
    *  hydration mismatch (server-rendered "0", then client snaps to "3"). */
   _hasHydrated: boolean;
 
-  /** Add one (or `qty`) of an item. Increments quantity if already in cart. */
+  /** Add one (or `qty`) of an item. Increments quantity if the same product+variant line exists. */
   addItem: (input: Omit<CartItem, 'quantity'>, qty?: number) => void;
-  /** Remove a line entirely. */
-  removeItem: (productId: string) => void;
+  /** Remove a line entirely. `variantId` is null for variantless lines. */
+  removeItem: (productId: string, variantId: string | null) => void;
   /** Set absolute qty. Setting to 0 (or below) removes the line. */
-  setQuantity: (productId: string, qty: number) => void;
+  setQuantity: (productId: string, variantId: string | null, qty: number) => void;
   /** Empty the cart. */
   clear: () => void;
 
@@ -54,12 +54,14 @@ type CartState = {
 
 const CART_PRODUCT_SELECT =
   'id, slug, name, price, featured_image_url, sku, track_inventory, stock_quantity, is_pre_order_enabled';
+const CART_VARIANT_SELECT =
+  'id, product_id, option_values, sku, price, stock_quantity, image_url, is_active';
 
 async function loadCartFromDb(userId: string): Promise<CartItem[]> {
   const supabase = createClient();
   const { data: rows, error } = await supabase
     .from('cart_items')
-    .select('product_id, quantity')
+    .select('product_id, variant_id, quantity')
     .eq('user_id', userId)
     .order('created_at', { ascending: true });
   if (error) {
@@ -68,44 +70,69 @@ async function loadCartFromDb(userId: string): Promise<CartItem[]> {
   }
   if (!rows?.length) return [];
 
-  const productIds = rows.map((r) => r.product_id);
-  const { data: products, error: prodError } = await supabase
-    .from('products')
-    .select(CART_PRODUCT_SELECT)
-    .eq('is_active', true)
-    .in('id', productIds);
+  const productIds = [...new Set(rows.map((r) => r.product_id))];
+  const variantIds = [...new Set(rows.map((r) => r.variant_id).filter((v): v is string => !!v))];
+  const [{ data: products, error: prodError }, variantsRes] = await Promise.all([
+    supabase.from('products').select(CART_PRODUCT_SELECT).eq('is_active', true).in('id', productIds),
+    variantIds.length
+      ? createClient().from('product_variants').select(CART_VARIANT_SELECT).in('id', variantIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
   if (prodError) {
     console.error('[cart] products load failed', prodError);
     return [];
   }
+  if (variantsRes.error) {
+    console.error('[cart] variants load failed', variantsRes.error);
+    return [];
+  }
 
   const byId = new Map((products ?? []).map((p) => [p.id, p]));
+  // RLS only returns active variants, so a deactivated/deleted variant simply
+  // won't be found here and its line is dropped from the local mirror.
+  const variantById = new Map((variantsRes.data ?? []).map((v) => [v.id, v]));
   const hydrationRows = rows.flatMap((row) => {
     const product = byId.get(row.product_id);
     if (!product) return [];
-    return [{ quantity: row.quantity, products: product }];
+    const variant = row.variant_id ? variantById.get(row.variant_id) : null;
+    if (row.variant_id && !variant) return [];
+    return [{ quantity: row.quantity, products: product, variant: variant ?? null }];
   });
   return hydrateCartItems(hydrationRows);
 }
 
-function syncLineToDb(userId: string, productId: string, quantity: number) {
+function syncLineToDb(
+  userId: string,
+  productId: string,
+  variantId: string | null,
+  quantity: number,
+) {
   const supabase = createClient();
   if (quantity <= 0) {
-    supabase
+    // `.eq('variant_id', null)` never matches NULL — needs `.is()`.
+    const del = supabase
       .from('cart_items')
       .delete()
       .eq('user_id', userId)
-      .eq('product_id', productId)
-      .then(({ error }) => {
+      .eq('product_id', productId);
+    (variantId === null ? del.is('variant_id', null) : del.eq('variant_id', variantId)).then(
+      ({ error }) => {
         if (error) console.error('[cart] delete failed', error);
-      });
+      },
+    );
     return;
   }
   supabase
     .from('cart_items')
     .upsert(
-      { user_id: userId, product_id: productId, quantity, updated_at: new Date().toISOString() },
-      { onConflict: 'user_id,product_id' },
+      {
+        user_id: userId,
+        product_id: productId,
+        variant_id: variantId,
+        quantity,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,product_id,variant_id' },
     )
     .then(({ error }) => {
       if (error) console.error('[cart] upsert failed', error);
@@ -127,44 +154,49 @@ export const useCartStore = create<CartState>()(
 
       addItem: (input, qty = 1) => {
         if (qty <= 0) return;
+        // Normalise so cartLineKey and DB writes always see explicit null.
+        const line = { ...input, variantId: input.variantId ?? null };
+        const key = cartLineKey(line);
         const items = get().items;
-        const existing = items.find((i) => i.productId === input.productId);
+        const existing = items.find((i) => cartLineKey(i) === key);
         let nextItems: CartItem[];
         if (existing) {
           nextItems = items.map((i) =>
-            i.productId === input.productId ? { ...i, quantity: i.quantity + qty } : i,
+            cartLineKey(i) === key ? { ...i, quantity: i.quantity + qty } : i,
           );
         } else {
-          nextItems = [...items, { ...input, quantity: qty }];
+          nextItems = [...items, { ...line, quantity: qty }];
         }
         set({ items: nextItems, appliedDiscount: null });
         const uid = get().authUserId;
         if (uid) {
-          const line = nextItems.find((i) => i.productId === input.productId);
-          if (line) syncLineToDb(uid, line.productId, line.quantity);
+          const saved = nextItems.find((i) => cartLineKey(i) === key);
+          if (saved) syncLineToDb(uid, saved.productId, saved.variantId ?? null, saved.quantity);
         }
       },
 
-      removeItem: (productId) => {
+      removeItem: (productId, variantId) => {
+        const key = cartLineKey({ productId, variantId });
         set({
-          items: get().items.filter((i) => i.productId !== productId),
+          items: get().items.filter((i) => cartLineKey(i) !== key),
           appliedDiscount: null,
         });
         const uid = get().authUserId;
-        if (uid) syncLineToDb(uid, productId, 0);
+        if (uid) syncLineToDb(uid, productId, variantId, 0);
       },
 
-      setQuantity: (productId, qty) => {
+      setQuantity: (productId, variantId, qty) => {
+        const key = cartLineKey({ productId, variantId });
         const items = get().items;
         let nextItems: CartItem[];
         if (qty <= 0) {
-          nextItems = items.filter((i) => i.productId !== productId);
+          nextItems = items.filter((i) => cartLineKey(i) !== key);
         } else {
-          nextItems = items.map((i) => (i.productId === productId ? { ...i, quantity: qty } : i));
+          nextItems = items.map((i) => (cartLineKey(i) === key ? { ...i, quantity: qty } : i));
         }
         set({ items: nextItems, appliedDiscount: null });
         const uid = get().authUserId;
-        if (uid) syncLineToDb(uid, productId, qty);
+        if (uid) syncLineToDb(uid, productId, variantId, qty);
       },
 
       clear: () => {
@@ -196,7 +228,11 @@ export const useCartStore = create<CartState>()(
           const local = get().items;
           if (local.length > 0) {
             const { error } = await supabase.rpc('merge_cart', {
-              p_items: local.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
+              p_items: local.map((i) => ({
+                product_id: i.productId,
+                variant_id: i.variantId ?? null,
+                quantity: i.quantity,
+              })),
             });
             if (error) console.error('[cart] merge failed', error);
           }
@@ -206,9 +242,12 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
+      // Key stays 'wor_cart_v2' deliberately — renaming it would orphan every
+      // existing guest cart (migrate only runs against the same key). The
+      // `version` field below is what actually tracks the schema.
       name: STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         // Signed-in carts live in the DB; persisting items here would re-merge
         // stale localStorage lines into the account on every page load.
@@ -218,7 +257,12 @@ export const useCartStore = create<CartState>()(
       migrate: (persisted) => {
         const p = (persisted ?? {}) as Partial<CartState>;
         return {
-          items: p.items ?? [],
+          // v2 → v3: lines gain variant identity; legacy rows are variantless.
+          items: (p.items ?? []).map((i) => ({
+            ...i,
+            variantId: i.variantId ?? null,
+            variantLabel: i.variantLabel ?? null,
+          })),
           appliedDiscount: p.appliedDiscount ?? null,
         } as CartState;
       },

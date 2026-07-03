@@ -1,16 +1,18 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { upsertProduct, type ProductFormState } from '@/app/admin/(panel)/products/actions';
 import ProductImagesField from '@/components/admin/ProductImagesField';
 import SeoMetaFields from '@/components/admin/SeoMetaFields';
 import SpecificationsField from '@/components/admin/SpecificationsField';
-import type { Brand, Category, Product } from '@/types/database';
+import VariantsField from '@/components/admin/VariantsField';
+import type { Brand, Category, Product, ProductVariant } from '@/types/database';
 
 type Props = {
   product?: Product;
   categories: Category[];
   brands: Brand[];
+  variants?: ProductVariant[];
 };
 
 const initial: ProductFormState = {};
@@ -37,12 +39,23 @@ function bool(
   return fallback;
 }
 
-export default function ProductForm({ product, categories, brands }: Props) {
+export default function ProductForm({ product, categories, brands, variants = [] }: Props) {
   const [state, action, pending] = useActionState(upsertProduct, initial);
   const err = (k: string) => state.fieldErrors?.[k];
   const values = state.values;
   const formKey = state.formKey ?? 'initial';
   const k = (name: string) => `${name}-${formKey}`;
+
+  // Gallery URLs lifted from ProductImagesField so the variant matrix can
+  // offer just-uploaded images without a save round-trip.
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(() =>
+    [product?.featured_image_url, ...(product?.image_urls ?? [])].filter(
+      (u): u is string => !!u,
+    ),
+  );
+  // True while at least one variant combination exists — stock is then owned
+  // by the variant rows (a DB trigger keeps the product total in sync).
+  const [variantManaged, setVariantManaged] = useState(variants.length > 0);
 
   return (
     <form action={action} className="space-y-6">
@@ -100,6 +113,12 @@ export default function ProductForm({ product, categories, brands }: Props) {
       </Section>
 
       <Section title="Pricing">
+        {variantManaged && (
+          <p className="text-xs text-muted-foreground">
+            This product has variants — customers pay the variant price. The
+            base price below is only a fallback and prefill for new variants.
+          </p>
+        )}
         <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Price (GYD)" error={err('price')}>
             <input
@@ -144,18 +163,24 @@ export default function ProductForm({ product, categories, brands }: Props) {
 
       <Section title="Inventory">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Stock quantity" error={err('stock_quantity')}>
+          <Field
+            label="Stock quantity"
+            error={err('stock_quantity')}
+            hint={variantManaged ? 'Managed per variant — total is kept in sync automatically.' : undefined}
+          >
             <input
               key={k('stock_quantity')}
               name="stock_quantity"
               type="number"
               min="0"
+              readOnly={variantManaged}
+              aria-readonly={variantManaged}
               defaultValue={str(
                 values,
                 'stock_quantity',
                 product?.stock_quantity != null ? String(product.stock_quantity) : '0',
               )}
-              className={INPUT}
+              className={`${INPUT} ${variantManaged ? 'bg-muted text-muted-foreground' : ''}`}
             />
           </Field>
           <Field label="Low-stock threshold" error={err('low_stock_threshold')}>
@@ -266,6 +291,23 @@ export default function ProductForm({ product, categories, brands }: Props) {
           initialUrls={product?.image_urls ?? []}
           initialImageMeta={product?.image_meta ?? {}}
           initialFeaturedAlt={product?.featured_image_alt ?? null}
+          onUrlsChange={setGalleryUrls}
+        />
+      </Section>
+
+      <Section title="Variants">
+        <p className="text-xs text-muted-foreground">
+          Sell this product in multiple versions (e.g. sizes or colors). Each
+          combination gets its own SKU, price, stock and an image picked from
+          the gallery above. Leave empty for a single-version product.
+        </p>
+        <VariantsField
+          initialOptions={product?.options ?? []}
+          initialVariants={variants}
+          galleryUrls={galleryUrls}
+          basePrice={product?.price ?? null}
+          onVariantManagedChange={setVariantManaged}
+          error={err('variants')}
         />
       </Section>
 

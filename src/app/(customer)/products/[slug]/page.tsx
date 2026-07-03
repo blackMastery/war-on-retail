@@ -7,6 +7,7 @@ import { getStoreSettings } from '@/lib/store-settings';
 import AddToCartButton from '@/components/customer/AddToCartButton';
 import ProductCard from '@/components/customer/ProductCard';
 import ProductGallery from '@/components/customer/ProductGallery';
+import ProductPurchasePanel from '@/components/customer/ProductPurchasePanel';
 import RecentlyViewedStrip from '@/components/customer/RecentlyViewedStrip';
 import RecentlyViewedTracker from '@/components/customer/RecentlyViewedTracker';
 import WishlistButton from '@/components/customer/WishlistButton';
@@ -238,12 +239,20 @@ export default async function ProductDetailPage({
   // "More from {brand}" strip when the brand has at least 3 other items.
   // Both queries run in parallel; we de-duplicate after the fact so the user
   // never sees the same product in both rows.
-  const [related, brandMore, customerCtx, reviewSummary] = await Promise.all([
-    fetchRelatedProducts(supabase, product, { limit: 8 }),
-    fetchMoreFromBrand(supabase, product, { limit: 6 }),
-    getCustomerContext(),
-    fetchApprovedProductReviews(supabase, product.id),
-  ]);
+  const [related, brandMore, customerCtx, reviewSummary, { data: variantRows }] =
+    await Promise.all([
+      fetchRelatedProducts(supabase, product, { limit: 8 }),
+      fetchMoreFromBrand(supabase, product, { limit: 6 }),
+      getCustomerContext(),
+      fetchApprovedProductReviews(supabase, product.id),
+      supabase
+        .from('product_variants')
+        .select('*')
+        .eq('product_id', product.id)
+        .eq('is_active', true)
+        .order('position'),
+    ]);
+  const variants = variantRows ?? [];
   const relatedIds = new Set(related.map((p) => p.id));
   const brandMoreDeduped = brandMore.filter((p) => !relatedIds.has(p.id)).slice(0, 4);
 
@@ -302,6 +311,32 @@ export default async function ProductDetailPage({
         <span className="text-secondary-foreground">{product.name}</span>
       </nav>
 
+      {variants.length > 0 ? (
+        /* Variantized product — a client island owns the option selection so
+           the gallery, price, stock card and add-to-cart react together. */
+        <ProductPurchasePanel
+          product={{
+            id: product.id,
+            slug: product.slug,
+            name: product.name,
+            sku: product.sku,
+            price: product.price,
+            featured_image_url: product.featured_image_url,
+            short_description: product.short_description,
+            description: product.description,
+            track_inventory: product.track_inventory,
+            is_pre_order_enabled: product.is_pre_order_enabled,
+            pre_order_message: product.pre_order_message,
+            specifications: specs,
+          }}
+          brand={brand ? { name: brand.name, slug: brand.slug } : null}
+          options={product.options}
+          variants={variants}
+          images={allImages}
+          imageMeta={galleryImageMeta}
+          settings={{ whatsapp: settings.whatsapp, phone: settings.phone }}
+        />
+      ) : (
       <div className="grid gap-8 md:grid-cols-2">
         {/* Gallery */}
         <ProductGallery
@@ -438,6 +473,7 @@ export default async function ProductDetailPage({
           )}
         </div>
       </div>
+      )}
 
       <section id="reviews" aria-labelledby="reviews-heading" className="mt-16 scroll-mt-28">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">

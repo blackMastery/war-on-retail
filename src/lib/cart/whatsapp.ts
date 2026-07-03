@@ -38,9 +38,10 @@ export function buildInquiryMessage(items: CartItem[], info: CartStoreInfo): str
   items.forEach((item, i) => {
     const lineTotal = item.price * item.quantity;
     subtotal += lineTotal;
+    const variantPart = item.variantLabel ? ` [${item.variantLabel}]` : '';
     const skuPart = item.sku ? ` (SKU: ${item.sku})` : '';
     lines.push(
-      `${i + 1}. ${item.name}${skuPart} × ${item.quantity} — ${formatPrice(lineTotal)}`,
+      `${i + 1}. ${item.name}${variantPart}${skuPart} × ${item.quantity} — ${formatPrice(lineTotal)}`,
     );
   });
 

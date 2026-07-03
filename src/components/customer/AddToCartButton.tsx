@@ -7,7 +7,7 @@ import { CheckIcon, ClockIcon, ShoppingBagIcon } from '@heroicons/react/24/outli
 import { useCartHydrated, useCartStore } from '@/lib/cart/store';
 import type { CartItem } from '@/lib/cart/types';
 
-type Mode = 'add' | 'preorder' | 'unavailable';
+type Mode = 'add' | 'preorder' | 'unavailable' | 'choose';
 
 type Props = {
   /** The product to add — same fields as a CartItem minus `quantity` + `isPreOrder`. */
@@ -22,6 +22,9 @@ type Props = {
    *   - `add`         — normal "Add to cart"
    *   - `preorder`    — enabled, label = "Pre-order"; adds the line with `isPreOrder=true`
    *   - `unavailable` — disabled, label = "Out of stock"
+   *   - `choose`      — variantized product on a card: navigates to the product
+   *                     page ("Choose options") instead of adding the parent,
+   *                     which the checkout would reject with VARIANT_REQUIRED
    *
    * Defaults to `add` when neither `mode` nor `disabled` is set. Callers
    * derive this from `productAvailability(product)`.
@@ -58,7 +61,11 @@ export default function AddToCartButton({
   const hydrated = useCartHydrated();
   const addItem = useCartStore((s) => s.addItem);
   const cartQuantity = useCartStore((s) => {
-    const line = s.items.find((i) => i.productId === product.productId);
+    const line = s.items.find(
+      (i) =>
+        i.productId === product.productId &&
+        (i.variantId ?? null) === (product.variantId ?? null),
+    );
     return line?.quantity ?? 0;
   });
   const [justAdded, setJustAdded] = useState(false);
@@ -69,8 +76,9 @@ export default function AddToCartButton({
   const effectiveMode: Mode = disabled ? 'unavailable' : (mode ?? 'add');
   const isPreOrder = effectiveMode === 'preorder';
   const isUnavailable = effectiveMode === 'unavailable';
-  const inCart = hydrated && cartQuantity > 0;
-  const showInCart = !isUnavailable && (justAdded || inCart);
+  const isChoose = effectiveMode === 'choose';
+  const inCart = hydrated && cartQuantity > 0 && !isChoose;
+  const showInCart = !isUnavailable && !isChoose && (justAdded || inCart);
 
   // Clear the feedback after FEEDBACK_MS, but reset the timer if the user
   // mashes the button so they always see the latest "Added!" cycle.
@@ -90,6 +98,10 @@ export default function AddToCartButton({
     e.preventDefault();
     e.stopPropagation();
     if (isUnavailable) return;
+    if (isChoose) {
+      router.push(`/products/${product.slug}`);
+      return;
+    }
     if (inCart && !justAdded) {
       router.push(variant === 'compact' ? `/products/${product.slug}` : '/cart');
       return;
@@ -116,17 +128,19 @@ export default function AddToCartButton({
 
   const ariaLabel = isUnavailable
     ? 'Out of stock'
-    : showInCart
-      ? inCart && !justAdded
-        ? variant === 'compact'
-          ? `View ${product.name} details`
-          : `Go to cart (${cartQuantity} in cart)`
+    : isChoose
+      ? `Choose options for ${product.name}`
+      : showInCart
+        ? inCart && !justAdded
+          ? variant === 'compact'
+            ? `View ${product.name} details`
+            : `Go to cart (${cartQuantity} in cart)`
+          : isPreOrder
+            ? 'Pre-order added to cart'
+            : 'Added to cart'
         : isPreOrder
-          ? 'Pre-order added to cart'
-          : 'Added to cart'
-      : isPreOrder
-        ? 'Pre-order'
-        : 'Add to cart';
+          ? 'Pre-order'
+          : 'Add to cart';
 
   return (
     <>
@@ -151,9 +165,11 @@ export default function AddToCartButton({
                 ? 'incart'
                 : isUnavailable
                   ? 'unavailable'
-                  : isPreOrder
-                    ? 'preorder'
-                    : 'add'
+                  : isChoose
+                    ? 'choose'
+                    : isPreOrder
+                      ? 'preorder'
+                      : 'add'
             }
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -196,6 +212,18 @@ export default function AddToCartButton({
                   </>
                 ) : (
                   'Out of stock'
+                )}
+              </>
+            ) : isChoose ? (
+              <>
+                <ShoppingBagIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                {variant === 'compact' ? (
+                  <>
+                    <span className="sm:hidden">Options</span>
+                    <span className="hidden sm:inline">Choose options</span>
+                  </>
+                ) : (
+                  'Choose options'
                 )}
               </>
             ) : isPreOrder ? (

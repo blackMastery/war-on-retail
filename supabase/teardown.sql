@@ -9,6 +9,7 @@
 drop table if exists public.chatbot_conversations cascade;
 drop table if exists public.faqs                  cascade;
 drop table if exists public.faq_categories        cascade;
+drop table if exists public.product_variants      cascade;
 drop table if exists public.products              cascade;
 drop table if exists public.brands                cascade;
 drop table if exists public.categories            cascade;
@@ -16,6 +17,7 @@ drop table if exists public.admin_users           cascade;
 
 -- Drop functions we created.
 drop function if exists public.search_products(text, integer, integer);
+drop function if exists public.sync_product_variant_aggregates() cascade;
 drop function if exists public.set_updated_at() cascade;
 
 -- Clear out the storage.objects policies our migrations installed.

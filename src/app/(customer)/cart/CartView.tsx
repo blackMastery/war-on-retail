@@ -12,6 +12,7 @@ import {
   useCartStore,
 } from '@/lib/cart/store';
 import { buildInquiryUrl } from '@/lib/cart/whatsapp';
+import { cartLineKey } from '@/lib/cart/types';
 import { formatPrice } from '@/lib/utils';
 import DiscountCodeInput from '@/components/customer/DiscountCodeInput';
 
@@ -83,7 +84,7 @@ export default function CartView({
         <AnimatePresence initial={false}>
         {items.map((item) => (
           <motion.li
-            key={item.productId}
+            key={cartLineKey(item)}
             layout
             exit={{ opacity: 0, x: -24, transition: { duration: 0.2, ease: 'easeOut' } }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
@@ -125,13 +126,16 @@ export default function CartView({
                 </Link>
                 <button
                   type="button"
-                  onClick={() => removeItem(item.productId)}
+                  onClick={() => removeItem(item.productId, item.variantId ?? null)}
                   aria-label={`Remove ${item.name} from cart`}
                   className="shrink-0 rounded-full p-1.5 text-muted-foreground hover:bg-red-50 hover:text-red-600"
                 >
                   <TrashIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
+              {item.variantLabel && (
+                <p className="mt-0.5 text-xs text-secondary-foreground">{item.variantLabel}</p>
+              )}
               {item.sku && (
                 <p className="mt-0.5 font-mono text-xs text-muted-foreground">SKU: {item.sku}</p>
               )}
@@ -144,7 +148,7 @@ export default function CartView({
               <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-2">
                 <QuantityStepper
                   value={item.quantity}
-                  onChange={(q) => setQuantity(item.productId, q)}
+                  onChange={(q) => setQuantity(item.productId, item.variantId ?? null, q)}
                   label={`Quantity of ${item.name}`}
                 />
                 <div className="text-right">

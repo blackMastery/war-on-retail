@@ -41,7 +41,12 @@ export default function ProductCard({
   className,
 }: ProductCardProps) {
   const isStrip = layout === 'strip';
-  const discount = calculateDiscount(product.price, product.compare_at_price);
+  // Variantized products: the base price/compare-at aren't what the customer
+  // pays, so show a "from {min}" price and no discount badge instead.
+  const hasVariants = product.has_variants && product.variant_price_min != null;
+  const discount = hasVariants
+    ? 0
+    : calculateDiscount(product.price, product.compare_at_price);
   const availability = productAvailability(product);
   const isOutOfStock = availability === 'out-of-stock';
   const isPreOrder = availability === 'pre-order';
@@ -149,14 +154,25 @@ export default function ProductCard({
               isStrip ? 'text-lg' : 'text-base sm:text-lg',
             )}
           >
-            {formatPrice(product.price)}
+            {hasVariants ? (
+              <>
+                {product.variant_price_min !== product.variant_price_max && (
+                  <span className="text-xs font-normal text-muted-foreground">from </span>
+                )}
+                {formatPrice(product.variant_price_min as number)}
+              </>
+            ) : (
+              formatPrice(product.price)
+            )}
           </span>
-          {product.compare_at_price && product.compare_at_price > product.price && (
-            <del className="text-xs text-muted-foreground line-through sm:text-sm">
-              <span className="sr-only">Original price: </span>
-              {formatPrice(product.compare_at_price)}
-            </del>
-          )}
+          {!hasVariants &&
+            product.compare_at_price &&
+            product.compare_at_price > product.price && (
+              <del className="text-xs text-muted-foreground line-through sm:text-sm">
+                <span className="sr-only">Original price: </span>
+                {formatPrice(product.compare_at_price)}
+              </del>
+            )}
         </div>
         {!isStrip && product.track_inventory && !isOutOfStock && (
           <p className="mt-1 hidden text-xs text-muted-foreground sm:block">
@@ -167,7 +183,18 @@ export default function ProductCard({
         <div className={cn('relative z-10 mt-auto', isStrip ? 'pt-3' : 'pt-2 sm:pt-3')}>
           <AddToCartButton
             variant="compact"
-            mode={isOutOfStock ? 'unavailable' : isPreOrder ? 'preorder' : 'add'}
+            // Variantized products can't be added from the card — the parent
+            // line would be rejected at checkout (VARIANT_REQUIRED). Send the
+            // customer to the product page to pick options instead.
+            mode={
+              isOutOfStock
+                ? 'unavailable'
+                : product.has_variants
+                  ? 'choose'
+                  : isPreOrder
+                    ? 'preorder'
+                    : 'add'
+            }
             product={{
               productId: product.id,
               slug: product.slug,

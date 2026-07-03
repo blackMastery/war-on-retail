@@ -147,11 +147,19 @@ export async function importProductsCsv(_: unknown, fd: FormData): Promise<Impor
       // Upsert by slug (slug has a unique index).
       const { data: existing } = await supabase
         .from('products')
-        .select('id')
+        .select('id, has_variants')
         .eq('slug', slug)
         .maybeSingle();
       if (existing) {
-        const { error } = await supabase.from('products').update(payload).eq('id', existing.id);
+        // Variantized products own their stock via the variant rows (a DB
+        // trigger keeps the total in sync) — a CSV stock value would clobber
+        // it with a bogus number until the next variant write.
+        const { stock_quantity: _stock, ...rest } = payload;
+        const updatePayload = existing.has_variants ? rest : payload;
+        const { error } = await supabase
+          .from('products')
+          .update(updatePayload)
+          .eq('id', existing.id);
         if (error) errors.push({ row: rowNo, message: error.message });
         else updated++;
       } else {

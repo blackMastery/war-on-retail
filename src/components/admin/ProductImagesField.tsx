@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import Image from 'next/image';
 import { uploadProductImage } from '@/app/admin/(panel)/products/image-actions';
 import type { ProductImageMeta } from '@/types/database';
@@ -22,6 +22,11 @@ type Props = {
   initialImageMeta?: Record<string, ProductImageMeta>;
   /** Featured image's alt — stored on its own column for fast SSR lookup. */
   initialFeaturedAlt?: string | null;
+  /**
+   * Fires with the current uploaded URLs (featured first) whenever the set
+   * changes — lets the surrounding form offer them elsewhere (variant images).
+   */
+  onUrlsChange?: (urls: string[]) => void;
 };
 
 const EMPTY_META: ProductImageMeta = { alt: null, caption: null, keywords: null };
@@ -31,6 +36,7 @@ export default function ProductImagesField({
   initialUrls = [],
   initialImageMeta = {},
   initialFeaturedAlt = null,
+  onUrlsChange,
 }: Props) {
   // Combine featured + gallery into one ordered list. Featured starts at index 0.
   const seed: ImageItem[] = [
@@ -58,9 +64,27 @@ export default function ProductImagesField({
   const [pending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const featuredUrl = featuredIndex >= 0 ? items[featuredIndex]?.url ?? '' : '';
-  const galleryUrls = items.filter((_, i) => i !== featuredIndex).map((it) => it.url);
+  // Only finished uploads may reach the hidden inputs. Placeholder rows keep
+  // a "pending:<filename>" fake URL while uploading (or after a failed
+  // upload) — saving the form mid-upload used to persist that string into
+  // featured_image_url/image_urls and crash next/image on the storefront.
+  const isReady = (it: ImageItem | undefined): it is ImageItem =>
+    !!it && !it.uploading && !it.error && !it.url.startsWith('pending:');
+  const readyUrls = items.filter(isReady).map((it) => it.url);
+  const featuredPick = featuredIndex >= 0 ? items[featuredIndex] : undefined;
+  // If the chosen featured is still uploading at save time, fall back to the
+  // first completed image rather than saving a product with no hero.
+  const featuredUrl = isReady(featuredPick) ? featuredPick.url : readyUrls[0] ?? '';
+  const galleryUrls = readyUrls.filter((u) => u !== featuredUrl);
   const featuredAlt = featuredUrl ? imageMeta[featuredUrl]?.alt ?? '' : '';
+
+  // Report the finished-upload URLs upward (featured first).
+  const uploadedUrls = [...(featuredUrl ? [featuredUrl] : []), ...galleryUrls];
+  const uploadedKey = uploadedUrls.join('\n');
+  useEffect(() => {
+    onUrlsChange?.(uploadedUrls);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadedKey]);
 
   // Strip metadata for URLs that aren't in the live list anymore, so the
   // server doesn't get a bag of orphans to walk through. Featured + gallery

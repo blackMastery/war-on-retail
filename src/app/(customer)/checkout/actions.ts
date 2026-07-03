@@ -82,6 +82,9 @@ const PlaceOrderInput = z.object({
     .array(
       z.object({
         product_id: z.string().uuid(),
+        // Chosen variant — omitted for variantless products. The RPC verifies
+        // it belongs to the product and rejects variantized products without one.
+        variant_id: z.string().uuid().optional(),
         quantity: z.number().int().min(1).max(99),
       }),
     )
@@ -142,6 +145,18 @@ export async function placeOrderAction(input: PlaceOrderInputT): Promise<PlaceOr
       return {
         error:
           "An item in your cart is no longer available. Please remove it and try again.",
+      };
+    }
+    if (msg.startsWith('VARIANT_MISSING')) {
+      return {
+        error:
+          'A version of an item in your cart is no longer available. Please remove it and pick another option.',
+      };
+    }
+    if (msg.startsWith('VARIANT_REQUIRED')) {
+      return {
+        error:
+          'An item in your cart now comes in multiple options. Please remove it and re-add it choosing the options you want.',
       };
     }
     // Discount-specific failures (the RPC re-validates the code). All map to a

@@ -179,7 +179,11 @@ export default function CheckoutWizard({
         customer: draft.customer,
         fulfillment: draft.fulfillment as WizardDraft['fulfillment'] & { type: 'delivery' | 'pickup' },
         paymentMethodId: draft.paymentMethodId,
-        items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
+        items: items.map((i) => ({
+          product_id: i.productId,
+          variant_id: i.variantId ?? undefined,
+          quantity: i.quantity,
+        })),
         discountCode: appliedDiscount?.code,
       });
       if (result?.error) {
@@ -773,7 +777,7 @@ function OrderSummary({
         <h2 className="text-lg font-bold">Order summary</h2>
         <ul role="list" className="divide-y divide-border">
           {items.map((item) => (
-            <li key={item.productId} className="flex gap-3 py-3">
+            <li key={`${item.productId}:${item.variantId ?? ''}`} className="flex gap-3 py-3">
               <span className="relative block h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border">
                 {item.imageUrl ? (
                   <Image
@@ -794,6 +798,11 @@ function OrderSummary({
               </span>
               <span className="min-w-0 flex-1 text-sm">
                 <span className="line-clamp-2 font-medium text-foreground">{item.name}</span>
+                {item.variantLabel && (
+                  <span className="block text-xs text-secondary-foreground">
+                    {item.variantLabel}
+                  </span>
+                )}
                 <span className="block text-xs text-muted-foreground tabular-nums">
                   Qty {item.quantity} · {formatPrice(item.price)}
                 </span>
