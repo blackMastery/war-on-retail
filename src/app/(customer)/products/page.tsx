@@ -20,7 +20,7 @@ export async function generateMetadata() {
   return pageMetadata('products', { title: 'All Products' });
 }
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 10;
 
 export default async function ProductsPage({
   searchParams,
