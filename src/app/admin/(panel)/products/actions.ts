@@ -58,8 +58,11 @@ export type ProductFormState = {
   formKey?: string;
 };
 
-function parseForm(fd: FormData) {
-  const raw = Object.fromEntries(fd.entries());
+function parseForm(fd: FormData): Record<string, string> {
+  const raw: Record<string, string> = {};
+  for (const [key, value] of fd.entries()) {
+    raw[key] = typeof value === 'string' ? value : value.name;
+  }
   // checkboxes are absent when unchecked — normalise booleans
   raw.track_inventory = String(fd.get('track_inventory') === 'on' || fd.get('track_inventory') === 'true');
   raw.is_active = String(fd.get('is_active') === 'on' || fd.get('is_active') === 'true');
