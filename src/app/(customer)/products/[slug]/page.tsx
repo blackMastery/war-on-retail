@@ -466,7 +466,7 @@ export default async function ProductDetailPage({
           )}
 
           {product.description && (
-            <div className="prose-theme prose-sm mt-8 max-w-none">
+            <div className="prose-theme prose-sm mt-8 max-w-none rounded-[10px] border border-white bg-destructive-foreground px-[10px] py-[5px]">
               <h2 className="text-lg font-semibold text-foreground">Description</h2>
               <p className="text-black">{product.description}</p>
             </div>
