@@ -166,7 +166,7 @@ export default function ProductCard({
             )}
           </span>
           {!hasVariants &&
-            product.compare_at_price &&
+            product.compare_at_price != null &&
             product.compare_at_price > product.price && (
               <del className="text-xs text-muted-foreground line-through sm:text-sm">
                 <span className="sr-only">Original price: </span>
