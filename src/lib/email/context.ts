@@ -52,7 +52,11 @@ export async function buildOrderEmailContext(
   if (!order) return null;
 
   const [{ data: customer }, { data: items }, settings] = await Promise.all([
-    supabase.from('customers').select('name, email').eq('id', order.customer_id).maybeSingle(),
+    supabase
+      .from('customers')
+      .select('name, email, phone')
+      .eq('id', order.customer_id)
+      .maybeSingle(),
     supabase
       .from('order_items')
       .select('product_name, quantity, line_total')
@@ -79,6 +83,7 @@ export async function buildOrderEmailContext(
 
   const vars: EmailVars = {
     customer_name: customer?.name ?? 'there',
+    customer_phone: customer?.phone ?? '',
     order_number: order.order_number,
     order_status: order.status,
     order_total: formatPrice(payable),
@@ -88,6 +93,7 @@ export async function buildOrderEmailContext(
       year: 'numeric',
     }),
     order_items: orderItemsHtml,
+    admin_order_url: `${settings.url.replace(/\/$/, '')}/admin/orders/${orderId}`,
     site_name: brand.name,
     site_phone: brand.phone,
     site_email: brand.email,

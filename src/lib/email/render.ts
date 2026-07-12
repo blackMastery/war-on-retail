@@ -38,12 +38,19 @@ export type EmailVariableDef = {
 };
 
 export const EMAIL_VARIABLES: EmailVariableDef[] = [
-  { key: 'customer_name', label: 'Customer name', description: "The recipient's name", sample: 'Jordan Singh' },
+  { key: 'customer_name', label: 'Customer name', description: "The customer's name", sample: 'Jordan Singh' },
+  { key: 'customer_phone', label: 'Customer phone', description: "The customer's phone number", sample: '+5926123456' },
   { key: 'order_number', label: 'Order number', description: 'e.g. WOR-2026-000042', sample: 'WOR-2026-000042' },
   { key: 'order_status', label: 'Order status', description: 'pending / approved / fulfilled / cancelled', sample: 'approved' },
   { key: 'order_total', label: 'Order total', description: 'Payable total, formatted', sample: 'GYD $125,000' },
   { key: 'order_date', label: 'Order date', description: 'When the order was placed', sample: '15 June 2026' },
   { key: 'order_items', label: 'Order items', description: 'Itemised table of the order', sample: '' },
+  {
+    key: 'admin_order_url',
+    label: 'Admin order URL',
+    description: 'Direct link to the order in /admin',
+    sample: 'https://www.waronretailguyana.com/admin/orders/00000000-0000-0000-0000-000000000001',
+  },
   { key: 'site_name', label: 'Store name', description: 'From store settings', sample: 'War on Retail' },
   { key: 'site_phone', label: 'Store phone', description: 'From store settings', sample: '592-694-3827' },
   { key: 'site_email', label: 'Store email', description: 'From store settings', sample: 'info@waronretail.com' },

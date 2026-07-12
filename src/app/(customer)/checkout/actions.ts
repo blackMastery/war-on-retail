@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { sendOrderEmail } from '@/lib/email/send';
+import { sendOrderEmail, sendAdminNewOrderEmails } from '@/lib/email/send';
 
 /**
  * Result of the returning-customer lookup. `found:false` covers both "no such
@@ -190,14 +190,19 @@ export async function placeOrderAction(input: PlaceOrderInputT): Promise<PlaceOr
     return { error: 'Order was created but no order number returned. Please contact us.' };
   }
 
-  // Best-effort confirmation email. Fires when the customer supplied an email
-  // at checkout (or already has one on file from an admin). No-ops otherwise.
-  // Never let an email hiccup affect the placed-order result.
+  // Best-effort emails. Customer confirmation fires when they have an email on
+  // file; admin alerts go to every active admin_users row. Neither may affect
+  // the placed-order result.
   if (row?.order_id) {
     try {
       await sendOrderEmail({ orderId: row.order_id, slug: 'order_confirmation' });
     } catch (err) {
       console.error('[checkout] confirmation email failed', err);
+    }
+    try {
+      await sendAdminNewOrderEmails({ orderId: row.order_id });
+    } catch (err) {
+      console.error('[checkout] admin new-order email failed', err);
     }
   }
 

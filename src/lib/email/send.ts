@@ -127,6 +127,57 @@ export async function sendOrderEmail(args: {
 }
 
 /**
+ * Notifies every active admin that a new order landed. One send (and email_log
+ * row) per admin. Best-effort: no-ops when the template is missing/inactive or
+ * there are no admin emails; never throws.
+ */
+export async function sendAdminNewOrderEmails(args: {
+  orderId: string;
+}): Promise<void> {
+  try {
+    const template = await getTemplateBySlug('admin_new_order');
+    if (!template || !template.is_active) return;
+
+    const ctx = await buildOrderEmailContext(args.orderId);
+    if (!ctx) return;
+
+    const supabase = createAdminClient();
+    const { data: admins, error } = await supabase
+      .from('admin_users')
+      .select('email')
+      .eq('is_active', true);
+    if (error) {
+      console.error('[email] failed to load admin recipients', error);
+      return;
+    }
+
+    const recipients = [
+      ...new Set(
+        (admins ?? [])
+          .map((a) => (a.email ?? '').trim().toLowerCase())
+          .filter((e) => e.length > 0),
+      ),
+    ];
+    if (recipients.length === 0) return;
+
+    const { subject, html } = renderTemplate(template, ctx.vars, ctx.brand);
+    await Promise.allSettled(
+      recipients.map((to) =>
+        sendEmail({
+          to,
+          subject,
+          html,
+          templateSlug: 'admin_new_order',
+          orderId: args.orderId,
+        }),
+      ),
+    );
+  } catch (err) {
+    console.error('[email] admin new-order notification failed', err);
+  }
+}
+
+/**
  * Sends a saved template to a test address using the preview sample data, so an
  * admin can verify real delivery (or see the logged fallback) from the editor.
  */
